@@ -2,7 +2,8 @@
 
 mapperMO is a prototype of an implementation Computational Analogy system investigating
 Word Embedding / semantic similarity ideas using a Multiple Objective Optimisation 
-framework developed at University of Coimbra.
+framework developed at University of Coimbra. The main purpose of this prototype is the
+creation of analogies/mappings of concepts to be used by a Conceptual Blending system.
 
 # Licensing
 
