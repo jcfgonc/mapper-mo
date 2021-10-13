@@ -1,0 +1,27 @@
+node {
+	fill-color: #00C0C0;
+	size: 24px;
+	text-size: 48;
+	text-color: blue;
+	text-font: verdana;
+	text-style: normal;
+}
+
+node.blend {
+	fill-color: #FF00FF;
+}
+
+edge {
+	fill-color: #FF0080;
+	size: 4px;
+	text-size: 48;
+	text-color: black;
+	shape: angle;
+	text-font: verdana;
+	text-style: normal;
+}
+
+edge.red {
+	fill-color: red;
+	text-color: red;
+}

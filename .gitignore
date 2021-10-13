@@ -1,0 +1,9 @@
+/.settings/
+/bin/
+/target/
+/data/
+/*.tsv
+/screenshots_
+/screenshots
+/libs/
+/tgf/

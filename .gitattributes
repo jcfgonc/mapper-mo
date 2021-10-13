@@ -1,0 +1,7 @@
+*.java linguist-detectable=true
+*.css linguist-detectable=false
+*.js linguist-detectable=false
+*.pl linguist-detectable=false
+*.htm* linguist-detectable=false
+*.xsl linguist-detectable=false
+*.xslt linguist-detectable=false
