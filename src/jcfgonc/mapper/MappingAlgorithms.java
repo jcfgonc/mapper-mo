@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.commons.math3.random.RandomGenerator;
@@ -21,7 +22,7 @@ import utils.VariousUtils;
 public class MappingAlgorithms {
 
 	/**
-	 * maps edges according to their label/direction around a reference concept
+	 * map edge label (+=outgoing, -=incoming) to the set of connected neighbors
 	 * 
 	 * @param reference
 	 * @param inputSpace
@@ -51,28 +52,37 @@ public class MappingAlgorithms {
 			RandomGenerator random, OrderedPair<String> refPair, HashSet<String> usedConcepts) {
 		// do the expansion
 		HashMap<String, OrderedPair<String>> pairs;
-		{
-			// get left/right edges
-			String left = refPair.getLeftElement();
-			String right = refPair.getRightElement();
+		// get left/right edges
+		String left = refPair.getLeftElement();
+		String right = refPair.getRightElement();
 
-			// left and right are expected to be different
-			assert !left.equals(right) : "left and right concepts of a pair are expected to be different";
+		// left and right are expected to be different
+		assert !left.equals(right) : "left and right concepts of a pair are expected to be different";
 
-			usedConcepts.add(left);
-			usedConcepts.add(right);
-			// create left/right edge maps according to labels+direction
-			MapOfSet<String, String> leftmap = mapEgdeLabelsDirToNeighbors(left, inputSpace, usedConcepts);
-			MapOfSet<String, String> rightmap = mapEgdeLabelsDirToNeighbors(right, inputSpace, usedConcepts);
-			// intersect maps' keys randomly
-			pairs = extractPairsFromMaps(leftmap, rightmap, random, usedConcepts);
-		}
+		usedConcepts.add(left);
+		usedConcepts.add(right);
+		// create left/right edge maps according to labels+direction
+		// map edge label(+=outgoing, -=incoming) to set of connected neighbors
+		MapOfSet<String, String> leftmap = mapEgdeLabelsDirToNeighbors(left, inputSpace, usedConcepts);
+		MapOfSet<String, String> rightmap = mapEgdeLabelsDirToNeighbors(right, inputSpace, usedConcepts);
+
+//		removeUselessRelations(leftmap);
+//		removeUselessRelations(rightmap);
+
+		// intersect maps' keys randomly
+		pairs = matchLeftRightMapsAndSelectRandom(leftmap, rightmap, random, usedConcepts);
 		// update the pair/mapping graph
 		for (String dirLabel : pairs.keySet()) {
 			if (pairGraph.getNumberOfVertices() > MOEA_Config.MAXIMUM_NUMBER_OF_CONCEPT_PAIRS)
 				break;
 			OrderedPair<String> nextPair = pairs.get(dirLabel);
-			String label = dirLabel.substring(1);
+
+			// take care of tagged +- label
+			String label = dirLabel;
+			if (dirLabel.startsWith("+") || dirLabel.startsWith("-")) {
+				label = dirLabel.substring(1);
+			}
+
 			if (dirLabel.charAt(0) == '-') {
 				pairGraph.addEdge(nextPair, refPair, label);
 			} else { // must be '+'
@@ -80,6 +90,21 @@ public class MappingAlgorithms {
 			}
 		}
 		return pairs;
+	}
+
+	private static void removeUselessRelations(MapOfSet<String, String> map) {
+		Iterator<String> keyIterator = map.keySet().iterator();
+		while (keyIterator.hasNext()) {
+			String key = keyIterator.next();
+			// remove + or - to match the list of useless relations
+			if (key.startsWith("+") || key.startsWith("-")) {
+				key = key.substring(1);
+			}
+			if (MOEA_Config.uselessRelations.contains(key)) {
+				keyIterator.remove();
+			}
+		}
+
 	}
 
 	/**
@@ -91,12 +116,13 @@ public class MappingAlgorithms {
 	 * @param usedConcepts
 	 * @return
 	 */
-	private static HashMap<String, OrderedPair<String>> extractPairsFromMaps(MapOfSet<String, String> leftmap, MapOfSet<String, String> rightmap,
+	private static HashMap<String, OrderedPair<String>> matchLeftRightMapsAndSelectRandom(MapOfSet<String, String> leftmap, MapOfSet<String, String> rightmap,
 			RandomGenerator random, HashSet<String> usedConcepts) {
 		HashMap<String, OrderedPair<String>> relationToPair = new HashMap<>();
 		Set<String> leftDirLabels = leftmap.keySet();
 		Set<String> rightDirLabels = rightmap.keySet();
 		for (String label : leftDirLabels) {
+			// TODO ter cuidado aqui se avancar com relacoes nao direccionais
 			if (rightDirLabels.contains(label)) {
 				Set<String> leftInputSet = leftmap.get(label);
 				Set<String> rightInputSet = rightmap.get(label);
@@ -142,7 +168,7 @@ public class MappingAlgorithms {
 	}
 
 	public static Object2IntOpenHashMap<OrderedPair<String>> createIsomorphism(StringGraph inputSpace,
-			DirectedMultiGraph<OrderedPair<String>, String> pairGraph, RandomGenerator random, OrderedPair<String> refPair, int deepnessLimit) {
+			DirectedMultiGraph<OrderedPair<String>, String> pairGraph, RandomGenerator random, OrderedPair<String> refPair) {
 
 		Object2IntOpenHashMap<OrderedPair<String>> pairDeepness = null;
 		pairDeepness = new Object2IntOpenHashMap<>();
@@ -160,7 +186,7 @@ public class MappingAlgorithms {
 			OrderedPair<String> currentPair = openSet.removeFirst();
 			// if (deepnessLimit >= 0) {
 			int deepness = pairDeepness.getInt(currentPair);
-			if (deepness >= deepnessLimit)
+			if (deepness >= MOEA_Config.DEEPNESS_LIMIT)
 				continue;
 			int nextDeepness = deepness + 1;
 
@@ -180,7 +206,7 @@ public class MappingAlgorithms {
 			closedSet.add(currentPair.getLeftElement());
 			closedSet.add(currentPair.getRightElement());
 		}
-		
+
 //		System.out.println("pairGraph's concepts:"+pairGraph.getNumberOfVertices());
 
 		return pairDeepness;
@@ -194,12 +220,12 @@ public class MappingAlgorithms {
 	 * @param deepnessLimit
 	 * @param random
 	 */
-	public static void updateMappingGraph(StringGraph inputSpace, MappingStructure<String, String> mappingStruct, int deepnessLimit, RandomGenerator random) {
+	public static void updateMappingGraph(StringGraph inputSpace, MappingStructure<String, String> mappingStruct, RandomGenerator random) {
 		DirectedMultiGraph<OrderedPair<String>, String> pairGraph = new DirectedMultiGraph<>();
 		// create a random mapping using the reference pair
 		@SuppressWarnings("unused")
 		Object2IntOpenHashMap<OrderedPair<String>> pairDeepness = MappingAlgorithms.createIsomorphism(inputSpace, pairGraph, random,
-				mappingStruct.getReferencePair(), deepnessLimit);
+				mappingStruct.getReferencePair());
 		// store results in the MappingStructure
 		mappingStruct.setPairGraph(pairGraph);
 	}

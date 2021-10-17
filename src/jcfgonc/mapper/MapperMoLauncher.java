@@ -19,6 +19,7 @@ import org.moeaframework.core.spi.OperatorProvider;
 import org.moeaframework.util.TypedProperties;
 
 import graph.DirectedMultiGraph;
+import graph.GraphAlgorithms;
 import graph.GraphReadWrite;
 import graph.StringGraph;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
@@ -70,6 +71,11 @@ public class MapperMoLauncher {
 
 		// read input space
 		StringGraph inputSpace = readInputSpace(MOEA_Config.inputSpacePath);
+		
+		// remove useless relations
+		inputSpace.removeEdgesByLabel(MOEA_Config.uselessRelations);
+		
+		GraphAlgorithms.addMirroredCopyEdges(inputSpace,MOEA_Config.undirectedRelations);
 
 		// read vital relations importance
 		Object2DoubleOpenHashMap<String> vitalRelations = VariousUtils.readVitalRelations(MOEA_Config.vitalRelationsPath);

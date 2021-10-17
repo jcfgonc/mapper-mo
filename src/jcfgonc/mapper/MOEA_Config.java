@@ -34,6 +34,8 @@ public class MOEA_Config {
 	 * relations which direction is irrelevant (used map opposing left/right edges from the concept pairs)
 	 */
 	public static final Set<String> undirectedRelations = Set.of("synonym", "antonym", "relatedto", "similarto");
+	
+	public static final Set<String> uselessRelations = Set.of("similarto", "derivedfrom", "hascontext", "relatedto");
 
 	public static final String screenshotsFolder = "screenshots";
 	public static final boolean GRAPHS_ENABLED = true;
@@ -43,7 +45,7 @@ public class MOEA_Config {
 	public static final int MAXIMUM_NUMBER_OF_CONCEPT_PAIRS = 10;
 	// mutation controls
 	public static final double LOCAL_JUMP_PROBABILITY = 0.88;
-	public static final double REFPAIR_JUMP_RANGE = 3;
+	public static final double REFPAIR_JUMP_RANGE = 2;
 	public static final double JUMP_PROBABILITY_POWER = 2.4;
 	public static final int DEEPNESS_LIMIT = 7;
 	public static final int NUMBER_MUTATION_TRIES = 10;

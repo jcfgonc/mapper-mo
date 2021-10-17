@@ -9,14 +9,13 @@ import structures.OrderedPair;
 
 public class MapperGeneticOperations {
 
-
 	public static MappingStructure<String, String> initializeGenes(StringGraph inputSpace, RandomGenerator random) {
 		// get a random concept pair
 		OrderedPair<String> refPair = MappingAlgorithms.getRandomConceptPair(inputSpace, random);
 		// set mapping structure
 		MappingStructure<String, String> mappingStruct = new MappingStructure<>(refPair);
 		// do the isomorphism using the concept pair
-		MappingAlgorithms.updateMappingGraph(inputSpace, mappingStruct, MOEA_Config.DEEPNESS_LIMIT, random);
+		MappingAlgorithms.updateMappingGraph(inputSpace, mappingStruct, random);
 		return mappingStruct;
 	}
 
@@ -37,15 +36,20 @@ public class MapperGeneticOperations {
 				System.err.println("mutation reached maximum number of tries (" + numberTries + ") without making a change");
 				break;
 			}
-
+			// shift left element
 			if (random.nextBoolean()) {
 				double r = Math.pow(random.nextDouble(), MOEA_Config.JUMP_PROBABILITY_POWER);
 				int hops = (int) Math.ceil(r * MOEA_Config.REFPAIR_JUMP_RANGE);
+				if (hops < 1)
+					hops = 1;
 				leftElement = GraphAlgorithms.getVertexFromRandomWalk(random, leftElement, inputSpace, hops);
 			}
+			// shift right element
 			if (random.nextBoolean()) {
 				double r = Math.pow(random.nextDouble(), MOEA_Config.JUMP_PROBABILITY_POWER);
 				int hops = (int) Math.ceil(r * MOEA_Config.REFPAIR_JUMP_RANGE);
+				if (hops < 1)
+					hops = 1;
 				rightElement = GraphAlgorithms.getVertexFromRandomWalk(random, rightElement, inputSpace, hops);
 			}
 			numberTries++;
@@ -77,7 +81,7 @@ public class MapperGeneticOperations {
 		// }
 		// store refpair back in the gene
 		genes.setReferencePair(new OrderedPair<String>(leftElement, rightElement));
-		MappingAlgorithms.updateMappingGraph(inputSpace, genes, MOEA_Config.DEEPNESS_LIMIT, random);
+		MappingAlgorithms.updateMappingGraph(inputSpace, genes, random);
 		return genes;
 	}
 
