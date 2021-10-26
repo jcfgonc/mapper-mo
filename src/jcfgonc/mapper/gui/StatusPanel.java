@@ -16,6 +16,7 @@ public class StatusPanel extends JPanel {
 	private static final long serialVersionUID = -3946006228924064009L;
 	private JLabel algorithmStatus;
 	private JLabel objectivesStatus;
+	private JLabel constraintsStatus;
 	private JLabel populationSizeStatus;
 	private JLabel numEpochsStatus;
 	private JLabel epochStatus;
@@ -50,6 +51,14 @@ public class StatusPanel extends JPanel {
 		objectivesStatus = new JLabel("");
 		objectivesStatus.setHorizontalAlignment(SwingConstants.LEFT);
 		add(objectivesStatus);
+
+		JLabel constraintsLabel = new JLabel("Constraints: ");
+		constraintsLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		add(constraintsLabel);
+
+		constraintsStatus = new JLabel("");
+		constraintsStatus.setHorizontalAlignment(SwingConstants.LEFT);
+		add(constraintsStatus);
 
 		JLabel populationSizeLabel = new JLabel("Population Size: ");
 		populationSizeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -133,32 +142,36 @@ public class StatusPanel extends JPanel {
 
 	}
 
-	public void setEpoch(String text) {
-		epochStatus.setText(text);
+	public void setEpoch(int val) {
+		epochStatus.setText(Integer.toString(val));
 	}
 
-	public void setNumberEpochs(String text) {
-		numEpochsStatus.setText(text);
+	public void setNumberEpochs(int val) {
+		numEpochsStatus.setText(Integer.toString(val));
 	}
 
-	public void setNumberRuns(String text) {
-		numRunsStatus.setText(text);
+	public void setNumberRuns(int val) {
+		numRunsStatus.setText(Integer.toString(val));
 	}
 
-	public void setNDS_Size(String text) {
-		ndsSizeStatus.setText(text);
+	public void setNDS_Size(int val) {
+		ndsSizeStatus.setText(Integer.toString(val));
 	}
 
-	public void setObjectives(String text) {
-		objectivesStatus.setText(text);
+	public void setObjectives(int val) {
+		objectivesStatus.setText(Integer.toString(val));
 	}
 
-	public void setPopulationSize(String text) {
-		populationSizeStatus.setText(text);
+	public void setConstraints(int val) {
+		constraintsStatus.setText(Integer.toString(val));
 	}
 
-	public void setCurrentRun(String text) {
-		currentRunStatus.setText(text);
+	public void setPopulationSize(int val) {
+		populationSizeStatus.setText(Integer.toString(val));
+	}
+
+	public void setCurrentRun(int val) {
+		currentRunStatus.setText(Integer.toString(val));
 	}
 
 	public void setAlgorithm(String text) {
@@ -228,6 +241,7 @@ public class StatusPanel extends JPanel {
 				try {
 					Thread.sleep(500L);
 				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
 		}
@@ -237,4 +251,5 @@ public class StatusPanel extends JPanel {
 		}
 
 	}
+
 }

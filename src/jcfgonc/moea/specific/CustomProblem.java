@@ -6,6 +6,7 @@ import org.moeaframework.core.Solution;
 import graph.DirectedMultiGraph;
 import jcfgonc.mapper.LogicUtils;
 import jcfgonc.mapper.MOEA_Config;
+import jcfgonc.mapper.MappingAlgorithms;
 import jcfgonc.mapper.StaticSharedVariables;
 import jcfgonc.mapper.structures.MappingStructure;
 import jcfgonc.moea.generic.ProblemDescription;
@@ -41,16 +42,47 @@ public class CustomProblem implements Problem, ProblemDescription {
 		CustomChromosome cc = (CustomChromosome) solution.getVariable(0); // unless the solution domain X has more than one dimension
 		MappingStructure<String, String> mappingStructure = cc.getGene();
 		DirectedMultiGraph<OrderedPair<String>, String> pairGraph = mappingStructure.getPairGraph();
+		OrderedPair<String> referencePair = mappingStructure.getReferencePair();
 
 		int numPairs = pairGraph.getNumberOfVertices();
+		boolean emptyGraph = numPairs <= 1;
 
 		// maximize the presence of vital/important relations
-		double vitalRelationsMean = LogicUtils.calculatePresenceVitalRelations(pairGraph, StaticSharedVariables.vitalRelations).getMean();
+		double vitalRelationsMean = 0;
+		if (!emptyGraph) {
+			vitalRelationsMean = LogicUtils.calculateVitalRelationsStatistics(pairGraph, StaticSharedVariables.vitalRelations).getMean();
+		}
 
 		// relation statistics
-		double[] rs = LogicUtils.calculateRelationStatistics(pairGraph);
-		double relationStdDev = rs[1]; // 0...1 : 0->equal amount of relation labels
-		int numRelations = (int) rs[2];
+		double relationStdDev;
+		int numRelations;
+		relationStdDev = 100;
+		numRelations = 0;
+		if (!emptyGraph) {
+			double[] rs = LogicUtils.calculateRelationStatistics(pairGraph);
+			relationStdDev = rs[1]; // 0...1 : 0 = equal amount of relation labels
+			numRelations = (int) rs[2];
+		}
+
+		int degreeOfReferencePair = 0;
+		if (!emptyGraph) {
+			degreeOfReferencePair = pairGraph.degreeOf(referencePair);
+		}
+
+		int refPairInnerDistance = 0;
+		if (!emptyGraph) {
+			refPairInnerDistance = MappingAlgorithms.calculateReferencePairInnerDistance(StaticSharedVariables.inputSpace, referencePair, 10);
+		}
+
+		double meanWordsPerConcept = 100;
+		if (!emptyGraph) {
+			double[] wpcs = LogicUtils.calculateWordsPerConceptStatistics(pairGraph);
+//			stats[0] = ds.getMean();
+//			stats[1] = ds.getStandardDeviation();
+//			stats[2] = ds.getMin();
+//			stats[3] = ds.getMax();
+			meanWordsPerConcept = wpcs[0];
+		}
 
 		// set solution's objectives here
 		int obj_i = 0;
@@ -58,15 +90,28 @@ public class CustomProblem implements Problem, ProblemDescription {
 		solution.setObjective(obj_i++, -vitalRelationsMean);
 		solution.setObjective(obj_i++, relationStdDev);
 		solution.setObjective(obj_i++, -numRelations);
+		solution.setObjective(obj_i++, -degreeOfReferencePair);
+		solution.setObjective(obj_i++, -refPairInnerDistance);
+		solution.setObjective(obj_i++, meanWordsPerConcept);
 
-		// if required define constraints below
 		// violated constraints are set to 1, otherwise set to 0
-		if (numPairs > MOEA_Config.MAXIMUM_NUMBER_OF_CONCEPT_PAIRS) { // range number of vertices in the blend space
+		if (numPairs < 3 || numPairs > MOEA_Config.MAXIMUM_NUMBER_OF_CONCEPT_PAIRS) { // limit the number of vertices in the blend space
 			solution.setConstraint(0, 1); // violated
 		} else {
 			solution.setConstraint(0, 0); // not violated
 		}
 
+		if (numRelations < 3) {
+			solution.setConstraint(1, 1); // violated
+		} else {
+			solution.setConstraint(1, 0); // not violated
+		}
+
+		if (refPairInnerDistance < 2) {
+			solution.setConstraint(2, 1); // violated
+		} else {
+			solution.setConstraint(2, 0); // not violated
+		}
 	}
 
 	private String[] objectivesDescription = { //
@@ -74,10 +119,15 @@ public class CustomProblem implements Problem, ProblemDescription {
 			"f:vitalRelationsMean", //
 			"f:relationStdDev", //
 			"d:numRelations", //
+			"d:degreeOfReferencePair", //
+			"d:refPairInnerDistance", //
+			"f:meanWordsPerConcept", //
 	};
 
 	private String[] constraintsDescription = { //
 			"required numPairs", //
+			"required numRelations", //
+			"required refPairInnerDistance", //
 	};
 
 	@Override

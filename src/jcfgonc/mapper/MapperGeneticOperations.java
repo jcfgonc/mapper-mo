@@ -19,6 +19,7 @@ public class MapperGeneticOperations {
 		return mappingStruct;
 	}
 
+	@SuppressWarnings("unused")
 	public static MappingStructure<String, String> mutateGenes(MappingStructure<String, String> genes, StringGraph inputSpace, RandomGenerator random) {
 		OrderedPair<String> refPair = genes.getReferencePair();
 		String leftElement = refPair.getLeftElement();
@@ -38,18 +39,24 @@ public class MapperGeneticOperations {
 			}
 			// shift left element
 			if (random.nextBoolean()) {
-				double r = Math.pow(random.nextDouble(), MOEA_Config.JUMP_PROBABILITY_POWER);
-				int hops = (int) Math.ceil(r * MOEA_Config.REFPAIR_JUMP_RANGE);
-				if (hops < 1)
-					hops = 1;
+				int hops = 1;
+				if (MOEA_Config.REFPAIR_JUMP_RANGE > 1) {
+					double r = Math.pow(random.nextDouble(), MOEA_Config.JUMP_PROBABILITY_POWER);
+					hops = (int) Math.ceil(r * MOEA_Config.REFPAIR_JUMP_RANGE);
+					if (hops < 1)
+						hops = 1;
+				}
 				leftElement = GraphAlgorithms.getVertexFromRandomWalk(random, leftElement, inputSpace, hops);
 			}
 			// shift right element
 			if (random.nextBoolean()) {
-				double r = Math.pow(random.nextDouble(), MOEA_Config.JUMP_PROBABILITY_POWER);
-				int hops = (int) Math.ceil(r * MOEA_Config.REFPAIR_JUMP_RANGE);
-				if (hops < 1)
-					hops = 1;
+				int hops = 1;
+				if (MOEA_Config.REFPAIR_JUMP_RANGE > 1) {
+					double r = Math.pow(random.nextDouble(), MOEA_Config.JUMP_PROBABILITY_POWER);
+					hops = (int) Math.ceil(r * MOEA_Config.REFPAIR_JUMP_RANGE);
+					if (hops < 1)
+						hops = 1;
+				}
 				rightElement = GraphAlgorithms.getVertexFromRandomWalk(random, rightElement, inputSpace, hops);
 			}
 			numberTries++;

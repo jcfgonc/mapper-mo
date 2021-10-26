@@ -71,11 +71,19 @@ public class MapperMoLauncher {
 
 		// read input space
 		StringGraph inputSpace = readInputSpace(MOEA_Config.inputSpacePath);
-		
+
 		// remove useless relations
 		inputSpace.removeEdgesByLabel(MOEA_Config.uselessRelations);
-		
-		GraphAlgorithms.addMirroredCopyEdges(inputSpace,MOEA_Config.undirectedRelations);
+
+		// test television_show	plant
+
+//		 String start = "television_show";
+//		 String end = "plant";
+//		 GraphAlgorithms.shortestPathSearch(inputSpace, start, end);
+//		 System.out.println(GraphAlgorithms.getDistance(inputSpace, start, end, 1000));
+//		 System.exit(0);
+
+		GraphAlgorithms.addMirroredCopyEdges(inputSpace, MOEA_Config.undirectedRelations);
 
 		// read vital relations importance
 		Object2DoubleOpenHashMap<String> vitalRelations = VariousUtils.readVitalRelations(MOEA_Config.vitalRelationsPath);
@@ -90,9 +98,9 @@ public class MapperMoLauncher {
 		properties.setProperty("CustomMutation.Rate", "1.0");
 
 		// eNSGA-II
-		properties.setProperty("epsilon", "0.0001"); // default is 0.01
-		properties.setProperty("windowSize", "256"); // epoch to trigger eNSGA2 population injection
-		properties.setProperty("maxWindowSize", "480"); // epoch to trigger eNSGA2 hard restart
+		properties.setProperty("epsilon", Double.toString(MOEA_Config.eNSGA2_epsilon));
+		properties.setProperty("windowSize", Integer.toString(MOEA_Config.eNSGA2_windowSize));
+		properties.setProperty("maxWindowSize", Integer.toString(MOEA_Config.eNSGA2_maxWindowSize));
 //		properties.setProperty("injectionRate", Double.toString(1.0 / 0.25)); // population to archive ratio, default is 0.25
 
 		// NSGA-III
@@ -113,7 +121,8 @@ public class MapperMoLauncher {
 		// personalize your constructor here
 		CustomProblem problem = new CustomProblem();
 
-		InteractiveExecutor ie = new InteractiveExecutor(problem, properties, resultsFilename, resultsWriter);
+		InteractiveExecutor ie = new InteractiveExecutor(problem, properties, resultsFilename, resultsWriter,
+				"MapperMO - Multiple Objective Conceptual Mapper");
 
 		resultsWriter.writeFileHeader(resultsFilename, problem);
 
@@ -141,6 +150,7 @@ public class MapperMoLauncher {
 		System.exit(0);
 	}
 
+	@SuppressWarnings("unused")
 	private static void saveIndividualSolutions(NondominatedPopulation currentResults, int run) {
 		for (int i = 0; i < currentResults.size(); i++) {
 			Solution solution = currentResults.get(i);

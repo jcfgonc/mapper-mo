@@ -17,6 +17,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import jcfgonc.mapper.structures.MappingStructure;
 import structures.MapOfSet;
 import structures.OrderedPair;
+import structures.UnorderedPair;
 import utils.VariousUtils;
 
 public class MappingAlgorithms {
@@ -92,6 +93,12 @@ public class MappingAlgorithms {
 		return pairs;
 	}
 
+	/**
+	 * Used by expandConceptPair() to remove useless relations (stored in MOEA_Config.uselessRelations). Currently not used.
+	 * 
+	 * @param map
+	 */
+	@SuppressWarnings("unused")
 	private static void removeUselessRelations(MapOfSet<String, String> map) {
 		Iterator<String> keyIterator = map.keySet().iterator();
 		while (keyIterator.hasNext()) {
@@ -104,7 +111,6 @@ public class MappingAlgorithms {
 				keyIterator.remove();
 			}
 		}
-
 	}
 
 	/**
@@ -222,10 +228,17 @@ public class MappingAlgorithms {
 	 */
 	public static void updateMappingGraph(StringGraph inputSpace, MappingStructure<String, String> mappingStruct, RandomGenerator random) {
 		DirectedMultiGraph<OrderedPair<String>, String> pairGraph = new DirectedMultiGraph<>();
+		OrderedPair<String> referencePair = mappingStruct.getReferencePair();
 		// create a random mapping using the reference pair
 		@SuppressWarnings("unused")
-		Object2IntOpenHashMap<OrderedPair<String>> pairDeepness = MappingAlgorithms.createIsomorphism(inputSpace, pairGraph, random,
-				mappingStruct.getReferencePair());
+		Object2IntOpenHashMap<OrderedPair<String>> pairDeepness;
+		for (int tries = 0; tries < 10; tries++) {
+			pairDeepness = MappingAlgorithms.createIsomorphism(inputSpace, pairGraph, random, referencePair);
+			int nVertices = pairGraph.getNumberOfVertices();
+			if (nVertices > 1) {
+				break;
+			}
+		}
 		// store results in the MappingStructure
 		mappingStruct.setPairGraph(pairGraph);
 	}
@@ -279,6 +292,32 @@ public class MappingAlgorithms {
 
 		OrderedPair<String> initial = new OrderedPair<String>(leftConcept, rightConcept);
 		return initial;
+	}
+
+	/**
+	 * calculates the distance (in hops on the given graph) between the two concepts of the given pair. Uses distanceBetweenVertices() from GraphAlgorithms but
+	 * with prior caching.
+	 * 
+	 * @param pair
+	 * @return
+	 */
+	public static int calculateReferencePairInnerDistance(StringGraph graph, OrderedPair<String> pair, int maximumDistance) {
+		// distance from a to b is equal to distance from b to a
+		// convert directional to bidirectional and get it from the cache
+		UnorderedPair<String> uPair = new UnorderedPair<String>(pair);
+		Integer value = (Integer) StaticSharedVariables.refPairInnerDistanceCache.get(uPair);
+		if (value != null) { // cache HIT
+			return value.intValue();
+		} else { // cache MISS
+			int refPairInnerDistance = GraphAlgorithms.getDistance(graph, pair.getLeftElement(), pair.getRightElement(), maximumDistance);
+			if (refPairInnerDistance == 0) {
+				System.err.println("refPairInnerDistance=0 for OrderedPair " + pair);
+			}
+			if (refPairInnerDistance == Integer.MAX_VALUE)
+				refPairInnerDistance = maximumDistance + 1;
+			StaticSharedVariables.refPairInnerDistanceCache.put(uPair, refPairInnerDistance);
+			return refPairInnerDistance;
+		}
 	}
 
 }

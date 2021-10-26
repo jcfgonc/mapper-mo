@@ -34,27 +34,30 @@ public class InteractiveExecutor {
 	private String resultsFilename;
 //	private BlenderVisualizer blenderVisualizer;
 	private volatile boolean guiUpdatingThreadRunning;
+	private String windowTitle;
 
-	public InteractiveExecutor(Problem problem, Properties algorithmProperties, String resultsFilename, ResultsWriter resultsWriter) {
+	public InteractiveExecutor(Problem problem, Properties algorithmProperties, String resultsFilename, ResultsWriter resultsWriter, String windowTitle) {
 		this.problem = problem;
 		this.algorithmProperties = algorithmProperties;
 		this.resultsWriter = resultsWriter;
 		this.resultsFilename = resultsFilename;
+		this.windowTitle = windowTitle;
 //		this.blenderVisualizer = new BlenderVisualizer(populationSize);
 		this.gui = new InteractiveExecutorGUI(this);
 		this.gui.initializeTheRest();
 		this.gui.setVisible(true);
 	}
 
-	public InteractiveExecutor(Problem problem, Properties algorithmProperties, String resultsFilename) {
-		this(problem, algorithmProperties, resultsFilename, null);
-	} 
+	public InteractiveExecutor(Problem problem, Properties algorithmProperties, String resultsFilename, String windowTitle) {
+		this(problem, algorithmProperties, resultsFilename, null, windowTitle);
+	}
 
 	public NondominatedPopulation execute(int moea_run) throws InterruptedException {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
 			// couldn't set system look and feel, continue with default
+			e.printStackTrace();
 		}
 
 		// code for external evolution visualizer
@@ -198,5 +201,9 @@ public class InteractiveExecutor {
 
 	public void skipCurrentRun() {
 		this.skipCurrentRun = true;
+	}
+
+	public String getWindowTitle() {
+		return windowTitle;
 	}
 }

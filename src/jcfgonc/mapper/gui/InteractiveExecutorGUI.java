@@ -36,6 +36,7 @@ public class InteractiveExecutorGUI extends JFrame {
 	private JPanel technicalPanel;
 	private final InteractiveExecutor interactiveExecutor;
 	private final int numberOfObjectives;
+	private final int numberOfConstraints;
 	private final Problem problem;
 	private StatusPanel statusPanel;
 	private OptimisationControlPanel optimisationControlPanel;
@@ -56,6 +57,7 @@ public class InteractiveExecutorGUI extends JFrame {
 	 */
 	private boolean guiUpdated;
 	private JPanel timeSeriesPanel;
+	private final String windowTitle;
 
 	/**
 	 * Create the frame.
@@ -78,16 +80,18 @@ public class InteractiveExecutorGUI extends JFrame {
 		this.interactiveExecutor = interactiveExecutor;
 		this.problem = interactiveExecutor.getProblem();
 		this.numberOfObjectives = problem.getNumberOfObjectives();
+		this.numberOfConstraints = problem.getNumberOfConstraints();
 		this.nds = null;
 		this.epoch = -1;
 		this.run = -1;
 		this.epochDuration = -1;
+		this.windowTitle = interactiveExecutor.getWindowTitle();
 
 		initialize();
 	}
 
 	private void initialize() {
-		setTitle("Blender 2.0 - Multiple Objective Optimization");
+		setTitle(windowTitle);
 		setName("MOEA");
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		contentPane = new JPanel();
@@ -145,8 +149,8 @@ public class InteractiveExecutorGUI extends JFrame {
 
 	public void abortOptimization() {
 		// default icon, custom title
-		int n = JOptionPane.showConfirmDialog(null, "Aborting optimization will discard the results of the current epoch.\nAre you sure?",
-				"Abort Optimization", JOptionPane.YES_NO_OPTION);
+		int n = JOptionPane.showConfirmDialog(null, "Aborting optimization will discard the results of the current epoch.\nAre you sure?", "Abort Optimization",
+				JOptionPane.YES_NO_OPTION);
 		if (n != 0)
 			return;
 		setVisible(false);
@@ -187,7 +191,9 @@ public class InteractiveExecutorGUI extends JFrame {
 
 		statusPanel.initializedTimeCounters();
 		// display static properties
-		statusPanel.setObjectives(Integer.toString(numberOfObjectives));
+		statusPanel.setObjectives(numberOfObjectives);
+		statusPanel.setConstraints(numberOfConstraints);
+
 		statusPanel.setAlgorithm(MOEA_Config.ALGORITHM);
 
 //		setLocation(-6, 0);
@@ -210,8 +216,9 @@ public class InteractiveExecutorGUI extends JFrame {
 	public void updateData(Collection<Solution> nds, int epoch, int run, double epochDuration) {
 		// changed with a new run
 		if (run != this.run) {
-			statusPanel.setCurrentRun(Integer.toString(run));
-			statusPanel.setPopulationSize(getAlgorithmProperties().getProperty("populationSize")); // get directly from the algorithm's properties
+			statusPanel.setCurrentRun(run);
+			// get directly from the algorithm's properties
+			statusPanel.setPopulationSize(Integer.parseInt(getAlgorithmProperties().getProperty("populationSize")));
 		}
 
 		this.nds = nds;
@@ -221,11 +228,11 @@ public class InteractiveExecutorGUI extends JFrame {
 		guiUpdated = false;
 
 		// update text boxes with dynamic properties
-		statusPanel.setEpoch(Integer.toString(epoch));
-		statusPanel.setNDS_Size(Integer.toString(nds.size()));
+		statusPanel.setEpoch(epoch);
+		statusPanel.setNDS_Size(nds.size());
 		statusPanel.setLastEpochDuration(epochDuration);
-		statusPanel.setNumberRuns(Integer.toString(MOEA_Config.MOEA_RUNS));
-		statusPanel.setNumberEpochs(Integer.toString(MOEA_Config.MAX_EPOCHS));
+		statusPanel.setNumberRuns(MOEA_Config.MOEA_RUNS);
+		statusPanel.setNumberEpochs(MOEA_Config.MAX_EPOCHS);
 		statusPanel.setRunTimeLimit(Double.toString(MOEA_Config.MAX_RUN_TIME));
 
 		if (settingsPanel.isGraphsEnabled()) {
@@ -256,8 +263,7 @@ public class InteractiveExecutorGUI extends JFrame {
 		}
 		// take the screenshot
 		new File(MOEA_Config.screenshotsFolder).mkdir();
-		String filename = String.format("run_%s_epoch_%s", screenshotFilenameDecimalFormat.format(run),
-				screenshotFilenameDecimalFormat.format(epoch));
+		String filename = String.format("run_%s_epoch_%s", screenshotFilenameDecimalFormat.format(run), screenshotFilenameDecimalFormat.format(epoch));
 
 		saveScreenShotPNG(MOEA_Config.screenshotsFolder + File.separator + filename + ".png");
 	}
