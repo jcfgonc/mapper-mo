@@ -2,6 +2,7 @@ package jcfgonc.mapper;
 
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
+import java.util.HashSet;
 import java.util.Properties;
 
 import javax.swing.UIManager;
@@ -30,6 +31,7 @@ import jcfgonc.moea.specific.CustomMutation;
 import jcfgonc.moea.specific.CustomProblem;
 import jcfgonc.moea.specific.CustomResultsWriter;
 import jcfgonc.moea.specific.ResultsWriter;
+import net.sf.extjwnl.JWNLException;
 import structures.OrderedPair;
 import structures.Ticker;
 import structures.UnorderedPair;
@@ -64,7 +66,7 @@ public class MapperMoLauncher {
 	}
 
 	public static void main(String[] args) throws NoSuchFileException, IOException, ClassNotFoundException, InstantiationException, IllegalAccessException,
-			UnsupportedLookAndFeelException, InterruptedException {
+			UnsupportedLookAndFeelException, InterruptedException, JWNLException {
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
 		RandomAdaptor random = new RandomAdaptor(new SynchronizedRandomGenerator(new Well44497b()));
@@ -75,7 +77,9 @@ public class MapperMoLauncher {
 		// remove useless relations
 		inputSpace.removeEdgesByLabel(MOEA_Config.uselessRelations);
 
-		// test television_show	plant
+		StaticSharedVariables.stopWords = new HashSet<String>(VariousUtils.readFileRows(MOEA_Config.stopWordsPath));
+
+		// test television_show plant
 
 //		 String start = "television_show";
 //		 String end = "plant";

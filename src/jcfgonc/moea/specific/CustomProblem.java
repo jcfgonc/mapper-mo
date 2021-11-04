@@ -4,6 +4,7 @@ import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 
 import graph.DirectedMultiGraph;
+import jcfgonc.mapper.GrammarUtils;
 import jcfgonc.mapper.LogicUtils;
 import jcfgonc.mapper.MOEA_Config;
 import jcfgonc.mapper.MappingAlgorithms;
@@ -71,7 +72,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 
 		int refPairInnerDistance = 0;
 		if (!emptyGraph) {
-			refPairInnerDistance = MappingAlgorithms.calculateReferencePairInnerDistance(StaticSharedVariables.inputSpace, referencePair, 10);
+		//	refPairInnerDistance = MappingAlgorithms.calculateReferencePairInnerDistance(StaticSharedVariables.inputSpace, referencePair, 10);
 		}
 
 		double meanWordsPerConcept = 100;
@@ -83,6 +84,8 @@ public class CustomProblem implements Problem, ProblemDescription {
 //			stats[3] = ds.getMax();
 			meanWordsPerConcept = wpcs[0];
 		}
+		
+		boolean sameWordClass = GrammarUtils.sameWordClass(referencePair);
 
 		// set solution's objectives here
 		int obj_i = 0;

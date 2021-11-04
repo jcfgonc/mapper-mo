@@ -54,4 +54,5 @@ public class MOEA_Config {
 	public static final int NUMBER_MUTATION_TRIES = 10;
 	public static final int CACHE_SAVE_TIMEOUT = 5 * 60;
 	public static final String CACHE_FILENAME = "refPairInnerDistanceCache.dat";
+	public static final String stopWordsPath = "data/english stop words 1.txt";
 }
