@@ -57,6 +57,9 @@ public class GrammarUtils {
 			System.lineSeparator();
 		}
 		// posType defined OR not
+		if (posType == null) {
+			System.out.println("could not resolve " + concept + " through ISA");
+		}
 
 		// store middle targets POS by starting at endingTarget and going back the camefrom path
 		// get path
@@ -81,10 +84,10 @@ public class GrammarUtils {
 			HashSet<POS> lPOS = getConceptPOS(leftElement);
 			HashSet<POS> rPOS = getConceptPOS(rightElement);
 
-//			if (lPOS.isEmpty())
-//				System.out.println("could not get word class for " + leftElement);
-//			if (rPOS.isEmpty())
-//				System.out.println("could not get word class for " + rightElement);
+			if (lPOS.isEmpty())
+				System.out.println("could not get word class for " + leftElement);
+			if (rPOS.isEmpty())
+				System.out.println("could not get word class for " + rightElement);
 
 			if (!lPOS.isEmpty() && !rPOS.isEmpty()) {
 				boolean intersects = VariousUtils.intersects(lPOS, rPOS);
@@ -131,28 +134,75 @@ public class GrammarUtils {
 		if (indexWord != null)
 			return true;
 
-		// TODO check if the given concept ISA <something> noun in the inputspace
-		// that could be recursive
-		isaWho(string);
-
 		List<String> words = Arrays.asList(VariousUtils.fastSplit(string, ' '));
-		if (words.size() > 1) {// otherwise check for compound noun
-			// remove stopwords
-			words.removeAll(StaticSharedVariables.stopWords);
+		// remove stopwords
+		words.removeAll(StaticSharedVariables.stopWords);
+
+		int numWords = words.size();
+		if (numWords == 2) {// otherwise check for compound noun
 
 			ListOfSet<POS> possiblePOS_perWord = new ListOfSet<>();
-
+			// assign possible POS for each word
 			for (String word : words) {
 				HashSet<POS> wPOS = getWordPOS(word);
 				possiblePOS_perWord.add(wPOS);
 			}
 
-			System.out.println(string + "\t" + possiblePOS_perWord);
+			// test compound noun rules
+			if (possiblePOS_perWord.numberOfNonEmptySets() == 2) {
 
+				HashSet<POS> pos0 = possiblePOS_perWord.get(0);
+				HashSet<POS> pos1 = possiblePOS_perWord.get(1);
+
+				if (pos0.contains(POS.ADJECTIVE)) {
+					if (pos1.contains(POS.ADJECTIVE)) {
+						return true;
+					}
+					if (pos1.contains(POS.NOUN)) {
+						return true;
+					}
+					if (pos1.contains(POS.VERB)) {
+						return true;
+					}
+				}
+				if (pos0.contains(POS.ADVERB)) {
+					if (pos1.contains(POS.NOUN)) {
+						return true;
+					}
+					if (pos1.contains(POS.VERB)) {
+						return true;
+					}
+				}
+				if (pos0.contains(POS.NOUN)) {
+					if (pos1.contains(POS.ADJECTIVE)) {
+						return true;
+					}
+					if (pos1.contains(POS.ADVERB)) {
+						return true;
+					}
+					if (pos1.contains(POS.NOUN)) {
+						return true;
+					}
+					if (pos1.contains(POS.VERB)) {
+						return true;
+					}
+				}
+				if (pos0.contains(POS.VERB)) {
+					if (pos1.contains(POS.ADVERB)) {
+						return true;
+					}
+					if (pos1.contains(POS.NOUN)) {
+						return true;
+					}
+				}
+			}
+			// not matched with the rules
 			System.lineSeparator();
 		}
+		// TODO check if the given concept ISA <something> noun in the inputspace
+		// that could be recursive
+//		isaWho(string);
 
-		// TODO Auto-generated method stub
 		return false;
 	}
 
