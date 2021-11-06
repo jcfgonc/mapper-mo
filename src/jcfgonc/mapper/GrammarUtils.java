@@ -24,7 +24,7 @@ public class GrammarUtils {
 	 */
 	private static SynchronizedMapOfSet<String, POS> cachedConceptPOS = new SynchronizedMapOfSet<>();
 
-	private boolean conceptCached(String concept, POS cachedType) {
+	private static boolean conceptCached(String concept, POS cachedType) {
 		Set<POS> cachedPOS = cachedConceptPOS.get(concept);
 		if (cachedPOS != null && cachedPOS.contains(cachedType)) {
 			return true;
@@ -32,15 +32,10 @@ public class GrammarUtils {
 		return false;
 	}
 
-	private boolean conceptCachedAsNoun(String concept) {
-		Set<POS> cachedPOS = cachedConceptPOS.get(concept);
-		if (cachedPOS != null && cachedPOS.contains(POS.NOUN)) {
-			return true;
-		}
-		return false;
+	private static boolean conceptCachedAsNoun(String concept) {
+		return conceptCached(concept, POS.NOUN);
 	}
 
-	@SuppressWarnings("unused")
 	/**
 	 * check if the given concept ISA <something> noun in the inputspace - should be recursive
 	 * 
@@ -48,7 +43,10 @@ public class GrammarUtils {
 	 * @throws JWNLException
 	 */
 	public static boolean checkISA_NounInInputSpace(String concept) throws JWNLException {
-		Dictionary dictionary = StaticSharedVariables.dictionary;
+		// duh, prevent futile work
+		if (conceptCachedAsNoun(concept) || isNounInWordnet(concept))
+			return true;
+
 		StringGraph inputSpace = StaticSharedVariables.inputSpace;
 
 		HashSet<String> closedSet = new HashSet<>();
@@ -62,44 +60,56 @@ public class GrammarUtils {
 
 		outerWhile: while (!openSet.isEmpty()) {
 			String current = openSet.removeFirst();
+
 			closedSet.add(current);
-			Set<StringEdge> in = inputSpace.incomingEdgesOf(current, "isa");
+			// Set<StringEdge> in = inputSpace.incomingEdgesOf(current, "isa");
 			Set<StringEdge> out = inputSpace.outgoingEdgesOf(current, "isa");
 			HashSet<String> targets = StringGraph.edgesTargets(out);
 
 			for (String target : targets) {
 				if (closedSet.contains(target))
 					continue;
-				// check if target has been decoded before
-				// otherwise check if target is
-				// found an ISA target which is a noun
-				HashSet<POS> wordPOS = getWordNetPOS(target);
-				if (wordPOS.contains(POS.NOUN)) {
+
+				// remember which concept came before
+				cameFrom.put(target, current);
+				openSet.addLast(target); // later expand next ISA target
+
+				// TODO: if target has a different POS, stop and return that POS
+
+				if (conceptCachedAsNoun(target) // check if target has been decoded before
+						|| isNounInWordnet(target)) { // otherwise check if target has a POS in wordnet
+
+					// found an ISA target which is a noun
 					posType = POS.NOUN;
 					endingTarget = target;
 					break outerWhile;
 				}
-				openSet.addLast(target); // later expand upper ISA level
-				cameFrom.put(target, concept);
+
+//				System.lineSeparator();
 			}
-			System.lineSeparator();
+			if (!openSet.isEmpty()) {
+				System.lineSeparator();
+			}
 		}
 		// posType defined OR not
 		if (posType == null) {
 			System.out.println("could not resolve " + concept + " through ISA");
+		} else {
+			// store middle targets POS by starting at endingTarget and going back the camefrom path
+			// get path
+			String prior;
+			String current = endingTarget;
+			while (true) {
+				cachedConceptPOS.add(current, posType);
+				prior = cameFrom.get(current);
+				if (prior == null)
+					break;
+				current = prior;
+			}
+			if (posType == POS.NOUN) {
+				return true;
+			}
 		}
-
-		// store middle targets POS by starting at endingTarget and going back the camefrom path
-		// get path
-		String prior;
-		String current = endingTarget;
-		while (true) {
-			prior = cameFrom.get(current);
-			if (prior == null)
-				break;
-			current = prior;
-		}
-		System.lineSeparator();
 		return false;
 	}
 
@@ -110,8 +120,8 @@ public class GrammarUtils {
 		// compound concepts are expected to be space separated
 		try {
 			// get POS for each concept
-			Set<POS> lPOS = getConceptPOS_fromWordnet(leftElement);
-			Set<POS> rPOS = getConceptPOS_fromWordnet(rightElement);
+			Set<POS> lPOS = getConceptPOS(leftElement);
+			Set<POS> rPOS = getConceptPOS(rightElement);
 
 			if (lPOS.isEmpty())
 				System.out.println("could not get POS for " + leftElement);
@@ -146,8 +156,10 @@ public class GrammarUtils {
 	 */
 	public static Set<POS> getConceptPOS(String concept) throws JWNLException {
 		Set<POS> posList = getConceptPOS_fromWordnet(concept);
-		if (checkISA_NounInInputSpace(concept)) {
-			posList.add(POS.NOUN);
+		if (!posList.contains(POS.NOUN)) {
+			if (checkISA_NounInInputSpace(concept)) {
+				posList.add(POS.NOUN);
+			}
 		}
 		return posList;
 	}
@@ -187,13 +199,96 @@ public class GrammarUtils {
 	}
 
 	/**
-	 * Self-explanatory. Checks if the given string is defined as a noun POS in wordnet, nothing more.
+	 * Self-explanatory. Checks if the given string is defined as a noun POS (simple or compound) in wordnet, nothing more.
 	 * 
 	 * @param string
 	 * @return
 	 * @throws JWNLException
 	 */
 	public static boolean isNounInWordnet(String string) throws JWNLException {
+		Dictionary dictionary = StaticSharedVariables.dictionary;
+
+		// check for easy/simple/existing identifiable noun
+		IndexWord indexWord = dictionary.getIndexWord(POS.NOUN, string);
+		if (indexWord != null)
+			return true;
+
+		List<String> words = Arrays.asList(VariousUtils.fastSplit(string, ' '));
+		// remove stopwords
+		words.removeAll(StaticSharedVariables.stopWords);
+
+		int numWords = words.size();
+		ListOfSet<POS> possiblePOS_perWord = new ListOfSet<>();
+
+		// assign possible POS for each word
+		for (String word : words) {
+			HashSet<POS> wPOS = getWordNetPOS(word);
+			possiblePOS_perWord.add(wPOS);
+		}
+
+		if (numWords == 1) {
+			// if wordnet knew about it, it should have been caught above
+			return false;
+		}
+
+		// check for compound noun
+		if (numWords == 2) {
+
+			// test compound noun rules
+			if (possiblePOS_perWord.numberOfNonEmptySets() == 2) {
+
+				HashSet<POS> pos0 = possiblePOS_perWord.get(0);
+				HashSet<POS> pos1 = possiblePOS_perWord.get(1);
+
+				// catches two word rules with at least one noun
+				if (pos0.contains(POS.NOUN) || pos1.contains(POS.NOUN))
+					return true;
+
+				// rules with no nouns
+				if (pos0.contains(POS.ADJECTIVE)) {
+					if (pos1.contains(POS.ADJECTIVE)) {
+						return true;
+					}
+					if (pos1.contains(POS.VERB)) {
+						return true;
+					}
+				}
+				if (pos0.contains(POS.ADVERB)) {
+					if (pos1.contains(POS.VERB)) {
+						return true;
+					}
+				}
+				if (pos0.contains(POS.VERB)) {
+					if (pos1.contains(POS.ADVERB)) {
+						return true;
+					}
+				}
+			}
+			// not matched with the two word rules
+
+		}
+		// not identified as a noun OR it is composed of three or more words
+
+		// dirty generic noun test (if contains at least one Noun) - expanded from the 2 noun rule
+		// obviously I am not sure if it is ok
+		for (HashSet<POS> pos : possiblePOS_perWord) {
+			if (pos.contains(POS.NOUN)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Self-explanatory. Checks if the given string is defined as a noun POS (simple or compound) in wordnet, nothing more.
+	 * 
+	 * @param string
+	 * @return
+	 * @throws JWNLException
+	 */
+	@Deprecated
+	public static boolean isNounInWordnet_OLD(String string) throws JWNLException {
 		Dictionary dictionary = StaticSharedVariables.dictionary;
 
 		// check for easy/simple/existing identifiable noun

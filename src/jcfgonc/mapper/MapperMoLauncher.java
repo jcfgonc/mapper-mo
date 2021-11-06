@@ -78,15 +78,7 @@ public class MapperMoLauncher {
 		inputSpace.removeEdgesByLabel(MOEA_Config.uselessRelations);
 
 		StaticSharedVariables.stopWords = new HashSet<String>(VariousUtils.readFileRows(MOEA_Config.stopWordsPath));
-
-		// test television_show plant
-
-//		 String start = "television_show";
-//		 String end = "plant";
-//		 GraphAlgorithms.shortestPathSearch(inputSpace, start, end);
-//		 System.out.println(GraphAlgorithms.getDistance(inputSpace, start, end, 1000));
-//		 System.exit(0);
-
+		
 		GraphAlgorithms.addMirroredCopyEdges(inputSpace, MOEA_Config.undirectedRelations);
 
 		// read vital relations importance
