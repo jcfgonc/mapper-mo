@@ -85,7 +85,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 			meanWordsPerConcept = wpcs[0];
 		}
 		
-		boolean sameWordClass = GrammarUtils.sameWordClass(referencePair);
+		boolean sameWordClass = GrammarUtils.sameWordPOS(referencePair);
 
 		// set solution's objectives here
 		int obj_i = 0;
