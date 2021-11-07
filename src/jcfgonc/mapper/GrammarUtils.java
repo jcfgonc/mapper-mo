@@ -24,8 +24,12 @@ public class GrammarUtils {
 	 */
 	private static SynchronizedMapOfSet<String, POS> cachedConceptPOS = new SynchronizedMapOfSet<>();
 
+	private static Set<POS> conceptCached(String concept) {
+		return cachedConceptPOS.get(concept);
+	}
+
 	private static boolean conceptCached(String concept, POS cachedType) {
-		Set<POS> cachedPOS = cachedConceptPOS.get(concept);
+		Set<POS> cachedPOS = conceptCached(concept);
 		if (cachedPOS != null && cachedPOS.contains(cachedType)) {
 			return true;
 		}
@@ -156,10 +160,11 @@ public class GrammarUtils {
 	 */
 	public static Set<POS> getConceptPOS(String concept) throws JWNLException {
 		Set<POS> posList = getConceptPOS_fromWordnet(concept);
-		if (!posList.contains(POS.NOUN)) {
+		// if wordnet does not know anything, try using ISA
+	//	if (posList.isEmpty()) {
 			if (checkISA_NounInInputSpace(concept)) {
 				posList.add(POS.NOUN);
-			}
+	//		}
 		}
 		return posList;
 	}
@@ -277,90 +282,6 @@ public class GrammarUtils {
 			}
 		}
 
-		return false;
-	}
-
-	/**
-	 * Self-explanatory. Checks if the given string is defined as a noun POS (simple or compound) in wordnet, nothing more.
-	 * 
-	 * @param string
-	 * @return
-	 * @throws JWNLException
-	 */
-	@Deprecated
-	public static boolean isNounInWordnet_OLD(String string) throws JWNLException {
-		Dictionary dictionary = StaticSharedVariables.dictionary;
-
-		// check for easy/simple/existing identifiable noun
-		IndexWord indexWord = dictionary.getIndexWord(POS.NOUN, string);
-		if (indexWord != null)
-			return true;
-
-		List<String> words = Arrays.asList(VariousUtils.fastSplit(string, ' '));
-		// remove stopwords
-		words.removeAll(StaticSharedVariables.stopWords);
-
-		int numWords = words.size();
-		if (numWords == 2) {// otherwise check for compound noun
-
-			ListOfSet<POS> possiblePOS_perWord = new ListOfSet<>();
-			// assign possible POS for each word
-			for (String word : words) {
-				HashSet<POS> wPOS = getWordNetPOS(word);
-				possiblePOS_perWord.add(wPOS);
-			}
-
-			// test compound noun rules
-			if (possiblePOS_perWord.numberOfNonEmptySets() == 2) {
-
-				HashSet<POS> pos0 = possiblePOS_perWord.get(0);
-				HashSet<POS> pos1 = possiblePOS_perWord.get(1);
-
-				if (pos0.contains(POS.ADJECTIVE)) {
-					if (pos1.contains(POS.ADJECTIVE)) {
-						return true;
-					}
-					if (pos1.contains(POS.NOUN)) {
-						return true;
-					}
-					if (pos1.contains(POS.VERB)) {
-						return true;
-					}
-				}
-				if (pos0.contains(POS.ADVERB)) {
-					if (pos1.contains(POS.NOUN)) {
-						return true;
-					}
-					if (pos1.contains(POS.VERB)) {
-						return true;
-					}
-				}
-				if (pos0.contains(POS.NOUN)) {
-					if (pos1.contains(POS.ADJECTIVE)) {
-						return true;
-					}
-					if (pos1.contains(POS.ADVERB)) {
-						return true;
-					}
-					if (pos1.contains(POS.NOUN)) {
-						return true;
-					}
-					if (pos1.contains(POS.VERB)) {
-						return true;
-					}
-				}
-				if (pos0.contains(POS.VERB)) {
-					if (pos1.contains(POS.ADVERB)) {
-						return true;
-					}
-					if (pos1.contains(POS.NOUN)) {
-						return true;
-					}
-				}
-			}
-			// not matched with the two word rules
-		}
-		// not identified as a noun OR it is composed of three or more words
 		return false;
 	}
 

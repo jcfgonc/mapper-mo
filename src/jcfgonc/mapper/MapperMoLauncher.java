@@ -114,6 +114,8 @@ public class MapperMoLauncher {
 		StaticSharedVariables.wordPairScores = wps;
 		StaticSharedVariables.random = random;
 
+		GrammarUtils.getConceptPOS("entice");
+		
 		// personalize your constructor here
 		CustomProblem problem = new CustomProblem();
 
