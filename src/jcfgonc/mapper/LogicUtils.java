@@ -113,4 +113,17 @@ public class LogicUtils {
 		return count;
 	}
 
+	public static double calculateSamePOS_pairsPercentage(DirectedMultiGraph<OrderedPair<String>, String> pairGraph) {
+		if (pairGraph.getNumberOfVertices() == 0)
+			return 0;
+		int samePOScount = 0;
+		for (OrderedPair<String> pair : pairGraph.vertexSet()) {
+			if (GrammarUtils.sameWordPOS(pair)) {
+				samePOScount++;
+			}
+		}
+		double ratio = (double) samePOScount / pairGraph.getNumberOfVertices();
+		return ratio;
+	}
+
 }

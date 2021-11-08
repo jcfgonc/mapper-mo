@@ -4,10 +4,8 @@ import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 
 import graph.DirectedMultiGraph;
-import jcfgonc.mapper.GrammarUtils;
 import jcfgonc.mapper.LogicUtils;
 import jcfgonc.mapper.MOEA_Config;
-import jcfgonc.mapper.MappingAlgorithms;
 import jcfgonc.mapper.StaticSharedVariables;
 import jcfgonc.mapper.structures.MappingStructure;
 import jcfgonc.moea.generic.ProblemDescription;
@@ -72,7 +70,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 
 		int refPairInnerDistance = 0;
 		if (!emptyGraph) {
-		//	refPairInnerDistance = MappingAlgorithms.calculateReferencePairInnerDistance(StaticSharedVariables.inputSpace, referencePair, 10);
+			// refPairInnerDistance = MappingAlgorithms.calculateReferencePairInnerDistance(StaticSharedVariables.inputSpace, referencePair, 10);
 		}
 
 		double meanWordsPerConcept = 100;
@@ -84,8 +82,8 @@ public class CustomProblem implements Problem, ProblemDescription {
 //			stats[3] = ds.getMax();
 			meanWordsPerConcept = wpcs[0];
 		}
-		
-		boolean sameWordClass = GrammarUtils.sameWordPOS(referencePair);
+
+		double posRatio = LogicUtils.calculateSamePOS_pairsPercentage(pairGraph);
 
 		// set solution's objectives here
 		int obj_i = 0;
@@ -96,6 +94,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 		solution.setObjective(obj_i++, -degreeOfReferencePair);
 		solution.setObjective(obj_i++, -refPairInnerDistance);
 		solution.setObjective(obj_i++, meanWordsPerConcept);
+		solution.setObjective(obj_i++, -posRatio);
 
 		// violated constraints are set to 1, otherwise set to 0
 		if (numPairs < 3 || numPairs > MOEA_Config.MAXIMUM_NUMBER_OF_CONCEPT_PAIRS) { // limit the number of vertices in the blend space
@@ -125,6 +124,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 			"d:degreeOfReferencePair", //
 			"d:refPairInnerDistance", //
 			"f:meanWordsPerConcept", //
+			"f:samePOSpairRatio", //
 	};
 
 	private String[] constraintsDescription = { //

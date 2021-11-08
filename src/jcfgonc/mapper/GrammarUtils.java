@@ -1,7 +1,6 @@
 package jcfgonc.mapper;
 
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,11 +23,24 @@ public class GrammarUtils {
 	 */
 	private static SynchronizedMapOfSet<String, POS> cachedConceptPOS = new SynchronizedMapOfSet<>();
 
-	private static Set<POS> conceptCached(String concept) {
+	/**
+	 * Warning, returns null if concept is not cached. Never returns an empty set. Otherwise returns the list of POS for the given concept.
+	 * 
+	 * @param concept
+	 * @return
+	 */
+	public static Set<POS> conceptCached(String concept) {
 		return cachedConceptPOS.get(concept);
 	}
 
-	private static boolean conceptCached(String concept, POS cachedType) {
+	/**
+	 * Returns true if the given concept is cached as the given POS type. Otherwise returns false.
+	 * 
+	 * @param concept
+	 * @param cachedType
+	 * @return
+	 */
+	public static boolean conceptCached(String concept, POS cachedType) {
 		Set<POS> cachedPOS = conceptCached(concept);
 		if (cachedPOS != null && cachedPOS.contains(cachedType)) {
 			return true;
@@ -36,31 +48,29 @@ public class GrammarUtils {
 		return false;
 	}
 
-	private static boolean conceptCachedAsNoun(String concept) {
-		return conceptCached(concept, POS.NOUN);
-	}
-
 	/**
-	 * check if the given concept ISA <something> noun in the inputspace - should be recursive
+	 * Check if the given concept ISA <something> with a POS in the inputspace, recursively.
 	 * 
 	 * @param concept
 	 * @throws JWNLException
 	 */
-	public static boolean checkISA_NounInInputSpace(String concept) throws JWNLException {
-		// duh, prevent futile work
-		if (conceptCachedAsNoun(concept) || isNounInWordnet(concept))
-			return true;
+	public static Set<POS> checkPOS_InInputSpace(String concept) throws JWNLException {
+		// prevent futile work
+		Set<POS> posType = conceptCached(concept);
+		if (posType != null)
+			return posType;
 
-		StringGraph inputSpace = StaticSharedVariables.inputSpace;
+		posType = new HashSet<POS>();
+
+		StringGraph inputSpace = StaticSharedVariables.originalInputSpace;
 
 		HashSet<String> closedSet = new HashSet<>();
 		ArrayDeque<String> openSet = new ArrayDeque<>();
 		HashMap<String, String> cameFrom = new HashMap<>();
 		String endingTarget = null;
 
-		openSet.addLast(concept);
 		// ---------init
-		POS posType = null;
+		openSet.addLast(concept);
 
 		outerWhile: while (!openSet.isEmpty()) {
 			String current = openSet.removeFirst();
@@ -68,6 +78,8 @@ public class GrammarUtils {
 			closedSet.add(current);
 			// Set<StringEdge> in = inputSpace.incomingEdgesOf(current, "isa");
 			Set<StringEdge> out = inputSpace.outgoingEdgesOf(current, "isa");
+			out.addAll(inputSpace.outgoingEdgesOf(current, "synonym"));
+			out.addAll(inputSpace.outgoingEdgesOf(current, "partof"));
 			HashSet<String> targets = StringGraph.edgesTargets(out);
 
 			for (String target : targets) {
@@ -78,26 +90,29 @@ public class GrammarUtils {
 				cameFrom.put(target, current);
 				openSet.addLast(target); // later expand next ISA target
 
-				// TODO: if target has a different POS, stop and return that POS
-
-				if (conceptCachedAsNoun(target) // check if target has been decoded before
-						|| isNounInWordnet(target)) { // otherwise check if target has a POS in wordnet
-
-					// found an ISA target which is a noun
-					posType = POS.NOUN;
+				// check if target has been decoded before
+				Set<POS> targetCached = conceptCached(target);
+				if (targetCached != null && !targetCached.isEmpty()) {
 					endingTarget = target;
+					posType.addAll(targetCached);
 					break outerWhile;
 				}
 
-//				System.lineSeparator();
-			}
-			if (!openSet.isEmpty()) {
+				// check if target has a POS in wordnet
+				Set<POS> conceptPOS_fromWordnet = getConceptPOS_fromWordnet(target);
+				if (conceptPOS_fromWordnet != null && !conceptPOS_fromWordnet.isEmpty()) {
+					endingTarget = target;
+					posType.addAll(conceptPOS_fromWordnet);
+					break outerWhile;
+				}
+			} // went through all targets
+			if (!openSet.isEmpty()) { // there is yet stuff to explore
 				System.lineSeparator();
 			}
 		}
 		// posType defined OR not
-		if (posType == null) {
-			System.out.println("could not resolve " + concept + " through ISA");
+		if (posType.isEmpty()) {
+//			System.out.println("could not resolve " + concept + " through ISA");
 		} else {
 			// store middle targets POS by starting at endingTarget and going back the camefrom path
 			// get path
@@ -110,11 +125,8 @@ public class GrammarUtils {
 					break;
 				current = prior;
 			}
-			if (posType == POS.NOUN) {
-				return true;
-			}
 		}
-		return false;
+		return posType;
 	}
 
 	public static boolean sameWordPOS(OrderedPair<String> pair) {
@@ -161,16 +173,14 @@ public class GrammarUtils {
 	public static Set<POS> getConceptPOS(String concept) throws JWNLException {
 		Set<POS> posList = getConceptPOS_fromWordnet(concept);
 		// if wordnet does not know anything, try using ISA
-	//	if (posList.isEmpty()) {
-			if (checkISA_NounInInputSpace(concept)) {
-				posList.add(POS.NOUN);
-	//		}
+		if (posList.isEmpty()) {
+			posList = checkPOS_InInputSpace(concept);
 		}
 		return posList;
 	}
 
 	/**
-	 * Gets concept POS list from wordnet only. Called by getConceptPOS().
+	 * Gets concept POS list from wordnet only. Tries both simple and compound cases.
 	 * 
 	 * @param concept
 	 * @return
@@ -218,7 +228,7 @@ public class GrammarUtils {
 		if (indexWord != null)
 			return true;
 
-		List<String> words = Arrays.asList(VariousUtils.fastSplit(string, ' '));
+		List<String> words = VariousUtils.arrayToArrayList(VariousUtils.fastSplit(string, ' '));
 		// remove stopwords
 		words.removeAll(StaticSharedVariables.stopWords);
 
@@ -227,13 +237,8 @@ public class GrammarUtils {
 
 		// assign possible POS for each word
 		for (String word : words) {
-			HashSet<POS> wPOS = getWordNetPOS(word);
+			HashSet<POS> wPOS = getWordNetPOS_simple(word);
 			possiblePOS_perWord.add(wPOS);
-		}
-
-		if (numWords == 1) {
-			// if wordnet knew about it, it should have been caught above
-			return false;
 		}
 
 		// check for compound noun
@@ -286,13 +291,13 @@ public class GrammarUtils {
 	}
 
 	/**
-	 * Gets a set of POS for the given concept in wordnet. If the concept does not exist in wordnet an empty set is returned.
+	 * Gets a set of POS for the given concept in wordnet. If the concept does not exist in wordnet an empty set is returned. Does not check for compound nouns.
 	 * 
 	 * @param concept
 	 * @return
 	 * @throws JWNLException
 	 */
-	public static HashSet<POS> getWordNetPOS(String concept) throws JWNLException {
+	public static HashSet<POS> getWordNetPOS_simple(String concept) throws JWNLException {
 		HashSet<POS> pos = new HashSet<>();
 		Dictionary dictionary = StaticSharedVariables.dictionary;
 		if (dictionary.getIndexWord(POS.NOUN, concept) != null) {

@@ -73,6 +73,7 @@ public class MapperMoLauncher {
 
 		// read input space
 		StringGraph inputSpace = readInputSpace(MOEA_Config.inputSpacePath);
+		StaticSharedVariables.originalInputSpace = inputSpace;
 
 		// remove useless relations
 		inputSpace.removeEdgesByLabel(MOEA_Config.uselessRelations);
@@ -114,7 +115,7 @@ public class MapperMoLauncher {
 		StaticSharedVariables.wordPairScores = wps;
 		StaticSharedVariables.random = random;
 
-		GrammarUtils.getConceptPOS("entice");
+//		GrammarUtils.getConceptPOS("drown underwater");
 		
 		// personalize your constructor here
 		CustomProblem problem = new CustomProblem();
