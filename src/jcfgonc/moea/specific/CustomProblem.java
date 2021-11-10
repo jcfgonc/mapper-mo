@@ -83,7 +83,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 			meanWordsPerConcept = wpcs[0];
 		}
 
-		double posRatio = LogicUtils.calculateSamePOS_pairsPercentage(pairGraph);
+		double posRatio = LogicUtils.calculateSamePOS_pairsPercentage(pairGraph, StaticSharedVariables.inputSpaceForPOS);
 
 		// set solution's objectives here
 		int obj_i = 0;

@@ -2,7 +2,6 @@ package jcfgonc.mapper;
 
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
-import java.util.HashSet;
 import java.util.Properties;
 
 import javax.swing.UIManager;
@@ -80,20 +79,27 @@ public class MapperMoLauncher {
 		inputSpace.removeVerticesStartingWith("this ");
 		inputSpace.removeVerticesStartingWith("you ");
 		inputSpace.removeVerticesStartingWith("that ");
-		StaticSharedVariables.originalInputSpace = inputSpace;
+		inputSpace.removeVerticesStartingWith("sit on it");
+		inputSpace.removeVerticesStartingWith("something you");
+		GraphAlgorithms.addMirroredCopyEdges(inputSpace, MOEA_Config.undirectedRelations);
+		StaticSharedVariables.inputSpaceForPOS = new StringGraph(inputSpace);
 
 		// remove useless relations
 		inputSpace.removeEdgesByLabel(MOEA_Config.uselessRelations);
-
-		StaticSharedVariables.stopWords = new HashSet<String>(VariousUtils.readFileRows(MOEA_Config.stopWordsPath));
-
-		GraphAlgorithms.addMirroredCopyEdges(inputSpace, MOEA_Config.undirectedRelations);
+		StaticSharedVariables.inputSpace = inputSpace;
 
 		// read vital relations importance
 		Object2DoubleOpenHashMap<String> vitalRelations = VariousUtils.readVitalRelations(MOEA_Config.vitalRelationsPath);
 
 		// read pre-calculated semantic scores of word/relation pairs
 		Object2DoubleOpenHashMap<UnorderedPair<String>> wps = WordEmbeddingUtils.readWordPairScores(MOEA_Config.wordPairScores_filename);
+
+//		StaticSharedVariables.stopWords = new HashSet<String>(VariousUtils.readFileRows(MOEA_Config.stopWordsPath));
+//		Set<POS> pos = GrammarUtils.getConceptPOS("amphoe", StaticSharedVariables.inputSpace);
+//		GrammarUtils.studyStringGraphVerticesPOS(StaticSharedVariables.inputSpaceForPOS);
+//		System.exit(0);
+
+		// ------ MOEA SETUP
 
 		// setup the mutation and the MOEA
 		registerCustomMutation();
@@ -117,7 +123,6 @@ public class MapperMoLauncher {
 		// personalize your results writer here
 		ResultsWriter resultsWriter = new CustomResultsWriter();
 
-		StaticSharedVariables.inputSpace = inputSpace;
 		StaticSharedVariables.vitalRelations = vitalRelations;
 		StaticSharedVariables.wordPairScores = wps;
 		StaticSharedVariables.random = random;

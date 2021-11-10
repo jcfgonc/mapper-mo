@@ -21,7 +21,7 @@ public class StaticSharedVariables {
 			new SynchronizedSeriarizableCache<>(MOEA_Config.CACHE_FILENAME, MOEA_Config.CACHE_SAVE_TIMEOUT);
 	public static Dictionary dictionary; // wordnet dictionary
 	public static HashSet<String> stopWords;
-	public static StringGraph originalInputSpace;
+	public static StringGraph inputSpaceForPOS;
 
 	static {
 		try {

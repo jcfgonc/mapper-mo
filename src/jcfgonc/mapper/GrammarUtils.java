@@ -1,6 +1,7 @@
 package jcfgonc.mapper;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,6 +14,8 @@ import net.sf.extjwnl.data.IndexWord;
 import net.sf.extjwnl.data.POS;
 import net.sf.extjwnl.dictionary.Dictionary;
 import structures.ListOfSet;
+import structures.ObjectCount;
+import structures.ObjectCounter;
 import structures.OrderedPair;
 import structures.SynchronizedMapOfSet;
 import utils.VariousUtils;
@@ -54,15 +57,13 @@ public class GrammarUtils {
 	 * @param concept
 	 * @throws JWNLException
 	 */
-	public static Set<POS> checkPOS_InInputSpace(String concept) throws JWNLException {
+	public static Set<POS> checkPOS_InInputSpace(String concept, StringGraph inputSpace) throws JWNLException {
 		// prevent futile work
 		Set<POS> posType = conceptCached(concept);
 		if (posType != null)
 			return posType;
 
 		posType = new HashSet<POS>();
-
-		StringGraph inputSpace = StaticSharedVariables.originalInputSpace;
 
 		HashSet<String> closedSet = new HashSet<>();
 		ArrayDeque<String> openSet = new ArrayDeque<>();
@@ -76,10 +77,11 @@ public class GrammarUtils {
 			String current = openSet.removeFirst();
 
 			closedSet.add(current);
-			// Set<StringEdge> in = inputSpace.incomingEdgesOf(current, "isa");
+			// these relations should maintain POS
 			Set<StringEdge> out = inputSpace.outgoingEdgesOf(current, "isa");
 			out.addAll(inputSpace.outgoingEdgesOf(current, "synonym"));
 			out.addAll(inputSpace.outgoingEdgesOf(current, "partof"));
+			out.addAll(inputSpace.outgoingEdgesOf(current, "derivedfrom"));
 			HashSet<String> targets = StringGraph.edgesTargets(out);
 
 			for (String target : targets) {
@@ -129,15 +131,15 @@ public class GrammarUtils {
 		return posType;
 	}
 
-	public static boolean sameWordPOS(OrderedPair<String> pair) {
+	public static boolean sameWordPOS(OrderedPair<String> pair, StringGraph inputSpace) {
 		String leftElement = pair.getLeftElement();
 		String rightElement = pair.getRightElement();
 
 		// compound concepts are expected to be space separated
 		try {
 			// get POS for each concept
-			Set<POS> lPOS = getConceptPOS(leftElement);
-			Set<POS> rPOS = getConceptPOS(rightElement);
+			Set<POS> lPOS = getConceptPOS(leftElement, inputSpace);
+			Set<POS> rPOS = getConceptPOS(rightElement, inputSpace);
 
 			if (lPOS.isEmpty())
 				System.out.println("could not get POS: " + leftElement);
@@ -170,11 +172,11 @@ public class GrammarUtils {
 	 * @return
 	 * @throws JWNLException
 	 */
-	public static Set<POS> getConceptPOS(String concept) throws JWNLException {
+	public static Set<POS> getConceptPOS(String concept, StringGraph inputSpace) throws JWNLException {
 		Set<POS> posList = getConceptPOS_fromWordnet(concept);
 		// if wordnet does not know anything, try using ISA
 		if (posList.isEmpty()) {
-			posList = checkPOS_InInputSpace(concept);
+			posList = checkPOS_InInputSpace(concept, inputSpace);
 		}
 		return posList;
 	}
@@ -315,4 +317,21 @@ public class GrammarUtils {
 		return pos;
 	}
 
+	static void studyStringGraphVerticesPOS(StringGraph graph) throws JWNLException {
+		ObjectCounter<String> degreeCounter = new ObjectCounter<>();
+		for (String concept : graph.getVertexSet()) {
+			degreeCounter.addObject(concept, graph.degreeOf(concept));
+		}
+		ArrayList<ObjectCount<String>> sortedCount = degreeCounter.getSortedCount();
+		for (ObjectCount<String> oc : sortedCount) {
+			String concept = oc.getId();
+			int inDegree = graph.getInDegree(concept);
+			int outDegree = graph.getOutDegree(concept);
+			int degree = oc.getCount();
+
+			Set<POS> pos = getConceptPOS(concept, graph);
+			if(pos.isEmpty())
+			System.out.printf("%s\t%d\t%d\t%d\t%s\n", concept, degree, inDegree, outDegree, pos);
+		}
+	}
 }

@@ -38,7 +38,7 @@ public class MOEA_Config {
 	 */
 	public static final Set<String> undirectedRelations = Set.of("synonym", "antonym", "relatedto", "similarto");
 
-	public static final Set<String> uselessRelations = Set.of("similarto", "derivedfrom", "hascontext", "relatedto", "synonym");
+	public static final Set<String> uselessRelations = Set.of("similarto", "derivedfrom", "hascontext", "relatedto");
 
 	public static final String screenshotsFolder = "screenshots";
 	public static final boolean GRAPHS_ENABLED = true;

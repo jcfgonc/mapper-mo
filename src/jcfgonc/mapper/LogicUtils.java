@@ -6,6 +6,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import graph.DirectedMultiGraph;
 import graph.GraphAlgorithms;
+import graph.StringGraph;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -113,12 +114,12 @@ public class LogicUtils {
 		return count;
 	}
 
-	public static double calculateSamePOS_pairsPercentage(DirectedMultiGraph<OrderedPair<String>, String> pairGraph) {
+	public static double calculateSamePOS_pairsPercentage(DirectedMultiGraph<OrderedPair<String>, String> pairGraph, StringGraph inputSpace) {
 		if (pairGraph.getNumberOfVertices() == 0)
 			return 0;
 		int samePOScount = 0;
 		for (OrderedPair<String> pair : pairGraph.vertexSet()) {
-			if (GrammarUtils.sameWordPOS(pair)) {
+			if (GrammarUtils.sameWordPOS(pair, inputSpace)) {
 				samePOScount++;
 			}
 		}
