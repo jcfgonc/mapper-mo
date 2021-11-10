@@ -140,9 +140,9 @@ public class GrammarUtils {
 			Set<POS> rPOS = getConceptPOS(rightElement);
 
 			if (lPOS.isEmpty())
-				System.out.println("could not get POS for " + leftElement);
+				System.out.println("could not get POS: " + leftElement);
 			if (rPOS.isEmpty())
-				System.out.println("could not get POS for " + rightElement);
+				System.out.println("could not get POS: " + rightElement);
 
 			if (!lPOS.isEmpty() && !rPOS.isEmpty()) {
 				boolean intersects = VariousUtils.intersects(lPOS, rPOS);

@@ -73,13 +73,20 @@ public class MapperMoLauncher {
 
 		// read input space
 		StringGraph inputSpace = readInputSpace(MOEA_Config.inputSpacePath);
+		// remove crap
+		inputSpace.removeVerticesStartingWith("they ");
+		inputSpace.removeVerticesStartingWith("some ");
+		inputSpace.removeVerticesStartingWith("sometime");
+		inputSpace.removeVerticesStartingWith("this ");
+		inputSpace.removeVerticesStartingWith("you ");
+		inputSpace.removeVerticesStartingWith("that ");
 		StaticSharedVariables.originalInputSpace = inputSpace;
 
 		// remove useless relations
 		inputSpace.removeEdgesByLabel(MOEA_Config.uselessRelations);
 
 		StaticSharedVariables.stopWords = new HashSet<String>(VariousUtils.readFileRows(MOEA_Config.stopWordsPath));
-		
+
 		GraphAlgorithms.addMirroredCopyEdges(inputSpace, MOEA_Config.undirectedRelations);
 
 		// read vital relations importance
@@ -116,7 +123,7 @@ public class MapperMoLauncher {
 		StaticSharedVariables.random = random;
 
 //		GrammarUtils.getConceptPOS("drown underwater");
-		
+
 		// personalize your constructor here
 		CustomProblem problem = new CustomProblem();
 
