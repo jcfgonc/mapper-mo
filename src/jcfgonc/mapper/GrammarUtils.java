@@ -27,7 +27,8 @@ public class GrammarUtils {
 	private static SynchronizedMapOfSet<String, POS> cachedConceptPOS = new SynchronizedMapOfSet<>();
 
 	/**
-	 * Warning, returns null if concept is not cached. Never returns an empty set. Otherwise returns the list of POS for the given concept.
+	 * Warning, returns null if concept is not cached. May return an empty set if the concept has no POS. Otherwise returns the list of POS for the given
+	 * concept.
 	 * 
 	 * @param concept
 	 * @return
@@ -60,7 +61,7 @@ public class GrammarUtils {
 	public static Set<POS> checkPOS_InInputSpace(String concept, StringGraph inputSpace) throws JWNLException {
 		// prevent futile work
 		Set<POS> posType = conceptCached(concept);
-		if (posType != null)
+		if (posType != null && !posType.isEmpty())
 			return posType;
 
 		posType = new HashSet<POS>();
@@ -81,7 +82,7 @@ public class GrammarUtils {
 			Set<StringEdge> out = inputSpace.outgoingEdgesOf(current, "isa");
 			out.addAll(inputSpace.outgoingEdgesOf(current, "synonym"));
 			out.addAll(inputSpace.outgoingEdgesOf(current, "partof"));
-			out.addAll(inputSpace.outgoingEdgesOf(current, "derivedfrom"));
+//			out.addAll(inputSpace.outgoingEdgesOf(current, "derivedfrom"));
 			HashSet<String> targets = StringGraph.edgesTargets(out);
 
 			for (String target : targets) {
@@ -142,9 +143,9 @@ public class GrammarUtils {
 			Set<POS> rPOS = getConceptPOS(rightElement, inputSpace);
 
 			if (lPOS.isEmpty())
-				System.out.println("could not get POS: " + leftElement);
+				System.out.println("could not get POS: " + leftElement + "\tdegree: " + inputSpace.degreeOf(leftElement));
 			if (rPOS.isEmpty())
-				System.out.println("could not get POS: " + rightElement);
+				System.out.println("could not get POS: " + rightElement + "\tdegree: " + inputSpace.degreeOf(rightElement));
 
 			if (!lPOS.isEmpty() && !rPOS.isEmpty()) {
 				boolean intersects = VariousUtils.intersects(lPOS, rPOS);
@@ -190,7 +191,7 @@ public class GrammarUtils {
 	 */
 	public static Set<POS> getConceptPOS_fromWordnet(String concept) throws JWNLException {
 		// was that concept's POS previously identified?
-		Set<POS> cachedPOS = cachedConceptPOS.get(concept);
+		Set<POS> cachedPOS = conceptCached(concept);
 		if (cachedPOS != null && !cachedPOS.isEmpty()) {
 			// YES
 			return cachedPOS;
@@ -330,8 +331,8 @@ public class GrammarUtils {
 			int degree = oc.getCount();
 
 			Set<POS> pos = getConceptPOS(concept, graph);
-			if(pos.isEmpty())
-			System.out.printf("%s\t%d\t%d\t%d\t%s\n", concept, degree, inDegree, outDegree, pos);
+			if (pos.isEmpty())
+				System.out.printf("%s\t%d\t%d\t%d\t%s\n", concept, degree, inDegree, outDegree, pos);
 		}
 	}
 }

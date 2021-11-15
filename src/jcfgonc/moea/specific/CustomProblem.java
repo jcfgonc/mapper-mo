@@ -6,6 +6,7 @@ import org.moeaframework.core.Solution;
 import graph.DirectedMultiGraph;
 import jcfgonc.mapper.LogicUtils;
 import jcfgonc.mapper.MOEA_Config;
+import jcfgonc.mapper.MappingAlgorithms;
 import jcfgonc.mapper.StaticSharedVariables;
 import jcfgonc.mapper.structures.MappingStructure;
 import jcfgonc.moea.generic.ProblemDescription;
@@ -70,7 +71,8 @@ public class CustomProblem implements Problem, ProblemDescription {
 
 		int refPairInnerDistance = 0;
 		if (!emptyGraph) {
-			// refPairInnerDistance = MappingAlgorithms.calculateReferencePairInnerDistance(StaticSharedVariables.inputSpace, referencePair, 10);
+			refPairInnerDistance = MappingAlgorithms.calculateReferencePairInnerDistance(StaticSharedVariables.inputSpace, referencePair,
+					MOEA_Config.REFERENCE_PAIRINNER_DISTANCE_CALCULATION_LIMIT);
 		}
 
 		double meanWordsPerConcept = 100;
@@ -83,7 +85,10 @@ public class CustomProblem implements Problem, ProblemDescription {
 			meanWordsPerConcept = wpcs[0];
 		}
 
-		double posRatio = LogicUtils.calculateSamePOS_pairsPercentage(pairGraph, StaticSharedVariables.inputSpaceForPOS);
+		double posRatio = 0;
+		if (!emptyGraph) {
+			posRatio = LogicUtils.calculateSamePOS_pairsPercentage(pairGraph, StaticSharedVariables.inputSpaceForPOS);
+		}
 
 		// set solution's objectives here
 		int obj_i = 0;

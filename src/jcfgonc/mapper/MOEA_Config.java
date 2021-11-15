@@ -13,7 +13,7 @@ public class MOEA_Config {
 	/**
 	 * number of (constant) solutions in the population
 	 */
-	public static int POPULATION_SIZE = 256;
+	public static int POPULATION_SIZE = 512;
 	/**
 	 * maximum number of epochs/generations to iterate
 	 */
@@ -25,7 +25,7 @@ public class MOEA_Config {
 	/*
 	 * maximum amount of time (minutes) allowed for each MOEA run
 	 */
-	public static double MAX_RUN_TIME = 240.0;
+	public static double MAX_RUN_TIME = 999999.0;
 
 	public static final String inputSpacePath = "data/conceptnet5v45.csv";
 	public static final String wordembedding_filename = "D:\\\\Temp\\\\ontologies\\\\word emb\\\\ConceptNet Numberbatch 19.08\\\\numberbatch-en.txt";
@@ -45,7 +45,7 @@ public class MOEA_Config {
 	public static final boolean SCREENSHOTS_ENABLED = false;
 	public static final boolean LAST_EPOCH_SCREENSHOT = false;
 
-	public static final int MAXIMUM_NUMBER_OF_CONCEPT_PAIRS = 10;
+	public static final int MAXIMUM_NUMBER_OF_CONCEPT_PAIRS = 16;
 	// mutation controls
 	public static final double LOCAL_JUMP_PROBABILITY = 0.88;
 	public static final int REFPAIR_JUMP_RANGE = 1;
@@ -53,6 +53,7 @@ public class MOEA_Config {
 	public static final int DEEPNESS_LIMIT = 7;
 	public static final int NUMBER_MUTATION_TRIES = 10;
 	public static final int CACHE_SAVE_TIMEOUT = 5 * 60;
+	public static final int REFERENCE_PAIRINNER_DISTANCE_CALCULATION_LIMIT = 7;
 	public static final String CACHE_FILENAME = "refPairInnerDistanceCache.dat";
 	public static final String stopWordsPath = "data/english stop words 1.txt";
 }
