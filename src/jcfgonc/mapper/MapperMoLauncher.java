@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.HashSet;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -33,7 +32,6 @@ import jcfgonc.moea.specific.CustomProblem;
 import jcfgonc.moea.specific.CustomResultsWriter;
 import jcfgonc.moea.specific.ResultsWriter;
 import net.sf.extjwnl.JWNLException;
-import net.sf.extjwnl.data.POS;
 import structures.OrderedPair;
 import structures.Ticker;
 import structures.UnorderedPair;
@@ -86,7 +84,7 @@ public class MapperMoLauncher {
 		inputSpace.removeVerticesStartingWith("something you");
 		GraphAlgorithms.addMirroredCopyEdges(inputSpace, MOEA_Config.undirectedRelations);
 //		GraphReadWrite.writeCSV(MOEA_Config.inputSpacePath, inputSpace);
-		
+
 		StaticSharedVariables.inputSpaceForPOS = new StringGraph(inputSpace);
 
 		// remove useless relations
@@ -98,12 +96,14 @@ public class MapperMoLauncher {
 
 		// read pre-calculated semantic scores of word/relation pairs
 		Object2DoubleOpenHashMap<UnorderedPair<String>> wps = WordEmbeddingUtils.readWordPairScores(MOEA_Config.wordPairScores_filename);
-		
+
 		StaticSharedVariables.stopWords = new HashSet<String>(VariousUtils.readFileRows(MOEA_Config.stopWordsPath));
-		
+
+		GrammarUtils.checkPOS_InInputSpace("bathurst inlet", StaticSharedVariables.inputSpaceForPOS);
+		GrammarUtils.checkPOS_InInputSpace("bathurst inlet", StaticSharedVariables.inputSpaceForPOS);
 //		GrammarUtils.studyStringGraphVerticesPOS(StaticSharedVariables.inputSpaceForPOS);
 //		Set<POS> pos = GrammarUtils.getConceptPOS("become strong", StaticSharedVariables.inputSpaceForPOS);
-//		System.exit(0);
+		System.exit(0);
 
 		// ------ MOEA SETUP
 

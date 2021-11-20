@@ -13,7 +13,7 @@ public class MOEA_Config {
 	/**
 	 * number of (constant) solutions in the population
 	 */
-	public static int POPULATION_SIZE = 512;
+	public static int POPULATION_SIZE = 256;
 	/**
 	 * maximum number of epochs/generations to iterate
 	 */
@@ -54,6 +54,7 @@ public class MOEA_Config {
 	public static final int NUMBER_MUTATION_TRIES = 10;
 	public static final int CACHE_SAVE_TIMEOUT = 5 * 60;
 	public static final int REFERENCE_PAIRINNER_DISTANCE_CALCULATION_LIMIT = 7;
-	public static final String CACHE_FILENAME = "refPairInnerDistanceCache.dat";
-	public static final String stopWordsPath = "data/english stop words 1.txt";
+	public static final String REFPAIR_CACHE_FILENAME = "refPairInnerDistanceCache.dat";
+	public static final String POS_CACHE_FILENAME = "posCache.dat";
+	public static final String stopWordsPath = "data/english stop words basic.txt";
 }
