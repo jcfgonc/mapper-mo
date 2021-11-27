@@ -1,12 +1,15 @@
 package jcfgonc.mapper;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import graph.DirectedMultiGraph;
 import graph.GraphAlgorithms;
-import graph.StringGraph;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -64,7 +67,7 @@ public class LogicUtils {
 
 	public static <T> double[] calculateWordsPerConceptStatistics(DirectedMultiGraph<OrderedPair<T>, T> graph) {
 		// array where each element is the number of words in a vertex
-		int[] conceptWords = getWordsPerConcept(graph);
+		int[] conceptWords = countWordsPerConcept(graph);
 		double[] asDouble = new double[conceptWords.length];
 		for (int i = 0; i < conceptWords.length; i++) {
 			int numWords = conceptWords[i];
@@ -86,7 +89,7 @@ public class LogicUtils {
 		return stats;
 	}
 
-	public static <T> int[] getWordsPerConcept(DirectedMultiGraph<OrderedPair<T>, T> graph) {
+	public static <T> int[] countWordsPerConcept(DirectedMultiGraph<OrderedPair<T>, T> graph) {
 		// list of all individual concepts extracted from the concept pairs of the graph
 		ArrayList<T> concepts = new ArrayList<T>(graph.getNumberOfVertices() * 2);
 		for (OrderedPair<T> vertex : graph.vertexSet()) {
@@ -97,34 +100,34 @@ public class LogicUtils {
 		int[] conceptWords = new int[numConcepts];
 		for (int i = 0; i < numConcepts; i++) {
 			T concept = concepts.get(i);
-			String[] words = VariousUtils.fastSplit(concept.toString(), '_');
+			String[] words = VariousUtils.fastSplit(concept.toString(), MOEA_Config.CONCEPT_WORD_SEPARATOR);
 			int numWords = words.length;
 			conceptWords[i] = numWords;
 		}
 		return conceptWords;
 	}
 
-	public static int countChars(String str, char c) {
-		int count = 0;
-		for (int i = 0; i < str.length(); i++) {
-			if (str.charAt(i) == c) {
-				count++;
-			}
-		}
-		return count;
-	}
-
-	public static double calculateSamePOS_pairsPercentage(DirectedMultiGraph<OrderedPair<String>, String> pairGraph, StringGraph inputSpace) {
-		if (pairGraph.getNumberOfVertices() == 0)
+	public static double minimumRadialDistanceFunc(double center, double diameter, double x) {
+		if (x >= center - diameter && x <= center + diameter)
 			return 0;
-		int samePOScount = 0;
-		for (OrderedPair<String> pair : pairGraph.vertexSet()) {
-			if (GrammarUtils.sameWordPOS(pair, inputSpace)) {
-				samePOScount++;
-			}
-		}
-		double ratio = (double) samePOScount / pairGraph.getNumberOfVertices();
-		return ratio;
+		return Math.ceil(Math.abs(center - x) - diameter);
 	}
 
+	public static Object2DoubleOpenHashMap<String> readVitalRelations(String path) throws IOException {
+		Object2DoubleOpenHashMap<String> relationToImportance = new Object2DoubleOpenHashMap<String>();
+		BufferedReader br = new BufferedReader(new FileReader(path, StandardCharsets.UTF_8), 1 << 24);
+		String line;
+		while ((line = br.readLine()) != null) {
+			line = line.trim();
+			if (line.contains(":")) // header, eg, s:relation
+				continue;
+			String[] cells = VariousUtils.fastSplitWhiteSpace(line);
+			String relation = cells[0];
+			double importance = Double.parseDouble(cells[1]);
+			relationToImportance.put(relation, importance);
+		}
+		br.close();
+		System.out.printf("using the definition of %d vital relations from %s\n", relationToImportance.size(), path);
+		return relationToImportance;
+	}
 }

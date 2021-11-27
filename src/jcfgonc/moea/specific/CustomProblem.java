@@ -4,6 +4,7 @@ import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 
 import graph.DirectedMultiGraph;
+import jcfgonc.mapper.GrammarUtils;
 import jcfgonc.mapper.LogicUtils;
 import jcfgonc.mapper.MOEA_Config;
 import jcfgonc.mapper.MappingAlgorithms;
@@ -69,13 +70,14 @@ public class CustomProblem implements Problem, ProblemDescription {
 			degreeOfReferencePair = pairGraph.degreeOf(referencePair);
 		}
 
-		int refPairInnerDistance = 0;
+		int refPairInnerDistance = 10;
 		if (!emptyGraph) {
-			refPairInnerDistance = MappingAlgorithms.calculateReferencePairInnerDistance(StaticSharedVariables.inputSpace, referencePair,
+			int dist = MappingAlgorithms.calculateReferencePairInnerDistance(StaticSharedVariables.inputSpace, referencePair,
 					MOEA_Config.REFERENCE_PAIRINNER_DISTANCE_CALCULATION_LIMIT);
+			refPairInnerDistance = dist;//(int) LogicUtils.minimumRadialDistanceFunc(3, 1, dist);
 		}
 
-		double meanWordsPerConcept = 100;
+		double meanWordsPerConcept = 10;
 		if (!emptyGraph) {
 			double[] wpcs = LogicUtils.calculateWordsPerConceptStatistics(pairGraph);
 //			stats[0] = ds.getMean();
@@ -87,7 +89,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 
 		double posRatio = 0;
 		if (!emptyGraph) {
-			posRatio = LogicUtils.calculateSamePOS_pairsPercentage(pairGraph, StaticSharedVariables.inputSpaceForPOS);
+			posRatio = GrammarUtils.calculateSamePOS_pairsPercentage(pairGraph, StaticSharedVariables.inputSpaceForPOS);
 		}
 
 		// set solution's objectives here
@@ -108,16 +110,28 @@ public class CustomProblem implements Problem, ProblemDescription {
 			solution.setConstraint(0, 0); // not violated
 		}
 
-		if (numRelations < 3) {
+//		if (numRelations < 3) {
+//			solution.setConstraint(1, 1); // violated
+//		} else {
+//			solution.setConstraint(1, 0); // not violated
+//		}
+
+		if (degreeOfReferencePair < 2) {
 			solution.setConstraint(1, 1); // violated
 		} else {
 			solution.setConstraint(1, 0); // not violated
 		}
 
-		if (refPairInnerDistance < 2) {
+		if (posRatio < 0.67) {
 			solution.setConstraint(2, 1); // violated
 		} else {
 			solution.setConstraint(2, 0); // not violated
+		}
+
+		if (vitalRelationsMean < 0.67) {
+			solution.setConstraint(3, 1); // violated
+		} else {
+			solution.setConstraint(3, 0); // not violated
 		}
 	}
 
@@ -134,8 +148,10 @@ public class CustomProblem implements Problem, ProblemDescription {
 
 	private String[] constraintsDescription = { //
 			"required numPairs", //
-			"required numRelations", //
-			"required refPairInnerDistance", //
+//			"required numRelations", //
+			"required degreeOfReferencePair", //
+			"required posRatio", //
+			"required vitalRelationsMean", //
 	};
 
 	@Override

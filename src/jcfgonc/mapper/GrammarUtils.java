@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import graph.DirectedMultiGraph;
 import graph.StringEdge;
 import graph.StringGraph;
 import net.sf.extjwnl.JWNLException;
@@ -62,11 +63,11 @@ public class GrammarUtils {
 		// prevent futile work
 		Set<POS> posType = conceptCached(concept);
 		if (posType != null) { // POS has either been queried or not before
-	//		System.out.println("previously resolved: " + concept + " = " + posType);
+			// System.out.println("previously resolved: " + concept + " = " + posType);
 			return posType;
 		}
 		// POS was not queried before
-		System.out.println("resolving new concept: " + concept);
+//		System.out.println("resolving new concept: " + concept);
 
 		posType = new HashSet<POS>();
 
@@ -101,7 +102,7 @@ public class GrammarUtils {
 			// these relations should maintain POS
 			Set<StringEdge> out = inputSpace.outgoingEdgesOf(current, "isa");
 			out.addAll(inputSpace.outgoingEdgesOf(current, "synonym"));
-			out.addAll(inputSpace.outgoingEdgesOf(current, "partof"));
+			// out.addAll(inputSpace.outgoingEdgesOf(current, "partof"));
 			HashSet<String> targets = StringGraph.edgesTargets(out);
 
 			for (String target : targets) {
@@ -143,6 +144,11 @@ public class GrammarUtils {
 
 		// compound concepts are expected to be space separated
 		try {
+
+			// complex concepts with useless words have no valid POS
+			if (containsUselessWords(leftElement) || containsUselessWords(rightElement))
+				return false;
+
 			// get POS for each concept
 			Set<POS> lPOS = checkPOS_InInputSpace(leftElement, inputSpace);
 			Set<POS> rPOS = checkPOS_InInputSpace(rightElement, inputSpace);
@@ -173,6 +179,16 @@ public class GrammarUtils {
 		return false;
 	}
 
+	private static boolean containsUselessWords(String concept) {
+		Set<String> uselessWords = MOEA_Config.uselessWords;
+		String[] words = VariousUtils.fastSplit(concept, MOEA_Config.CONCEPT_WORD_SEPARATOR);
+		for (String word : words) {
+			if (uselessWords.contains(word))
+				return true;
+		}
+		return false;
+	}
+
 	public static HashSet<POS> getConceptPOS(String concept) throws JWNLException {
 		// try simple direct wordnet test
 		HashSet<POS> pos = getWordNetPOS_noRules(concept);
@@ -197,7 +213,7 @@ public class GrammarUtils {
 	 */
 	public static boolean checkWordnetForCompoundNoun(String string) throws JWNLException {
 
-		List<String> words = VariousUtils.arrayToArrayList(VariousUtils.fastSplit(string, ' '));
+		List<String> words = VariousUtils.arrayToArrayList(VariousUtils.fastSplit(string, MOEA_Config.CONCEPT_WORD_SEPARATOR));
 		// remove stopwords
 		words.removeAll(StaticSharedVariables.stopWords);
 
@@ -300,5 +316,18 @@ public class GrammarUtils {
 			if (pos.isEmpty())
 				System.out.printf("%s\t%d\t%d\t%d\t%s\n", concept, degree, inDegree, outDegree, pos);
 		}
+	}
+
+	public static double calculateSamePOS_pairsPercentage(DirectedMultiGraph<OrderedPair<String>, String> pairGraph, StringGraph inputSpace) {
+		if (pairGraph.getNumberOfVertices() == 0)
+			return 0;
+		int samePOScount = 0;
+		for (OrderedPair<String> pair : pairGraph.vertexSet()) {
+			if (sameWordPOS(pair, inputSpace)) {
+				samePOScount++;
+			}
+		}
+		double ratio = (double) samePOScount / pairGraph.getNumberOfVertices();
+		return ratio;
 	}
 }

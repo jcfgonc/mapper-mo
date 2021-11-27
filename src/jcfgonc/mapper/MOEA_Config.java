@@ -6,10 +6,12 @@ public class MOEA_Config {
 	/**
 	 * name of the algorithm to be used by the MOEA-Framework
 	 */
-	public static final String ALGORITHM = "eNSGAII";
-	public static final double eNSGA2_epsilon = 0.0001; // default is 0.01
-	public static final int eNSGA2_windowSize = 480; // epoch to trigger eNSGA2 population injection
-	public static final int eNSGA2_maxWindowSize = 640; // epoch to trigger eNSGA2 hard restart
+	public static final String ALGORITHM = "NSGA3";
+	public static final double eNSGA2_epsilon = 0.01; // default is 0.01
+	public static final int eNSGA2_windowSize = 128; // epoch to trigger eNSGA2 population injection
+	public static final int eNSGA2_maxWindowSize = 512; // epoch to trigger eNSGA2 hard restart
+	public static final int NSGA3_divisionsOuter = 4; // decrease with increasing dimensions/objectives
+	public static final int NSGA3_divisionsInner = 1; // increase with increasing dimensions/objectives
 	/**
 	 * number of (constant) solutions in the population
 	 */
@@ -40,21 +42,27 @@ public class MOEA_Config {
 
 	public static final Set<String> uselessRelations = Set.of("similarto", "derivedfrom", "hascontext", "relatedto");
 
+	public static final Set<String> uselessWords = Set.of("that", "than", "this", "my", "your", "his", "her", "he", "hers", "these");
+
+	public static final char CONCEPT_WORD_SEPARATOR = ' ';
+
+	public static final String stopWordsPath = "data/english stop words basic.txt";
+
 	public static final String screenshotsFolder = "screenshots";
 	public static final boolean GRAPHS_ENABLED = true;
 	public static final boolean SCREENSHOTS_ENABLED = false;
-	public static final boolean LAST_EPOCH_SCREENSHOT = false;
+	public static final boolean LAST_EPOCH_SCREENSHOT = true;
 
-	public static final int MAXIMUM_NUMBER_OF_CONCEPT_PAIRS = 16;
+	public static final int MAXIMUM_NUMBER_OF_CONCEPT_PAIRS = 8;
 	// mutation controls
-	public static final double LOCAL_JUMP_PROBABILITY = 0.88;
-	public static final int REFPAIR_JUMP_RANGE = 1;
-	public static final double JUMP_PROBABILITY_POWER = 2.4;
-	public static final int DEEPNESS_LIMIT = 7;
+	public static final double REFPAIR_MUTATION_PROBABILITY = 0.125;
+	public static final double LOCAL_JUMP_PROBABILITY = 0.88; // local to global jump probability - currently not used
+	public static final int REFPAIR_JUMP_RANGE = 2;
+	public static final double JUMP_PROBABILITY_POWER = 5.2;
+	public static final int REFPAIR_ISOMORPHISM_MAX_DEEPNESS = 7;
 	public static final int NUMBER_MUTATION_TRIES = 10;
-	public static final int CACHE_SAVE_TIMEOUT = 5 * 60;
-	public static final int REFERENCE_PAIRINNER_DISTANCE_CALCULATION_LIMIT = 7;
+	public static final int REFERENCE_PAIRINNER_DISTANCE_CALCULATION_LIMIT = 100;
+	public static final int CACHE_SAVE_TIMEOUT = 1 * 60;
 	public static final String REFPAIR_CACHE_FILENAME = "refPairInnerDistanceCache.dat";
 	public static final String POS_CACHE_FILENAME = "posCache.dat";
-	public static final String stopWordsPath = "data/english stop words basic.txt";
 }

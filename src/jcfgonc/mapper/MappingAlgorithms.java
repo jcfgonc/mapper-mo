@@ -192,7 +192,7 @@ public class MappingAlgorithms {
 			OrderedPair<String> currentPair = openSet.removeFirst();
 			// if (deepnessLimit >= 0) {
 			int deepness = pairDeepness.getInt(currentPair);
-			if (deepness >= MOEA_Config.DEEPNESS_LIMIT)
+			if (deepness >= MOEA_Config.REFPAIR_ISOMORPHISM_MAX_DEEPNESS)
 				continue;
 			int nextDeepness = deepness + 1;
 

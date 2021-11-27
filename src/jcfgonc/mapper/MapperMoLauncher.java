@@ -92,18 +92,20 @@ public class MapperMoLauncher {
 		StaticSharedVariables.inputSpace = inputSpace;
 
 		// read vital relations importance
-		Object2DoubleOpenHashMap<String> vitalRelations = VariousUtils.readVitalRelations(MOEA_Config.vitalRelationsPath);
+		Object2DoubleOpenHashMap<String> vitalRelations = LogicUtils.readVitalRelations(MOEA_Config.vitalRelationsPath);
 
 		// read pre-calculated semantic scores of word/relation pairs
 		Object2DoubleOpenHashMap<UnorderedPair<String>> wps = WordEmbeddingUtils.readWordPairScores(MOEA_Config.wordPairScores_filename);
 
 		StaticSharedVariables.stopWords = new HashSet<String>(VariousUtils.readFileRows(MOEA_Config.stopWordsPath));
 
-		GrammarUtils.checkPOS_InInputSpace("bathurst inlet", StaticSharedVariables.inputSpaceForPOS);
-		GrammarUtils.checkPOS_InInputSpace("bathurst inlet", StaticSharedVariables.inputSpaceForPOS);
+	//	Set<POS> x = GrammarUtils.checkPOS_InInputSpace("walk in closet", StaticSharedVariables.inputSpaceForPOS);
+	//	System.out.println(x);
+		
+//		GrammarUtils.checkPOS_InInputSpace("bathurst inlet", StaticSharedVariables.inputSpaceForPOS);
 //		GrammarUtils.studyStringGraphVerticesPOS(StaticSharedVariables.inputSpaceForPOS);
 //		Set<POS> pos = GrammarUtils.getConceptPOS("become strong", StaticSharedVariables.inputSpaceForPOS);
-		System.exit(0);
+//		System.exit(0);
 
 		// ------ MOEA SETUP
 
@@ -120,8 +122,8 @@ public class MapperMoLauncher {
 //		properties.setProperty("injectionRate", Double.toString(1.0 / 0.25)); // population to archive ratio, default is 0.25
 
 		// NSGA-III
-//		properties.setProperty("divisionsOuter", "10"); // 3
-//		properties.setProperty("divisionsInner", "1"); // 2
+		properties.setProperty("divisionsOuter", Integer.toString(MOEA_Config.NSGA3_divisionsOuter));
+		properties.setProperty("divisionsInner", Integer.toString(MOEA_Config.NSGA3_divisionsInner));
 
 		String dateTimeStamp = VariousUtils.generateCurrentDateAndTimeStamp();
 		String resultsFilename = String.format("moea_results_%s.tsv", dateTimeStamp);
