@@ -6,24 +6,24 @@ public class MOEA_Config {
 	/**
 	 * name of the algorithm to be used by the MOEA-Framework
 	 */
-	public static final String ALGORITHM = "NSGA3";
+	public static final String ALGORITHM = "eNSGA2";
 	public static final double eNSGA2_epsilon = 0.01; // default is 0.01
-	public static final int eNSGA2_windowSize = 128; // epoch to trigger eNSGA2 population injection
+	public static final int eNSGA2_windowSize = 256; // epoch to trigger eNSGA2 population injection
 	public static final int eNSGA2_maxWindowSize = 512; // epoch to trigger eNSGA2 hard restart
 	public static final int NSGA3_divisionsOuter = 4; // decrease with increasing dimensions/objectives
 	public static final int NSGA3_divisionsInner = 1; // increase with increasing dimensions/objectives
 	/**
 	 * number of (constant) solutions in the population
 	 */
-	public static int POPULATION_SIZE = 256;
+	public static int POPULATION_SIZE = 2048;
 	/**
 	 * maximum number of epochs/generations to iterate
 	 */
-	public static int MAX_EPOCHS = 99999;
+	public static int MAX_EPOCHS = 999999;
 	/**
 	 * maximum number of MOEA runs (each run iterates max_epochs)
 	 */
-	public static int MOEA_RUNS = 99999;
+	public static int MOEA_RUNS = 999999;
 	/*
 	 * maximum amount of time (minutes) allowed for each MOEA run
 	 */
@@ -43,6 +43,9 @@ public class MOEA_Config {
 	public static final Set<String> uselessRelations = Set.of("similarto", "derivedfrom", "hascontext", "relatedto");
 
 	public static final Set<String> uselessWords = Set.of("that", "than", "this", "my", "your", "his", "her", "he", "hers", "these");
+
+	public static final String fixedConceptLeft = "child";
+	public static final String fixedConceptRight = null;
 
 	public static final char CONCEPT_WORD_SEPARATOR = ' ';
 

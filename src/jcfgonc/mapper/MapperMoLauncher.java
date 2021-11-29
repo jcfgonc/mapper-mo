@@ -67,6 +67,12 @@ public class MapperMoLauncher {
 
 	public static void main(String[] args) throws NoSuchFileException, IOException, ClassNotFoundException, InstantiationException, IllegalAccessException,
 			UnsupportedLookAndFeelException, InterruptedException, JWNLException {
+
+//		for (int i = 0; i < 10; i++) {
+//			System.out.println(MapperUtils.minimumRadialDistanceFunc(3, 1, i));
+//		}
+//		System.exit(0);
+
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
 		RandomAdaptor random = new RandomAdaptor(new SynchronizedRandomGenerator(new Well44497b()));
@@ -92,16 +98,16 @@ public class MapperMoLauncher {
 		StaticSharedVariables.inputSpace = inputSpace;
 
 		// read vital relations importance
-		Object2DoubleOpenHashMap<String> vitalRelations = LogicUtils.readVitalRelations(MOEA_Config.vitalRelationsPath);
+		Object2DoubleOpenHashMap<String> vitalRelations = MapperUtils.readVitalRelations(MOEA_Config.vitalRelationsPath);
 
 		// read pre-calculated semantic scores of word/relation pairs
 		Object2DoubleOpenHashMap<UnorderedPair<String>> wps = WordEmbeddingUtils.readWordPairScores(MOEA_Config.wordPairScores_filename);
 
 		StaticSharedVariables.stopWords = new HashSet<String>(VariousUtils.readFileRows(MOEA_Config.stopWordsPath));
 
-	//	Set<POS> x = GrammarUtils.checkPOS_InInputSpace("walk in closet", StaticSharedVariables.inputSpaceForPOS);
-	//	System.out.println(x);
-		
+		// Set<POS> x = GrammarUtils.checkPOS_InInputSpace("walk in closet", StaticSharedVariables.inputSpaceForPOS);
+		// System.out.println(x);
+
 //		GrammarUtils.checkPOS_InInputSpace("bathurst inlet", StaticSharedVariables.inputSpaceForPOS);
 //		GrammarUtils.studyStringGraphVerticesPOS(StaticSharedVariables.inputSpaceForPOS);
 //		Set<POS> pos = GrammarUtils.getConceptPOS("become strong", StaticSharedVariables.inputSpaceForPOS);

@@ -5,8 +5,8 @@ import org.moeaframework.core.Solution;
 
 import graph.DirectedMultiGraph;
 import jcfgonc.mapper.GrammarUtils;
-import jcfgonc.mapper.LogicUtils;
 import jcfgonc.mapper.MOEA_Config;
+import jcfgonc.mapper.MapperUtils;
 import jcfgonc.mapper.MappingAlgorithms;
 import jcfgonc.mapper.StaticSharedVariables;
 import jcfgonc.mapper.structures.MappingStructure;
@@ -31,7 +31,8 @@ public class CustomProblem implements Problem, ProblemDescription {
 	public Solution newSolution() {
 		// !!! do not touch this unless the solution domain X has more than ONE dimension
 		Solution solution = new Solution(getNumberOfVariables(), getNumberOfObjectives(), getNumberOfConstraints());
-		solution.setVariable(0, new CustomChromosome());
+		CustomChromosome cc = new CustomChromosome();
+		solution.setVariable(0, cc);
 		return solution;
 	}
 
@@ -44,14 +45,14 @@ public class CustomProblem implements Problem, ProblemDescription {
 		MappingStructure<String, String> mappingStructure = cc.getGene();
 		DirectedMultiGraph<OrderedPair<String>, String> pairGraph = mappingStructure.getPairGraph();
 		OrderedPair<String> referencePair = mappingStructure.getReferencePair();
-
+		
 		int numPairs = pairGraph.getNumberOfVertices();
 		boolean emptyGraph = numPairs <= 1;
 
 		// maximize the presence of vital/important relations
 		double vitalRelationsMean = 0;
 		if (!emptyGraph) {
-			vitalRelationsMean = LogicUtils.calculateVitalRelationsStatistics(pairGraph, StaticSharedVariables.vitalRelations).getMean();
+			vitalRelationsMean = MapperUtils.calculateVitalRelationsStatistics(pairGraph, StaticSharedVariables.vitalRelations).getMean();
 		}
 
 		// relation statistics
@@ -60,7 +61,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 		relationStdDev = 100;
 		numRelations = 0;
 		if (!emptyGraph) {
-			double[] rs = LogicUtils.calculateRelationStatistics(pairGraph);
+			double[] rs = MapperUtils.calculateRelationStatistics(pairGraph);
 			relationStdDev = rs[1]; // 0...1 : 0 = equal amount of relation labels
 			numRelations = (int) rs[2];
 		}
@@ -74,12 +75,12 @@ public class CustomProblem implements Problem, ProblemDescription {
 		if (!emptyGraph) {
 			int dist = MappingAlgorithms.calculateReferencePairInnerDistance(StaticSharedVariables.inputSpace, referencePair,
 					MOEA_Config.REFERENCE_PAIRINNER_DISTANCE_CALCULATION_LIMIT);
-			refPairInnerDistance = dist;//(int) LogicUtils.minimumRadialDistanceFunc(3, 1, dist);
+			refPairInnerDistance = dist;//(int) MapperUtils.minimumRadialDistanceFunc(3, 1, dist);
 		}
 
 		double meanWordsPerConcept = 10;
 		if (!emptyGraph) {
-			double[] wpcs = LogicUtils.calculateWordsPerConceptStatistics(pairGraph);
+			double[] wpcs = MapperUtils.calculateWordsPerConceptStatistics(pairGraph);
 //			stats[0] = ds.getMean();
 //			stats[1] = ds.getStandardDeviation();
 //			stats[2] = ds.getMin();

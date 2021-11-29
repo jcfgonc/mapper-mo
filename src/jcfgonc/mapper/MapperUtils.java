@@ -16,7 +16,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import structures.OrderedPair;
 import utils.VariousUtils;
 
-public class LogicUtils {
+public class MapperUtils {
 
 	public static DescriptiveStatistics calculateVitalRelationsStatistics(DirectedMultiGraph<OrderedPair<String>, String> graph,
 			Object2DoubleOpenHashMap<String> relationWeights) {
