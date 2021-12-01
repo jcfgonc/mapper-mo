@@ -31,25 +31,21 @@ public class InteractiveExecutor {
 	private Problem problem;
 	private InteractiveExecutorGUI gui;
 	private ResultsWriter resultsWriter;
-	private String resultsFilename;
 //	private BlenderVisualizer blenderVisualizer;
 	private volatile boolean guiUpdatingThreadRunning;
 	private String windowTitle;
 
-	public InteractiveExecutor(Problem problem, Properties algorithmProperties, String resultsFilename, ResultsWriter resultsWriter, String windowTitle) {
+	public InteractiveExecutor(Problem problem, Properties algorithmProperties, ResultsWriter resultsWriter, String windowTitle) {
 		this.problem = problem;
 		this.algorithmProperties = algorithmProperties;
 		this.resultsWriter = resultsWriter;
-		this.resultsFilename = resultsFilename;
 		this.windowTitle = windowTitle;
 //		this.blenderVisualizer = new BlenderVisualizer(populationSize);
 		this.gui = new InteractiveExecutorGUI(this);
 		this.gui.initializeTheRest();
 		this.gui.setVisible(true);
-	}
 
-	public InteractiveExecutor(Problem problem, Properties algorithmProperties, String resultsFilename, String windowTitle) {
-		this(problem, algorithmProperties, resultsFilename, null, windowTitle);
+		this.resultsWriter.writeFileHeader(problem);
 	}
 
 	public NondominatedPopulation execute(int moea_run) throws InterruptedException {
@@ -82,10 +78,8 @@ public class InteractiveExecutor {
 
 		clearGraphs();
 		gui.resetCurrentRunTime();
-//		gui.updateStatus(null, epoch, moea_run, 0);
 
 		lastResult = new NondominatedPopulation();
-		// lastResult = new EpsilonBoxDominanceArchive(0.01);
 
 		ticker.resetTicker();
 		do {
@@ -93,7 +87,6 @@ public class InteractiveExecutor {
 			algorithm.step();
 			double epochDuration = ticker.getTimeDeltaLastCall();
 
-			// lastResult = algorithm.getResult();
 			lastResult.addAll(algorithm.getResult());
 
 			// update GUI stuff
@@ -102,7 +95,6 @@ public class InteractiveExecutor {
 			// update blender visualizer
 //			blenderVisualizer.update(lastResult);
 			double runElapsedTime = ticker.getElapsedTime() / 60.0;
-//			System.out.println(runElapsedTime);
 			if (algorithm.isTerminated() || //
 					runElapsedTime > MOEA_Config.MAX_RUN_TIME || //
 					epoch >= MOEA_Config.MAX_EPOCHS || //
@@ -110,19 +102,18 @@ public class InteractiveExecutor {
 					skipCurrentRun) {
 				break; // break while loop
 			}
-//			System.out.printf("epoch %d done\n",epoch);
 			epoch++;
 		} while (true);
 
 		algorithm.terminate();
 		gui.takeLastEpochScreenshot();
+		resultsWriter.appendResultsToFile(lastResult, problem);
 		return lastResult;
 	}
 
 	private void updateStatus(int moea_run, int epoch, double epochDuration) {
 		// do not queue gui updates, only do one at a time
 		if (guiUpdatingThreadRunning) {
-			// System.out.println("guiUpdatingThread busy");
 			return;
 		}
 
@@ -185,8 +176,7 @@ public class InteractiveExecutor {
 	public void abortOptimization() {
 		gui.takeLastEpochScreenshot();
 		if (resultsWriter != null) {
-			resultsWriter.appendResultsToFile(resultsFilename, lastResult, problem);
-			resultsWriter.close();
+			resultsWriter.appendResultsToFile(lastResult, problem);
 		}
 		System.exit(-1);
 	}

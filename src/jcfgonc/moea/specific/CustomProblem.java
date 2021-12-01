@@ -45,7 +45,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 		MappingStructure<String, String> mappingStructure = cc.getGene();
 		DirectedMultiGraph<OrderedPair<String>, String> pairGraph = mappingStructure.getPairGraph();
 		OrderedPair<String> referencePair = mappingStructure.getReferencePair();
-		
+
 		int numPairs = pairGraph.getNumberOfVertices();
 		boolean emptyGraph = numPairs <= 1;
 
@@ -75,7 +75,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 		if (!emptyGraph) {
 			int dist = MappingAlgorithms.calculateReferencePairInnerDistance(StaticSharedVariables.inputSpace, referencePair,
 					MOEA_Config.REFERENCE_PAIRINNER_DISTANCE_CALCULATION_LIMIT);
-			refPairInnerDistance = dist;//(int) MapperUtils.minimumRadialDistanceFunc(3, 1, dist);
+			refPairInnerDistance = (int) MapperUtils.minimumRadialDistanceFunc(3, 1, dist);
 		}
 
 		double meanWordsPerConcept = 10;
@@ -100,40 +100,41 @@ public class CustomProblem implements Problem, ProblemDescription {
 		solution.setObjective(obj_i++, relationStdDev);
 		solution.setObjective(obj_i++, -numRelations);
 		solution.setObjective(obj_i++, -degreeOfReferencePair);
-		solution.setObjective(obj_i++, -refPairInnerDistance);
+		solution.setObjective(obj_i++, refPairInnerDistance);
 		solution.setObjective(obj_i++, meanWordsPerConcept);
 		solution.setObjective(obj_i++, -posRatio);
 
-		// violated constraints are set to 1, otherwise set to 0
-		if (numPairs < 3 || numPairs > MOEA_Config.MAXIMUM_NUMBER_OF_CONCEPT_PAIRS) { // limit the number of vertices in the blend space
-			solution.setConstraint(0, 1); // violated
-		} else {
-			solution.setConstraint(0, 0); // not violated
-		}
-
-//		if (numRelations < 3) {
-//			solution.setConstraint(1, 1); // violated
+//		obj_i = 0;
+//		// violated constraints are set to 1, otherwise set to 0
+//		if (numPairs < 3 || numPairs > MOEA_Config.MAXIMUM_NUMBER_OF_CONCEPT_PAIRS) { // limit the number of vertices in the blend space
+//			solution.setConstraint(obj_i++, 1); // violated
 //		} else {
-//			solution.setConstraint(1, 0); // not violated
+//			solution.setConstraint(obj_i++, 0); // not violated
 //		}
-
-		if (degreeOfReferencePair < 2) {
-			solution.setConstraint(1, 1); // violated
-		} else {
-			solution.setConstraint(1, 0); // not violated
-		}
-
-		if (posRatio < 0.67) {
-			solution.setConstraint(2, 1); // violated
-		} else {
-			solution.setConstraint(2, 0); // not violated
-		}
-
-		if (vitalRelationsMean < 0.67) {
-			solution.setConstraint(3, 1); // violated
-		} else {
-			solution.setConstraint(3, 0); // not violated
-		}
+//
+//		if (numRelations < 3) {
+//			solution.setConstraint(obj_i++, 1); // violated
+//		} else {
+//			solution.setConstraint(obj_i++, 0); // not violated
+//		}
+//
+//		if (degreeOfReferencePair < (MOEA_Config.MAXIMUM_NUMBER_OF_CONCEPT_PAIRS / 2)) {
+//			solution.setConstraint(obj_i++, 1); // violated
+//		} else {
+//			solution.setConstraint(obj_i++, 0); // not violated
+//		}
+//
+//		if (posRatio < 0.67) {
+//			solution.setConstraint(obj_i++, 1); // violated
+//		} else {
+//			solution.setConstraint(obj_i++, 0); // not violated
+//		}
+//
+//		if (vitalRelationsMean < 0.67) {
+//			solution.setConstraint(obj_i++, 1); // violated
+//		} else {
+//			solution.setConstraint(obj_i++, 0); // not violated
+//		}
 	}
 
 	private String[] objectivesDescription = { //
@@ -148,11 +149,11 @@ public class CustomProblem implements Problem, ProblemDescription {
 	};
 
 	private String[] constraintsDescription = { //
-			"required numPairs", //
+//			"required numPairs", //
 //			"required numRelations", //
-			"required degreeOfReferencePair", //
-			"required posRatio", //
-			"required vitalRelationsMean", //
+//			"required degreeOfReferencePair", //
+//			"required posRatio", //
+//			"required vitalRelationsMean", //
 	};
 
 	@Override

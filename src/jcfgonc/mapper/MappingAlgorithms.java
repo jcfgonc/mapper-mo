@@ -74,7 +74,7 @@ public class MappingAlgorithms {
 		pairs = matchLeftRightMapsAndSelectRandom(leftmap, rightmap, random, usedConcepts);
 		// update the pair/mapping graph
 		for (String dirLabel : pairs.keySet()) {
-			if (pairGraph.getNumberOfVertices() > MOEA_Config.MAXIMUM_NUMBER_OF_CONCEPT_PAIRS)
+			if (pairGraph.getNumberOfVertices() >= MOEA_Config.MAXIMUM_NUMBER_OF_CONCEPT_PAIRS)
 				break;
 			OrderedPair<String> nextPair = pairs.get(dirLabel);
 
@@ -186,7 +186,7 @@ public class MappingAlgorithms {
 		pairDeepness.put(refPair, 0);
 		// ---------init
 		while (!openSet.isEmpty()) {
-			if (pairGraph.getNumberOfVertices() > MOEA_Config.MAXIMUM_NUMBER_OF_CONCEPT_PAIRS)
+			if (pairGraph.getNumberOfVertices() >= MOEA_Config.MAXIMUM_NUMBER_OF_CONCEPT_PAIRS)
 				break;
 
 			OrderedPair<String> currentPair = openSet.removeFirst();

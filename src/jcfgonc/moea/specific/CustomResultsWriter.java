@@ -14,6 +14,12 @@ import structures.OrderedPair;
 
 public class CustomResultsWriter implements ResultsWriter {
 
+	private String filename;
+
+	public CustomResultsWriter(String filename) {
+		this.filename = filename;
+	}
+
 	/**
 	 * opens the given file in append mode and writes the results header. It is hard-coded for the blender
 	 * 
@@ -21,7 +27,7 @@ public class CustomResultsWriter implements ResultsWriter {
 	 * @param problem
 	 * @throws IOException
 	 */
-	public void writeFileHeader(String filename, Problem problem) {
+	public void writeFileHeader(Problem problem) {
 		try {
 			FileWriter fw = new FileWriter(filename, true);
 			BufferedWriter bw = new BufferedWriter(fw);
@@ -47,7 +53,7 @@ public class CustomResultsWriter implements ResultsWriter {
 	}
 
 	// this is hard-coded for the blender
-	public void appendResultsToFile(String filename, NondominatedPopulation results, Problem problem) {
+	public void appendResultsToFile(NondominatedPopulation results, Problem problem) {
 		try {
 
 			// nothing to save
@@ -85,11 +91,6 @@ public class CustomResultsWriter implements ResultsWriter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public void close() {
-		// not needed
 	}
 
 }

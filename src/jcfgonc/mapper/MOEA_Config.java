@@ -9,7 +9,7 @@ public class MOEA_Config {
 	public static final String ALGORITHM = "eNSGA2";
 	public static final double eNSGA2_epsilon = 0.01; // default is 0.01
 	public static final int eNSGA2_windowSize = 256; // epoch to trigger eNSGA2 population injection
-	public static final int eNSGA2_maxWindowSize = 512; // epoch to trigger eNSGA2 hard restart
+	public static final int eNSGA2_maxWindowSize = 640; // epoch to trigger eNSGA2 hard restart
 	public static final int NSGA3_divisionsOuter = 4; // decrease with increasing dimensions/objectives
 	public static final int NSGA3_divisionsInner = 1; // increase with increasing dimensions/objectives
 	/**
@@ -44,7 +44,7 @@ public class MOEA_Config {
 
 	public static final Set<String> uselessWords = Set.of("that", "than", "this", "my", "your", "his", "her", "he", "hers", "these");
 
-	public static final String fixedConceptLeft = "child";
+	public static final String fixedConceptLeft = null;
 	public static final String fixedConceptRight = null;
 
 	public static final char CONCEPT_WORD_SEPARATOR = ' ';
@@ -62,7 +62,7 @@ public class MOEA_Config {
 	public static final double LOCAL_JUMP_PROBABILITY = 0.88; // local to global jump probability - currently not used
 	public static final int REFPAIR_JUMP_RANGE = 2;
 	public static final double JUMP_PROBABILITY_POWER = 5.2;
-	public static final int REFPAIR_ISOMORPHISM_MAX_DEEPNESS = 7;
+	public static final int REFPAIR_ISOMORPHISM_MAX_DEEPNESS = 32;
 	public static final int NUMBER_MUTATION_TRIES = 10;
 	public static final int REFERENCE_PAIRINNER_DISTANCE_CALCULATION_LIMIT = 100;
 	public static final int CACHE_SAVE_TIMEOUT = 1 * 60;

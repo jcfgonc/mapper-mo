@@ -14,7 +14,7 @@ public interface ResultsWriter {
 	 * @param problem
 	 * @throws IOException
 	 */
-	public void writeFileHeader(String filename, Problem problem);
+	public void writeFileHeader(Problem problem);
 
 	/**
 	 * Opens the given file in append mode and appends the given results.
@@ -24,7 +24,5 @@ public interface ResultsWriter {
 	 * @param problem
 	 * @throws IOException
 	 */
-	public void appendResultsToFile(String filename, NondominatedPopulation results, Problem problem);
-
-	public void close();
+	public void appendResultsToFile(NondominatedPopulation results, Problem problem);
 }

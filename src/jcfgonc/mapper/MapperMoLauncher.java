@@ -104,14 +104,9 @@ public class MapperMoLauncher {
 		Object2DoubleOpenHashMap<UnorderedPair<String>> wps = WordEmbeddingUtils.readWordPairScores(MOEA_Config.wordPairScores_filename);
 
 		StaticSharedVariables.stopWords = new HashSet<String>(VariousUtils.readFileRows(MOEA_Config.stopWordsPath));
-
-		// Set<POS> x = GrammarUtils.checkPOS_InInputSpace("walk in closet", StaticSharedVariables.inputSpaceForPOS);
-		// System.out.println(x);
-
-//		GrammarUtils.checkPOS_InInputSpace("bathurst inlet", StaticSharedVariables.inputSpaceForPOS);
-//		GrammarUtils.studyStringGraphVerticesPOS(StaticSharedVariables.inputSpaceForPOS);
-//		Set<POS> pos = GrammarUtils.getConceptPOS("become strong", StaticSharedVariables.inputSpaceForPOS);
-//		System.exit(0);
+		StaticSharedVariables.vitalRelations = vitalRelations;
+		StaticSharedVariables.wordPairScores = wps;
+		StaticSharedVariables.random = random;
 
 		// ------ MOEA SETUP
 
@@ -135,21 +130,12 @@ public class MapperMoLauncher {
 		String resultsFilename = String.format("moea_results_%s.tsv", dateTimeStamp);
 
 		// personalize your results writer here
-		ResultsWriter resultsWriter = new CustomResultsWriter();
-
-		StaticSharedVariables.vitalRelations = vitalRelations;
-		StaticSharedVariables.wordPairScores = wps;
-		StaticSharedVariables.random = random;
-
-//		GrammarUtils.getConceptPOS("drown underwater");
+		ResultsWriter resultsWriter = new CustomResultsWriter(resultsFilename);
 
 		// personalize your constructor here
 		CustomProblem problem = new CustomProblem();
 
-		InteractiveExecutor ie = new InteractiveExecutor(problem, properties, resultsFilename, resultsWriter,
-				"MapperMO - Multiple Objective Conceptual Mapper");
-
-		resultsWriter.writeFileHeader(resultsFilename, problem);
+		InteractiveExecutor ie = new InteractiveExecutor(problem, properties, resultsWriter, "MapperMO - Multiple Objective Conceptual Mapper");
 
 		// do 'k' runs of 'n' epochs
 		int totalRuns = MOEA_Config.MOEA_RUNS;
@@ -161,15 +147,10 @@ public class MapperMoLauncher {
 			properties.setProperty("populationSize", Integer.toString(MOEA_Config.POPULATION_SIZE));
 
 			// do one run of 'n' epochs
-			NondominatedPopulation currentResults = ie.execute(moea_run);
+			ie.execute(moea_run);
 
-			// allResults.add(currentResults);
-			resultsWriter.appendResultsToFile(resultsFilename, currentResults, problem);
-//			saveIndividualSolutions(currentResults, moea_run);
 		}
-		resultsWriter.close();
 		ie.closeGUI();
-		// mergeAndSaveResults(String.format("moea_results_%s_merged.tsv", dateTimeStamp), allResults, problem, 0.01);
 
 		// terminate daemon threads
 		System.exit(0);

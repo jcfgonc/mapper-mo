@@ -9,7 +9,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Properties;
@@ -44,7 +43,6 @@ public class InteractiveExecutorGUI extends JFrame {
 	private JPanel upperPanel;
 	private JPanel upperLeftPanel;
 	private BarChartPanel ndsSizePanel;
-	private ObjectivesChartPanel objectivesBoxplotPanel;
 	private SettingsPanel settingsPanel;
 	private JPanel fillPanel;
 	private final DecimalFormat screenshotFilenameDecimalFormat = new DecimalFormat("0000");
@@ -109,9 +107,6 @@ public class InteractiveExecutorGUI extends JFrame {
 		timeSeriesPanel = new JPanel();
 		upperLeftPanel.add(timeSeriesPanel);
 		timeSeriesPanel.setLayout(new GridLayout(1, 0, 0, 0));
-
-		objectivesBoxplotPanel = new ObjectivesChartPanel(null, null, problem);
-		upperLeftPanel.add(objectivesBoxplotPanel);
 
 		timeEpochPanel = new BarChartPanel("Time vs Epoch", "Epoch", "Time (s)", new Color(200, 0, 100));
 		timeSeriesPanel.add(timeEpochPanel);
@@ -180,7 +175,7 @@ public class InteractiveExecutorGUI extends JFrame {
 //		ndsSizePanel.initialize(new Color(83, 255, 169));
 		timeEpochPanel.initialize();
 		ndsSizePanel.initialize();
-		objectivesBoxplotPanel.initialize();
+//		objectivesBoxplotPanel.initialize();
 
 //		this.setLocationRelativeTo(null); // center jframe
 
@@ -249,7 +244,7 @@ public class InteractiveExecutorGUI extends JFrame {
 			nonDominatedSetPanel.updateGraphs(nds);
 			timeEpochPanel.addSample(epoch, epochDuration);
 			ndsSizePanel.addSample(epoch, nds.size());
-			objectivesBoxplotPanel.addValues(nds);
+//			objectivesBoxplotPanel.addValues(nds);
 		}
 		guiUpdated = true;
 	}
@@ -283,9 +278,7 @@ public class InteractiveExecutorGUI extends JFrame {
 				};
 				SwingUtilities.invokeAndWait(updater);
 			}
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -294,7 +287,7 @@ public class InteractiveExecutorGUI extends JFrame {
 		nonDominatedSetPanel.clearData();
 		ndsSizePanel.clearData();
 		timeEpochPanel.clearData();
-		objectivesBoxplotPanel.clearData();
+//		objectivesBoxplotPanel.clearData();
 	}
 
 	protected void windowResized(ComponentEvent e) {

@@ -4,6 +4,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -14,9 +15,10 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 
 public class GUI_Utils {
-	private static ExecutorService savingExecutors = Executors.newFixedThreadPool(16);
+	private static ExecutorService savingExecutors = Executors.newFixedThreadPool(1);
 
 	public static void saveScreenShotPNG(BufferedImage img, String filename) {
+		CountDownLatch latch = new CountDownLatch(1); // used to block calling thread
 		savingExecutors.execute(() -> {
 			try {
 				// ImageWriter is single-threaded, can not be shared between multiple threads
@@ -24,20 +26,27 @@ public class GUI_Utils {
 				ImageWriter pngWriter = ImageIO.getImageWritersByFormatName("png").next();
 				ImageWriteParam parameters = pngWriter.getDefaultWriteParam();
 				// set blasters to full
-				parameters.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-				parameters.setCompressionQuality(0);
+				if (parameters.canWriteCompressed()) {
+					parameters.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+					parameters.setCompressionQuality(0.5f);
+				}
 
 				ImageOutputStream out = ImageIO.createImageOutputStream(new File(filename));
 				pngWriter.setOutput(out);
 				pngWriter.write(null, new IIOImage(img, null, null), parameters);
 				out.close();
+
+				latch.countDown(); // notify calling thread
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-//			String threadName = Thread.currentThread().getName();
-//			System.out.printf("%s wrote %s\n", threadName, filename);
 		});
-
+		try {
+			// wait on called thread
+			latch.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static RenderingHints createDefaultRenderingHints() {

@@ -21,8 +21,10 @@ public class MapperGeneticOperations {
 
 	@SuppressWarnings("unused")
 	private static OrderedPair<String> createReferencePair(StringGraph inputSpace, RandomGenerator random) {
-		if (MOEA_Config.fixedConceptLeft != null) { // L fixed
-			if (MOEA_Config.fixedConceptRight != null) { // LR fixed
+		boolean fixedLeft = MOEA_Config.fixedConceptLeft != null;
+		boolean fixedRight = MOEA_Config.fixedConceptRight != null;
+		if (fixedLeft) { // L fixed
+			if (fixedRight) { // LR fixed
 				return new OrderedPair<String>(MOEA_Config.fixedConceptLeft, MOEA_Config.fixedConceptRight);
 			} else { // L fixed R free
 				String randomConcept;
@@ -32,7 +34,7 @@ public class MapperGeneticOperations {
 				return new OrderedPair<String>(MOEA_Config.fixedConceptLeft, randomConcept);
 			}
 		} else {// L free
-			if (MOEA_Config.fixedConceptRight != null) { // L free R fixed
+			if (fixedRight) { // L free R fixed
 				String randomConcept;
 				do { // make sure L and R are different
 					randomConcept = VariousUtils.getRandomElementFromCollection(inputSpace.getVertexSet(), random);
