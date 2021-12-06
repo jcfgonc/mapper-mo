@@ -16,6 +16,8 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 
+import visual.GUI_Utils;
+
 public class BarChartPanel extends JPanel {
 
 	private static final long serialVersionUID = 6897997626552672853L;

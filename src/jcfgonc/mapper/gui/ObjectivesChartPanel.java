@@ -14,6 +14,7 @@ import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 
 import jcfgonc.moea.generic.ProblemDescription;
+import visual.GUI_Utils;
 
 /**
  * This class handles the drawing of the objective's statistics.

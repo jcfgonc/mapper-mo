@@ -2,6 +2,7 @@ package jcfgonc.moea.generic;
 
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -16,10 +17,12 @@ import jcfgonc.mapper.MOEA_Config;
 import jcfgonc.mapper.gui.InteractiveExecutorGUI;
 import jcfgonc.moea.specific.ResultsWriter;
 import structures.Ticker;
+import utils.VariousUtils;
 
 public class InteractiveExecutor {
 	private Properties algorithmProperties;
-	private NondominatedPopulation lastResult;
+	private NondominatedPopulation results;
+	private ArrayList<Solution> lastResults;
 	/**
 	 * cancels the MOEA in general
 	 */
@@ -34,6 +37,10 @@ public class InteractiveExecutor {
 //	private BlenderVisualizer blenderVisualizer;
 	private volatile boolean guiUpdatingThreadRunning;
 	private String windowTitle;
+	private String resultsFilename;
+	private String dateTimeStamp;
+	private int epoch;
+	private ReentrantLock pauseLock;
 
 	public InteractiveExecutor(Problem problem, Properties algorithmProperties, ResultsWriter resultsWriter, String windowTitle) {
 		this.problem = problem;
@@ -45,10 +52,13 @@ public class InteractiveExecutor {
 		this.gui.initializeTheRest();
 		this.gui.setVisible(true);
 
-		this.resultsWriter.writeFileHeader(problem);
+		this.dateTimeStamp = VariousUtils.generateCurrentDateAndTimeStamp();
+		this.resultsFilename = String.format("moea_results_%s.tsv", dateTimeStamp);
+		this.resultsWriter.writeFileHeader(problem, resultsFilename);
+		this.pauseLock = new ReentrantLock();
 	}
 
-	public NondominatedPopulation execute(int moea_run) throws InterruptedException {
+	public ArrayList<Solution> execute(int moea_run) throws InterruptedException {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
@@ -67,7 +77,7 @@ public class InteractiveExecutor {
 //			};
 //		}.start();
 
-		int epoch = 0;
+		epoch = 0;
 		Algorithm algorithm = null;
 		guiUpdatingThreadRunning = false;
 
@@ -79,15 +89,21 @@ public class InteractiveExecutor {
 		clearGraphs();
 		gui.resetCurrentRunTime();
 
-		lastResult = new NondominatedPopulation();
+		results = new NondominatedPopulation();
 
 		ticker.resetTicker();
 		do {
+			// dumb way to pause execution
+			pauseLock.lock();
+			pauseLock.unlock();
+
 			// count algorithm time
+			ticker.getTimeDeltaLastCall();
 			algorithm.step();
 			double epochDuration = ticker.getTimeDeltaLastCall();
 
-			lastResult.addAll(algorithm.getResult());
+			lastResults = new ArrayList<Solution>(algorithm.getResult().getElements());
+			results.addAll(lastResults);
 
 			// update GUI stuff
 			updateStatus(moea_run, epoch, epochDuration);
@@ -107,8 +123,9 @@ public class InteractiveExecutor {
 
 		algorithm.terminate();
 		gui.takeLastEpochScreenshot();
-		resultsWriter.appendResultsToFile(lastResult, problem);
-		return lastResult;
+		ArrayList<Solution> arr = new ArrayList<Solution>(results.getElements());
+		resultsWriter.appendResultsToFile(arr, problem, resultsFilename);
+		return arr;
 	}
 
 	private void updateStatus(int moea_run, int epoch, double epochDuration) {
@@ -119,12 +136,12 @@ public class InteractiveExecutor {
 
 		Runnable updater = new Runnable() {
 			// local copy of the solution list to prevent concurrent modified exception
-			ArrayList<Solution> nds = new ArrayList<Solution>(lastResult.getElements());
+			ArrayList<Solution> array = new ArrayList<Solution>(results.getElements());
 
 			public void run() {
 				try {
 					guiUpdatingThreadRunning = true;
-					gui.updateData(nds, epoch, moea_run, epochDuration);
+					gui.updateData(array, epoch, moea_run, epochDuration);
 				} catch (Exception e) {
 					System.err.println("updateStatus(): BOOM there goes the dynamite");
 					e.printStackTrace();
@@ -162,23 +179,12 @@ public class InteractiveExecutor {
 		return algorithmProperties;
 	}
 
-	public NondominatedPopulation getLastResult() {
-		return lastResult;
+	public NondominatedPopulation getResults() {
+		return results;
 	}
 
 	public boolean isCanceled() {
 		return canceled;
-	}
-
-	/**
-	 * Called when the user clicks on the abort button. Saves last results and exits the JVM.
-	 */
-	public void abortOptimization() {
-		gui.takeLastEpochScreenshot();
-		if (resultsWriter != null) {
-			resultsWriter.appendResultsToFile(lastResult, problem);
-		}
-		System.exit(-1);
 	}
 
 	/**
@@ -195,5 +201,29 @@ public class InteractiveExecutor {
 
 	public String getWindowTitle() {
 		return windowTitle;
+	}
+
+	public void saveCurrentNDS() {
+		String filename = String.format("moea_results_%s_epoch_%d.tsv", dateTimeStamp, epoch);
+
+		resultsWriter.writeFileHeader(problem, filename);
+		resultsWriter.appendResultsToFile(lastResults, problem, filename);
+	}
+
+	public void dumpRandomSolution() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public boolean isPaused() {
+		return pauseLock.isLocked();
+	}
+
+	public void pause() {
+		if (isPaused()) {
+			pauseLock.unlock();
+		} else {
+			pauseLock.lock();
+		}
 	}
 }

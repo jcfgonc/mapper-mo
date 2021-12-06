@@ -126,16 +126,13 @@ public class MapperMoLauncher {
 		properties.setProperty("divisionsOuter", Integer.toString(MOEA_Config.NSGA3_divisionsOuter));
 		properties.setProperty("divisionsInner", Integer.toString(MOEA_Config.NSGA3_divisionsInner));
 
-		String dateTimeStamp = VariousUtils.generateCurrentDateAndTimeStamp();
-		String resultsFilename = String.format("moea_results_%s.tsv", dateTimeStamp);
-
 		// personalize your results writer here
-		ResultsWriter resultsWriter = new CustomResultsWriter(resultsFilename);
+		ResultsWriter resultsWriter = new CustomResultsWriter();
 
 		// personalize your constructor here
 		CustomProblem problem = new CustomProblem();
 
-		InteractiveExecutor ie = new InteractiveExecutor(problem, properties, resultsWriter, "MapperMO - Multiple Objective Conceptual Mapper");
+		InteractiveExecutor ie = new InteractiveExecutor(problem, properties, resultsWriter, MOEA_Config.WINDOW_TITLE);
 
 		// do 'k' runs of 'n' epochs
 		int totalRuns = MOEA_Config.MOEA_RUNS;

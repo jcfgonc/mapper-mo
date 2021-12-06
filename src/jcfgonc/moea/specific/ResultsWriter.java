@@ -1,28 +1,30 @@
 package jcfgonc.moea.specific;
 
 import java.io.IOException;
+import java.util.List;
 
-import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Problem;
+import org.moeaframework.core.Solution;
 
 public interface ResultsWriter {
 
 	/**
-	 * Opens the given file in append mode and writes the results header.
+	 * Creates a new file with the given filename and writes the results header. Should be the first access to the given filename. File should be closed
+	 * afterwards.
 	 * 
 	 * @param filename
 	 * @param problem
 	 * @throws IOException
 	 */
-	public void writeFileHeader(Problem problem);
+	public void writeFileHeader(Problem problem, String filename);
 
 	/**
-	 * Opens the given file in append mode and appends the given results.
+	 * Opens the given file in append mode and appends the given results to the existing contents. File should be closed afterwards.
 	 * 
 	 * @param filename
-	 * @param results
+	 * @param lastNDS
 	 * @param problem
 	 * @throws IOException
 	 */
-	public void appendResultsToFile(NondominatedPopulation results, Problem problem);
+	public void appendResultsToFile(List<Solution> lastNDS, Problem problem, String filename);
 }

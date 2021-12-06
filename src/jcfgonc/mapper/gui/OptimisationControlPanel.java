@@ -15,10 +15,11 @@ public class OptimisationControlPanel extends JPanel {
 	private InteractiveExecutorGUI gui;
 	private JButton nextRunButton;
 	private JButton stopButton;
-	private AbstractButton abortButton;
-	private JButton printNDS_button;
+	private AbstractButton dumpRandomSolutionButton;
+	private JButton saveCurrentNDSButton;
 	private JPanel panelTop;
 	private JPanel panelMiddle;
+	private JButton pauseButton;
 
 	public OptimisationControlPanel(InteractiveExecutorGUI interactiveExecutorGUI) {
 		this.gui = interactiveExecutorGUI;
@@ -36,41 +37,54 @@ public class OptimisationControlPanel extends JPanel {
 		flowLayout_1.setVgap(2);
 		add(panelMiddle);
 
-		printNDS_button = new JButton("Print Non Dominated Set");
-		printNDS_button.addActionListener(new ActionListener() {
+		saveCurrentNDSButton = new JButton("Save Current NDSet");
+		saveCurrentNDSButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				gui.printNonDominatedSet();
+				gui.saveCurrentNDS();
 			}
 		});
-		panelTop.add(printNDS_button);
 
-		nextRunButton = new JButton("Next Run");
-		nextRunButton.addActionListener(new ActionListener() {
+		dumpRandomSolutionButton = new JButton("Dump Random Solution");
+		panelTop.add(dumpRandomSolutionButton);
+		dumpRandomSolutionButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				gui.skipCurrentRun();
+				// System.out.println((double) (horizontalPane.getDividerLocation()) / (horizontalPane.getWidth() - horizontalPane.getDividerSize()));
+				gui.dumpRandomSolution();
 			}
 		});
-		nextRunButton.setToolTipText("stops the current moea run and starts the next.");
-		panelTop.add(nextRunButton);
+		dumpRandomSolutionButton.setToolTipText("Dumps to a file a random solution chosen from the Non Dominated Set.");
+		panelTop.add(saveCurrentNDSButton);
 
 		stopButton = new JButton("Stop Optimization");
+		panelMiddle.add(stopButton);
 		stopButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				gui.stopOptimization();
 			}
 		});
-		stopButton.setToolTipText("Waits for the current epoch to complete and returns the best results so far.");
-		panelMiddle.add(stopButton);
+		stopButton.setToolTipText("Pauses the optimization procedure after the current epoch.");
 
-		abortButton = new JButton("Abort Optimization");
-		abortButton.addActionListener(new ActionListener() {
+		pauseButton = new JButton("Pause");
+		panelMiddle.add(pauseButton);
+		pauseButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// System.out.println((double) (horizontalPane.getDividerLocation()) / (horizontalPane.getWidth() - horizontalPane.getDividerSize()));
-				gui.abortOptimization();
+				gui.pause();
+				if (gui.isPaused()) {
+					pauseButton.setText("Unpause");
+				} else {
+					pauseButton.setText("Pause");
+				}
 			}
 		});
-		abortButton.setToolTipText("Aborts the optimization by discarding the current epoch's results and returns the best results so far.");
-		panelMiddle.add(abortButton);
+
+		nextRunButton = new JButton("Next Run");
+		panelMiddle.add(nextRunButton);
+		nextRunButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				gui.skipCurrentRun();
+			}
+		});
+		nextRunButton.setToolTipText("Stops the current optimization run and starts the next.");
 	}
 
 }

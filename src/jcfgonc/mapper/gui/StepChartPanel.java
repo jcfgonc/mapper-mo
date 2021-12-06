@@ -15,6 +15,8 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+import visual.GUI_Utils;
+
 public class StepChartPanel extends JPanel {
 
 	private static final long serialVersionUID = 6897997626552672853L;

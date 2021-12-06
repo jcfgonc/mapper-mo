@@ -4,6 +4,7 @@ import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 
 import graph.DirectedMultiGraph;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import jcfgonc.mapper.GrammarUtils;
 import jcfgonc.mapper.MOEA_Config;
 import jcfgonc.mapper.MapperUtils;
@@ -66,10 +67,10 @@ public class CustomProblem implements Problem, ProblemDescription {
 			numRelations = (int) rs[2];
 		}
 
-		int degreeOfReferencePair = 0;
-		if (!emptyGraph) {
-			degreeOfReferencePair = pairGraph.degreeOf(referencePair);
-		}
+//		int degreeOfReferencePair = 0;
+//		if (!emptyGraph) {
+//			degreeOfReferencePair = pairGraph.degreeOf(referencePair);
+//		}
 
 		int refPairInnerDistance = 10;
 		if (!emptyGraph) {
@@ -93,16 +94,28 @@ public class CustomProblem implements Problem, ProblemDescription {
 			posRatio = GrammarUtils.calculateSamePOS_pairsPercentage(pairGraph, StaticSharedVariables.inputSpaceForPOS);
 		}
 
+		double closenessCentrality = 0;
+		if (!emptyGraph) {
+			closenessCentrality = MapperUtils.closenessCentrality(referencePair, pairGraph);
+		}
+
+//		double coiso = 0;
+		if (!emptyGraph) {
+			Object2IntOpenHashMap<OrderedPair<String>> childrenTree = MappingAlgorithms.countNumberOfChildrenPerSubTree(pairGraph, referencePair);
+			System.lineSeparator();
+		}
+
 		// set solution's objectives here
 		int obj_i = 0;
 		solution.setObjective(obj_i++, -numPairs);
 		solution.setObjective(obj_i++, -vitalRelationsMean);
 		solution.setObjective(obj_i++, relationStdDev);
 		solution.setObjective(obj_i++, -numRelations);
-		solution.setObjective(obj_i++, -degreeOfReferencePair);
+//		solution.setObjective(obj_i++, -degreeOfReferencePair);
 		solution.setObjective(obj_i++, refPairInnerDistance);
 		solution.setObjective(obj_i++, meanWordsPerConcept);
 		solution.setObjective(obj_i++, -posRatio);
+		solution.setObjective(obj_i++, -closenessCentrality);
 
 //		obj_i = 0;
 //		// violated constraints are set to 1, otherwise set to 0
@@ -142,10 +155,11 @@ public class CustomProblem implements Problem, ProblemDescription {
 			"f:vitalRelationsMean", //
 			"f:relationStdDev", //
 			"d:numRelations", //
-			"d:degreeOfReferencePair", //
+//			"d:degreeOfReferencePair", //
 			"d:refPairInnerDistance", //
 			"f:meanWordsPerConcept", //
 			"f:samePOSpairRatio", //
+			"f:closenessCentrality", //
 	};
 
 	private String[] constraintsDescription = { //

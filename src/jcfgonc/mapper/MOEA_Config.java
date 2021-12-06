@@ -3,6 +3,7 @@ package jcfgonc.mapper;
 import java.util.Set;
 
 public class MOEA_Config {
+	public static final String WINDOW_TITLE = "MapperMO - Multiple Objective Conceptual Mapper";
 	/**
 	 * name of the algorithm to be used by the MOEA-Framework
 	 */
@@ -15,7 +16,7 @@ public class MOEA_Config {
 	/**
 	 * number of (constant) solutions in the population
 	 */
-	public static int POPULATION_SIZE = 2048;
+	public static int POPULATION_SIZE = 256;
 	/**
 	 * maximum number of epochs/generations to iterate
 	 */
@@ -62,9 +63,9 @@ public class MOEA_Config {
 	public static final double LOCAL_JUMP_PROBABILITY = 0.88; // local to global jump probability - currently not used
 	public static final int REFPAIR_JUMP_RANGE = 2;
 	public static final double JUMP_PROBABILITY_POWER = 5.2;
-	public static final int REFPAIR_ISOMORPHISM_MAX_DEEPNESS = 32;
+	public static final int REFPAIR_ISOMORPHISM_MAX_DEEPNESS = 16;
 	public static final int NUMBER_MUTATION_TRIES = 10;
-	public static final int REFERENCE_PAIRINNER_DISTANCE_CALCULATION_LIMIT = 100;
+	public static final int REFERENCE_PAIRINNER_DISTANCE_CALCULATION_LIMIT = 16;
 	public static final int CACHE_SAVE_TIMEOUT = 1 * 60;
 	public static final String REFPAIR_CACHE_FILENAME = "refPairInnerDistanceCache.dat";
 	public static final String POS_CACHE_FILENAME = "posCache.dat";

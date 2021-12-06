@@ -15,7 +15,6 @@ import java.util.Properties;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -26,6 +25,7 @@ import org.moeaframework.core.Solution;
 
 import jcfgonc.mapper.MOEA_Config;
 import jcfgonc.moea.generic.InteractiveExecutor;
+import visual.GUI_Utils;
 
 public class InteractiveExecutorGUI extends JFrame {
 
@@ -68,10 +68,10 @@ public class InteractiveExecutorGUI extends JFrame {
 	 * @param i
 	 */
 	public InteractiveExecutorGUI(InteractiveExecutor interactiveExecutor) {
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
-			@Override
 			public void windowClosing(WindowEvent e) {
-				abortOptimization();
+				// do nothing
 			}
 		});
 
@@ -140,16 +140,6 @@ public class InteractiveExecutorGUI extends JFrame {
 				windowResized(e);
 			}
 		});
-	}
-
-	public void abortOptimization() {
-		// default icon, custom title
-		int n = JOptionPane.showConfirmDialog(null, "Aborting optimization will discard the results of the current epoch.\nAre you sure?", "Abort Optimization",
-				JOptionPane.YES_NO_OPTION);
-		if (n != 0)
-			return;
-		setVisible(false);
-		interactiveExecutor.abortOptimization();
 	}
 
 	@Override
@@ -313,8 +303,8 @@ public class InteractiveExecutorGUI extends JFrame {
 		interactiveExecutor.stopOptimization();
 	}
 
-	public void printNonDominatedSet() {
-		nonDominatedSetPanel.printNonDominatedSet();
+	public void saveCurrentNDS() {
+		interactiveExecutor.saveCurrentNDS();
 	}
 
 	public void skipCurrentRun() {
@@ -335,5 +325,17 @@ public class InteractiveExecutorGUI extends JFrame {
 
 	public int getRun() {
 		return run;
+	}
+
+	public void dumpRandomSolution() {
+		interactiveExecutor.dumpRandomSolution();
+	}
+
+	public void pause() {
+		interactiveExecutor.pause();
+	}
+
+	public boolean isPaused() {
+		return interactiveExecutor.isPaused();
 	}
 }

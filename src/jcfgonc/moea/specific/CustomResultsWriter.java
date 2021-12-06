@@ -1,10 +1,11 @@
 package jcfgonc.moea.specific;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
-import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 
@@ -14,10 +15,7 @@ import structures.OrderedPair;
 
 public class CustomResultsWriter implements ResultsWriter {
 
-	private String filename;
-
-	public CustomResultsWriter(String filename) {
-		this.filename = filename;
+	public CustomResultsWriter() {
 	}
 
 	/**
@@ -25,12 +23,16 @@ public class CustomResultsWriter implements ResultsWriter {
 	 * 
 	 * @param filename
 	 * @param problem
+	 * @param filename
 	 * @throws IOException
 	 */
-	public void writeFileHeader(Problem problem) {
+	public void writeFileHeader(Problem problem, String filename) {
 		try {
-			FileWriter fw = new FileWriter(filename, true);
-			BufferedWriter bw = new BufferedWriter(fw);
+			File f = new File(filename);
+			f.delete();
+
+			FileWriter fw = new FileWriter(f);
+			BufferedWriter bw = new BufferedWriter(fw, 1 << 20);
 
 			CustomProblem cp = (CustomProblem) problem;
 			int numberOfObjectives = problem.getNumberOfObjectives();
@@ -53,7 +55,7 @@ public class CustomResultsWriter implements ResultsWriter {
 	}
 
 	// this is hard-coded for the blender
-	public void appendResultsToFile(NondominatedPopulation results, Problem problem) {
+	public void appendResultsToFile(List<Solution> results, Problem problem, String filename) {
 		try {
 
 			// nothing to save
@@ -61,7 +63,7 @@ public class CustomResultsWriter implements ResultsWriter {
 				return;
 
 			FileWriter fw = new FileWriter(filename, true);
-			BufferedWriter bw = new BufferedWriter(fw);
+			BufferedWriter bw = new BufferedWriter(fw, 1 << 20);
 			CustomProblem cp = (CustomProblem) problem;
 
 			int numberOfObjectives = cp.getNumberOfObjectives();

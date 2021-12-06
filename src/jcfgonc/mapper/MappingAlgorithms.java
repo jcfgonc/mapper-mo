@@ -320,4 +320,48 @@ public class MappingAlgorithms {
 		}
 	}
 
+	/**
+	 * Calculates the number of children per sub tree for the given graph, starting at the root vertex. Used to calculate the balanced sub-tree(s) at the root
+	 * vertex.
+	 * 
+	 * @param graph
+	 * @param root
+	 * @return
+	 */
+	public static Object2IntOpenHashMap<OrderedPair<String>> countNumberOfChildrenPerSubTree(DirectedMultiGraph<OrderedPair<String>, String> graph,
+			OrderedPair<String> root) {
+		HashMap<OrderedPair<String>, OrderedPair<String>> cameFrom = new HashMap<>();
+		HashSet<OrderedPair<String>> closedSet = new HashSet<>();
+		ArrayDeque<OrderedPair<String>> stack = new ArrayDeque<>();
+		ArrayDeque<OrderedPair<String>> output = new ArrayDeque<>();
+		// depth first expansion so that later we can go back from the terminal nodes to the root (in the output deque)
+		stack.push(root);
+		while (!stack.isEmpty()) {
+			OrderedPair<String> node = stack.pop();
+			closedSet.add(node);
+			output.push(node);
+			Set<OrderedPair<String>> neighborhood = graph.getNeighborVertices(node);
+			for (OrderedPair<String> neighbor : neighborhood) {
+				if (!closedSet.contains(neighbor)) {
+					stack.push(neighbor);
+					cameFrom.put(neighbor, node);
+				}
+			}
+		}
+		Object2IntOpenHashMap<OrderedPair<String>> numChildren = new Object2IntOpenHashMap<>(output.size() * 2);
+		while (!output.isEmpty()) {
+			OrderedPair<String> node = output.pop();
+			// children of this node is its neighborhood except ancestor
+			Set<OrderedPair<String>> children = graph.getNeighborVertices(node);
+			OrderedPair<String> ancestor = cameFrom.get(node);
+			children.remove(ancestor);
+			int childCount = 0;
+			for (OrderedPair<String> child : children) {
+				// add number of children for each "child" including self
+				childCount += numChildren.getInt(child) + 1;
+			}
+			numChildren.put(node, childCount);
+		}
+		return numChildren;
+	}
 }

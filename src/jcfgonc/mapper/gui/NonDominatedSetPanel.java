@@ -6,7 +6,6 @@ import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import javax.swing.JPanel;
 
@@ -24,6 +23,7 @@ import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 
 import jcfgonc.moea.generic.ProblemDescription;
+import visual.GUI_Utils;
 
 public class NonDominatedSetPanel extends JPanel {
 
@@ -116,24 +116,6 @@ public class NonDominatedSetPanel extends JPanel {
 				}
 			});
 
-		}
-	}
-
-	public void printNonDominatedSet() {
-		if (nonDominatedSet == null || nonDominatedSet.isEmpty())
-			return;
-		Iterator<Solution> pi = nonDominatedSet.iterator();
-		while (pi.hasNext()) {
-			Solution solution = pi.next();
-			for (int objectiveIndex = 0; objectiveIndex < numberOfObjectives; objectiveIndex++) {
-				double x = solution.getObjective(objectiveIndex);
-				System.out.print(x);
-				if (objectiveIndex < numberOfObjectives - 1)
-					System.out.print("\t");
-			}
-			if (pi.hasNext()) {
-				System.out.println();
-			}
 		}
 	}
 
