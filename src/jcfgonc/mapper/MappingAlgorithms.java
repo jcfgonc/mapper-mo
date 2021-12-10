@@ -11,6 +11,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 
 import graph.DirectedMultiGraph;
 import graph.GraphAlgorithms;
+import graph.GraphEdge;
 import graph.StringEdge;
 import graph.StringGraph;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -363,5 +364,41 @@ public class MappingAlgorithms {
 			numChildren.put(node, childCount);
 		}
 		return numChildren;
+	}
+
+	public static <T> double closenessCentrality(T referencePair, DirectedMultiGraph<T, String> pairGraph) {
+		int nvert = pairGraph.getNumberOfVertices();
+		Object2IntOpenHashMap<T> deepness = getVerticesDeepness(referencePair, pairGraph);
+		double deepSum = 0;
+		for (int deep : deepness.values()) {
+			deepSum += deep;
+		}
+		double centrality = (double) (nvert - 1) / deepSum;
+		return centrality;
+	}
+
+	private static <T> Object2IntOpenHashMap<T> getVerticesDeepness(T referencePair, DirectedMultiGraph<T, String> pairGraph) {
+		HashSet<T> closedSet = new HashSet<>();
+		ArrayDeque<T> openSet = new ArrayDeque<>();
+		Object2IntOpenHashMap<T> deepness = new Object2IntOpenHashMap<>();
+		deepness.put(referencePair, 0);
+
+		// ---------init
+		openSet.addLast(referencePair);
+
+		while (!openSet.isEmpty()) {
+			T current = openSet.removeFirst();
+			closedSet.add(current);
+			int nextDeepness = deepness.getInt(current) + 1;
+			HashSet<GraphEdge<T, String>> touchingE = pairGraph.edgesOf(current);
+			for (GraphEdge<T, String> edge : touchingE) {
+				T other = edge.getOppositeOf(current);
+				if (!closedSet.contains(other)) {
+					openSet.addLast(other);
+					deepness.put(other, nextDeepness);
+				}
+			}
+		}
+		return deepness;
 	}
 }

@@ -1,25 +1,20 @@
 package jcfgonc.mapper;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import graph.DirectedMultiGraph;
 import graph.GraphAlgorithms;
-import graph.GraphEdge;
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import structures.OrderedPair;
 import utils.VariousUtils;
 
-public class MapperUtils {
+public class ObjectiveEvaluationUtils {
 
 	public static DescriptiveStatistics calculateVitalRelationsStatistics(DirectedMultiGraph<OrderedPair<String>, String> graph,
 			Object2DoubleOpenHashMap<String> relationWeights) {
@@ -116,58 +111,40 @@ public class MapperUtils {
 		return Math.ceil(Math.abs(center - x) - diameter);
 	}
 
-	public static Object2DoubleOpenHashMap<String> readVitalRelations(String path) throws IOException {
-		Object2DoubleOpenHashMap<String> relationToImportance = new Object2DoubleOpenHashMap<String>();
-		BufferedReader br = new BufferedReader(new FileReader(path, StandardCharsets.UTF_8), 1 << 24);
-		String line;
-		while ((line = br.readLine()) != null) {
-			line = line.trim();
-			if (line.contains(":")) // header, eg, s:relation
-				continue;
-			String[] cells = VariousUtils.fastSplitWhiteSpace(line);
-			String relation = cells[0];
-			double importance = Double.parseDouble(cells[1]);
-			relationToImportance.put(relation, importance);
-		}
-		br.close();
-		System.out.printf("using the definition of %d vital relations from %s\n", relationToImportance.size(), path);
-		return relationToImportance;
-	}
-
-	public static <T> double closenessCentrality(T referencePair, DirectedMultiGraph<T, String> pairGraph) {
-		int nvert = pairGraph.getNumberOfVertices();
-		Object2IntOpenHashMap<T> deepness = getVerticesDeepness(referencePair, pairGraph);
-		double deepSum = 0;
-		for (int deep : deepness.values()) {
-			deepSum += deep;
-		}
-		double centrality = (double) (nvert - 1) / deepSum;
-		return centrality;
-	}
-
-	private static <T> Object2IntOpenHashMap<T> getVerticesDeepness(T referencePair,
-			DirectedMultiGraph<T, String> pairGraph) {
-		HashSet<T> closedSet = new HashSet<>();
-		ArrayDeque<T> openSet = new ArrayDeque<>();
-		Object2IntOpenHashMap<T> deepness = new Object2IntOpenHashMap<>();
-		deepness.put(referencePair, 0);
-
-		// ---------init
-		openSet.addLast(referencePair);
-
-		while (!openSet.isEmpty()) {
-			T current = openSet.removeFirst();
-			closedSet.add(current);
-			int nextDeepness = deepness.getInt(current) + 1;
-			HashSet<GraphEdge<T, String>> touchingE = pairGraph.edgesOf(current);
-			for (GraphEdge<T, String> edge : touchingE) {
-				T other = edge.getOppositeOf(current);
-				if (!closedSet.contains(other)) {
-					openSet.addLast(other);
-					deepness.put(other, nextDeepness);
-				}
+	public static double assymetricParabolaFunc(int minorPower, int higherPower, double x) {
+		if (x < 0) {
+			if (minorPower % 2 == 0) {
+				return Math.pow(x, minorPower);
+			} else {
+				return -Math.pow(x, minorPower); // always positive
 			}
+		} else {
+			return Math.pow(x, higherPower);
 		}
-		return deepness;
 	}
+
+	public static double idealDegree(DirectedMultiGraph<OrderedPair<String>, String> pairGraph, OrderedPair<String> referencePair) {
+		double degree = pairGraph.degreeOf(referencePair);
+		final double idealDegree = 5;
+		double val = assymetricParabolaFunc(4, 2, degree - idealDegree);
+		return val;
+	}
+
+	public static double calculateSubTreesBalance(DirectedMultiGraph<OrderedPair<String>, String> pairGraph, OrderedPair<String> referencePair) {
+		// calculates strictly nearby balance
+		Object2IntOpenHashMap<OrderedPair<String>> childrenTree = MappingAlgorithms.countNumberOfChildrenPerSubTree(pairGraph, referencePair);
+		Set<OrderedPair<String>> neighborVertices = pairGraph.getNeighborVertices(referencePair);
+		DoubleArrayList subTreeCount = new DoubleArrayList(neighborVertices.size());
+		for (OrderedPair<String> vertex : neighborVertices) {
+			subTreeCount.add(childrenTree.getInt(vertex) + 1);
+		}
+		double[] elements = subTreeCount.elements();
+		DescriptiveStatistics ds = new DescriptiveStatistics(elements);
+		double stddev = ds.getStandardDeviation();
+//		if (subTreeCount.size() > 1) {
+//			System.lineSeparator();
+//		}
+		return stddev;
+	}
+
 }

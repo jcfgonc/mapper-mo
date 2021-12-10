@@ -47,6 +47,7 @@ public class MapperGeneticOperations {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	public static MappingStructure<String, String> mutateGenes(MappingStructure<String, String> genes, StringGraph inputSpace, RandomGenerator random) {
 		OrderedPair<String> refPair = genes.getReferencePair();
 		String leftElement = refPair.getLeftElement();

@@ -16,7 +16,7 @@ public class MOEA_Config {
 	/**
 	 * number of (constant) solutions in the population
 	 */
-	public static int POPULATION_SIZE = 256;
+	public static int POPULATION_SIZE = 2048;
 	/**
 	 * maximum number of epochs/generations to iterate
 	 */
@@ -57,11 +57,10 @@ public class MOEA_Config {
 	public static final boolean SCREENSHOTS_ENABLED = false;
 	public static final boolean LAST_EPOCH_SCREENSHOT = true;
 
-	public static final int MAXIMUM_NUMBER_OF_CONCEPT_PAIRS = 8;
+	public static final int MAXIMUM_NUMBER_OF_CONCEPT_PAIRS = 10;
 	// mutation controls
-	public static final double REFPAIR_MUTATION_PROBABILITY = 0.125;
-	public static final double LOCAL_JUMP_PROBABILITY = 0.88; // local to global jump probability - currently not used
-	public static final int REFPAIR_JUMP_RANGE = 2;
+	public static final double REFPAIR_MUTATION_PROBABILITY = 1.0 / 8.0;
+	public static final int REFPAIR_JUMP_RANGE = 1;
 	public static final double JUMP_PROBABILITY_POWER = 5.2;
 	public static final int REFPAIR_ISOMORPHISM_MAX_DEEPNESS = 16;
 	public static final int NUMBER_MUTATION_TRIES = 10;

@@ -22,7 +22,6 @@ import utils.VariousUtils;
 public class InteractiveExecutor {
 	private Properties algorithmProperties;
 	private NondominatedPopulation results;
-	private ArrayList<Solution> lastResults;
 	/**
 	 * cancels the MOEA in general
 	 */
@@ -102,8 +101,9 @@ public class InteractiveExecutor {
 			algorithm.step();
 			double epochDuration = ticker.getTimeDeltaLastCall();
 
-			lastResults = new ArrayList<Solution>(algorithm.getResult().getElements());
+			NondominatedPopulation lastResults = algorithm.getResult();
 			results.addAll(lastResults);
+			// results = new NondominatedPopulation(lastResults);
 
 			// update GUI stuff
 			updateStatus(moea_run, epoch, epochDuration);
@@ -207,7 +207,7 @@ public class InteractiveExecutor {
 		String filename = String.format("moea_results_%s_epoch_%d.tsv", dateTimeStamp, epoch);
 
 		resultsWriter.writeFileHeader(problem, filename);
-		resultsWriter.appendResultsToFile(lastResults, problem, filename);
+		resultsWriter.appendResultsToFile(results.getElements(), problem, filename);
 	}
 
 	public void dumpRandomSolution() {

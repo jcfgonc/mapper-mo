@@ -1,6 +1,9 @@
 package jcfgonc.mapper;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
 import java.util.HashSet;
 import java.util.Properties;
@@ -68,13 +71,7 @@ public class MapperMoLauncher {
 	public static void main(String[] args) throws NoSuchFileException, IOException, ClassNotFoundException, InstantiationException, IllegalAccessException,
 			UnsupportedLookAndFeelException, InterruptedException, JWNLException {
 
-//		for (int i = 0; i < 10; i++) {
-//			System.out.println(MapperUtils.minimumRadialDistanceFunc(3, 1, i));
-//		}
-//		System.exit(0);
-
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
 		RandomAdaptor random = new RandomAdaptor(new SynchronizedRandomGenerator(new Well44497b()));
 
 		// read input space
@@ -98,7 +95,7 @@ public class MapperMoLauncher {
 		StaticSharedVariables.inputSpace = inputSpace;
 
 		// read vital relations importance
-		Object2DoubleOpenHashMap<String> vitalRelations = MapperUtils.readVitalRelations(MOEA_Config.vitalRelationsPath);
+		Object2DoubleOpenHashMap<String> vitalRelations = readVitalRelations(MOEA_Config.vitalRelationsPath);
 
 		// read pre-calculated semantic scores of word/relation pairs
 		Object2DoubleOpenHashMap<UnorderedPair<String>> wps = WordEmbeddingUtils.readWordPairScores(MOEA_Config.wordPairScores_filename);
@@ -123,8 +120,8 @@ public class MapperMoLauncher {
 //		properties.setProperty("injectionRate", Double.toString(1.0 / 0.25)); // population to archive ratio, default is 0.25
 
 		// NSGA-III
-		properties.setProperty("divisionsOuter", Integer.toString(MOEA_Config.NSGA3_divisionsOuter));
-		properties.setProperty("divisionsInner", Integer.toString(MOEA_Config.NSGA3_divisionsInner));
+//		properties.setProperty("divisionsOuter", Integer.toString(MOEA_Config.NSGA3_divisionsOuter));
+//		properties.setProperty("divisionsInner", Integer.toString(MOEA_Config.NSGA3_divisionsInner));
 
 		// personalize your results writer here
 		ResultsWriter resultsWriter = new CustomResultsWriter();
@@ -179,5 +176,23 @@ public class MapperMoLauncher {
 		System.out.println("loading took " + ticker.getTimeDeltaLastCall() + " s");
 		System.out.println("-------");
 		return inputSpace;
+	}
+
+	public static Object2DoubleOpenHashMap<String> readVitalRelations(String path) throws IOException {
+		Object2DoubleOpenHashMap<String> relationToImportance = new Object2DoubleOpenHashMap<String>();
+		BufferedReader br = new BufferedReader(new FileReader(path, StandardCharsets.UTF_8), 1 << 24);
+		String line;
+		while ((line = br.readLine()) != null) {
+			line = line.trim();
+			if (line.contains(":")) // header, eg, s:relation
+				continue;
+			String[] cells = VariousUtils.fastSplitWhiteSpace(line);
+			String relation = cells[0];
+			double importance = Double.parseDouble(cells[1]);
+			relationToImportance.put(relation, importance);
+		}
+		br.close();
+		System.out.printf("using the definition of %d vital relations from %s\n", relationToImportance.size(), path);
+		return relationToImportance;
 	}
 }
