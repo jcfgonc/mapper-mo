@@ -1,6 +1,9 @@
 package jcfgonc.mapper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -11,6 +14,7 @@ import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import structures.MapOfList;
 import structures.OrderedPair;
 import utils.VariousUtils;
 
@@ -145,6 +149,33 @@ public class ObjectiveEvaluationUtils {
 //			System.lineSeparator();
 //		}
 		return stddev;
+	}
+
+	public static int calculateRelationAsymmetryPenalty(//
+			MapOfList<OrderedPair<String>, String> priorRelations, //
+			HashSet<OrderedPair<String>> terminalSet) {
+		int numConflictingRelations = 0;
+		// for (Entry<OrderedPair<String>, List<String>> terminal : priorRelations.entrySet()) {
+		// List<String> relationList = terminal.getValue();
+		for (OrderedPair<String> terminal : terminalSet) { // iterate only in terminal vertices
+			List<String> relationList = priorRelations.get(terminal);
+			if (containsOpposingRelations(relationList)) {
+				numConflictingRelations++;
+			}
+		}
+		return numConflictingRelations;
+	}
+
+	private static boolean containsOpposingRelations(List<String> relationList) {
+		// check for ISA
+		if (relationList.size() < 2) {
+			return false;
+		}
+		return (relationList.contains("+isa") && relationList.contains("-isa")) //
+				|| (relationList.contains("+partof") && relationList.contains("-partof")) //
+				|| (relationList.contains("+capableof") && relationList.contains("-capableof")) //
+				|| (relationList.contains("+usedfor") && relationList.contains("-usedfor")) //
+		;
 	}
 
 }

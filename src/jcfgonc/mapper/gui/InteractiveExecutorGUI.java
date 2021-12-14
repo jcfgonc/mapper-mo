@@ -3,6 +3,7 @@ package jcfgonc.mapper.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
@@ -14,6 +15,7 @@ import java.util.Collection;
 import java.util.Properties;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -85,7 +87,15 @@ public class InteractiveExecutorGUI extends JFrame {
 		this.epochDuration = -1;
 		this.windowTitle = interactiveExecutor.getWindowTitle();
 
+		createIcon();
 		initialize();
+	}
+
+	private void createIcon() {
+		String imagePath = MOEA_Config.MOEA_ICON_PATH;
+		ImageIcon ImageIcon = new ImageIcon(imagePath);
+		Image Image = ImageIcon.getImage();
+		this.setIconImage(Image);
 	}
 
 	private void initialize() {

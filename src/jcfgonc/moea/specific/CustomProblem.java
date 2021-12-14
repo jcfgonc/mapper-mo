@@ -1,5 +1,7 @@
 package jcfgonc.moea.specific;
 
+import java.util.HashSet;
+
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 
@@ -11,6 +13,7 @@ import jcfgonc.mapper.ObjectiveEvaluationUtils;
 import jcfgonc.mapper.StaticSharedVariables;
 import jcfgonc.mapper.structures.MappingStructure;
 import jcfgonc.moea.generic.ProblemDescription;
+import structures.MapOfList;
 import structures.OrderedPair;
 
 public class CustomProblem implements Problem, ProblemDescription {
@@ -58,13 +61,13 @@ public class CustomProblem implements Problem, ProblemDescription {
 		}
 
 		// relation statistics
-		double relationStdDev;
+//		double relationStdDev;
 		int numRelations;
-		relationStdDev = 100;
+//		relationStdDev = 100;
 		numRelations = 0;
 		if (!emptyGraph) {
 			double[] rs = ObjectiveEvaluationUtils.calculateRelationStatistics(pairGraph);
-			relationStdDev = rs[1]; // 0...1 : 0 = equal amount of relation labels
+//			relationStdDev = rs[1]; // 0...1 : 0 = equal amount of relation labels
 			numRelations = (int) rs[2];
 		}
 
@@ -107,11 +110,19 @@ public class CustomProblem implements Problem, ProblemDescription {
 //			System.out.println(subTreeBal);
 		}
 
+		double assymetricRelationCount = 10;
+		if (!emptyGraph) {
+			MapOfList<OrderedPair<String>, String> priorRelations = new MapOfList<>();
+			HashSet<OrderedPair<String>> terminalSet = new HashSet<>();
+			MappingAlgorithms.calculatePathsFromOrigin(pairGraph, referencePair, priorRelations, terminalSet);
+			assymetricRelationCount = ObjectiveEvaluationUtils.calculateRelationAsymmetryPenalty(priorRelations, terminalSet);
+		}
+
 		// set solution's objectives here
 		int obj_i = 0;
 		solution.setObjective(obj_i++, -numPairs);
 		solution.setObjective(obj_i++, -vitalRelationsMean);
-		solution.setObjective(obj_i++, relationStdDev);
+//		solution.setObjective(obj_i++, relationStdDev);
 		solution.setObjective(obj_i++, -numRelations);
 		solution.setObjective(obj_i++, -degreeOfReferencePair);
 		solution.setObjective(obj_i++, refPairInnerDistance);
@@ -119,21 +130,42 @@ public class CustomProblem implements Problem, ProblemDescription {
 		solution.setObjective(obj_i++, -posRatio);
 //		solution.setObjective(obj_i++, -closenessCentrality);
 		solution.setObjective(obj_i++, subTreeBal);
+		solution.setObjective(obj_i++, assymetricRelationCount);
 
-//		obj_i = 0;
-//		// violated constraints are set to 1, otherwise set to 0
-//		if (numPairs < 3 || numPairs > MOEA_Config.MAXIMUM_NUMBER_OF_CONCEPT_PAIRS) { // limit the number of vertices in the blend space
-//			solution.setConstraint(obj_i++, 1); // violated
-//		} else {
-//			solution.setConstraint(obj_i++, 0); // not violated
-//		}
-//
+		obj_i = 0;
+		// violated constraints are set to 1, otherwise set to 0
+		if (degreeOfReferencePair < 3) {
+			solution.setConstraint(obj_i++, 1); // violated
+		} else {
+			solution.setConstraint(obj_i++, 0); // not violated
+		}
+		if (posRatio < 0.75) {
+			solution.setConstraint(obj_i++, 1); // violated
+		} else {
+			solution.setConstraint(obj_i++, 0); // not violated
+		}
+		if (subTreeBal > 3.5) {
+			solution.setConstraint(obj_i++, 1); // violated
+		} else {
+			solution.setConstraint(obj_i++, 0); // not violated
+		}
+		if (numRelations < 3) {
+			solution.setConstraint(obj_i++, 1); // violated
+		} else {
+			solution.setConstraint(obj_i++, 0); // not violated
+		}
+		if (vitalRelationsMean < 0.75) {
+			solution.setConstraint(obj_i++, 1); // violated
+		} else {
+			solution.setConstraint(obj_i++, 0); // not violated
+		}
+
 	}
 
 	private String[] objectivesDescription = { //
 			"d:numPairs", //
 			"f:vitalRelationsMean", //
-			"f:relationStdDev", //
+//			"f:relationStdDev", //
 			"d:numRelations", //
 			"d:degreeOfReferencePair", //
 			"d:refPairInnerDistance", //
@@ -141,14 +173,15 @@ public class CustomProblem implements Problem, ProblemDescription {
 			"f:samePOSpairRatio", //
 //			"f:closenessCentrality", //
 			"f:subTreeBalance", //
+			"d:assymetricRelationCount", //
 	};
 
 	private String[] constraintsDescription = { //
-//			"required numPairs", //
-//			"required numRelations", //
-//			"required degreeOfReferencePair", //
-//			"required posRatio", //
-//			"required vitalRelationsMean", //
+			"required degreeOfReferencePair", //
+			"required posRatio", //
+			"required subTreeBal", //
+			"required numRelations", //
+			"required vitalRelationsMean", //
 	};
 
 	@Override

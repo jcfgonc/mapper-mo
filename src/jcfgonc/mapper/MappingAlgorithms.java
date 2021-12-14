@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.math3.random.RandomGenerator;
@@ -16,6 +17,7 @@ import graph.StringEdge;
 import graph.StringGraph;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import jcfgonc.mapper.structures.MappingStructure;
+import structures.MapOfList;
 import structures.MapOfSet;
 import structures.OrderedPair;
 import structures.UnorderedPair;
@@ -400,5 +402,37 @@ public class MappingAlgorithms {
 			}
 		}
 		return deepness;
+	}
+
+	public static void calculatePathsFromOrigin(DirectedMultiGraph<OrderedPair<String>, String> pairGraph, //
+			OrderedPair<String> referencePair, MapOfList<OrderedPair<String>, String> priorRelations, HashSet<OrderedPair<String>> terminalSet) {
+		HashSet<OrderedPair<String>> closedSet = new HashSet<>();
+		ArrayDeque<OrderedPair<String>> openSet = new ArrayDeque<>();
+		openSet.add(referencePair);
+		while (!openSet.isEmpty()) {
+			OrderedPair<String> currentVertex = openSet.removeLast();
+			closedSet.add(currentVertex);
+			// check for terminal vertices
+			if (!currentVertex.equals(referencePair) && pairGraph.degreeOf(currentVertex) == 1) {
+				terminalSet.add(currentVertex);
+			}
+			List<String> currentPreviousRelations = priorRelations.get(currentVertex);
+			HashSet<GraphEdge<OrderedPair<String>, String>> edgesOf = pairGraph.edgesOf(currentVertex);
+			for (GraphEdge<OrderedPair<String>, String> edge : edgesOf) {
+				OrderedPair<String> neighboringVertex = edge.getOppositeOf(currentVertex);
+				if (closedSet.contains(neighboringVertex))
+					continue;
+				String relation;
+				if (edge.outgoesFrom(currentVertex)) {
+					relation = "+" + edge.getLabel();
+				} else {
+					relation = "-" + edge.getLabel();
+				}
+				if (currentPreviousRelations != null)
+					priorRelations.add(neighboringVertex, currentPreviousRelations);
+				priorRelations.add(neighboringVertex, relation);
+				openSet.add(neighboringVertex);
+			}
+		}
 	}
 }

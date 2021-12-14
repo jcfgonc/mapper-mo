@@ -8,6 +8,7 @@ import java.nio.file.NoSuchFileException;
 import java.util.HashSet;
 import java.util.Properties;
 
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -72,6 +73,7 @@ public class MapperMoLauncher {
 			UnsupportedLookAndFeelException, InterruptedException, JWNLException {
 
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
 		RandomAdaptor random = new RandomAdaptor(new SynchronizedRandomGenerator(new Well44497b()));
 
 		// read input space
@@ -93,6 +95,8 @@ public class MapperMoLauncher {
 		// remove useless relations
 		inputSpace.removeEdgesByLabel(MOEA_Config.uselessRelations);
 		StaticSharedVariables.inputSpace = inputSpace;
+
+		MOEA_Config.fixedConceptLeft = askUserForFixedConcept();
 
 		// read vital relations importance
 		Object2DoubleOpenHashMap<String> vitalRelations = readVitalRelations(MOEA_Config.vitalRelationsPath);
@@ -194,5 +198,30 @@ public class MapperMoLauncher {
 		br.close();
 		System.out.printf("using the definition of %d vital relations from %s\n", relationToImportance.size(), path);
 		return relationToImportance;
+	}
+
+	private static String askUserForFixedConcept() {
+		StringGraph inputSpace = StaticSharedVariables.inputSpace;
+
+		String concept;
+		do {
+			concept = (String) JOptionPane.showInputDialog(null, //
+					"Type in one of the mapping's concept:", "MapperMO", JOptionPane.DEFAULT_OPTION, null, //
+					null, null);
+			if (concept == null) { // cancel clicked
+				System.exit(0);
+			}
+			concept = concept.trim();
+			if (concept.isEmpty()) { // nothing entered
+				return null;
+			}
+			// something was entered
+			boolean valid = inputSpace.containsVertex(concept);
+			if (valid)
+				return concept;
+			JOptionPane.showMessageDialog(null, "Knowledge Base does not contain the concept \"" + concept + "\"", //
+					"MapperMO", JOptionPane.WARNING_MESSAGE);
+
+		} while (true);
 	}
 }

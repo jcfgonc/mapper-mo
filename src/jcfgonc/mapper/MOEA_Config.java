@@ -9,18 +9,18 @@ public class MOEA_Config {
 	 */
 	public static final String ALGORITHM = "eNSGA2";
 	public static final double eNSGA2_epsilon = 0.01; // default is 0.01
-	public static final int eNSGA2_windowSize = 256; // epoch to trigger eNSGA2 population injection
-	public static final int eNSGA2_maxWindowSize = 640; // epoch to trigger eNSGA2 hard restart
+	public static final int eNSGA2_windowSize = 4096; // epoch to trigger eNSGA2 population injection
+	public static final int eNSGA2_maxWindowSize = 4096; // epoch to trigger eNSGA2 hard restart
 	public static final int NSGA3_divisionsOuter = 4; // decrease with increasing dimensions/objectives
 	public static final int NSGA3_divisionsInner = 1; // increase with increasing dimensions/objectives
 	/**
 	 * number of (constant) solutions in the population
 	 */
-	public static int POPULATION_SIZE = 2048;
+	public static int POPULATION_SIZE = 4096;
 	/**
 	 * maximum number of epochs/generations to iterate
 	 */
-	public static int MAX_EPOCHS = 999999;
+	public static int MAX_EPOCHS = 131072;
 	/**
 	 * maximum number of MOEA runs (each run iterates max_epochs)
 	 */
@@ -45,8 +45,8 @@ public class MOEA_Config {
 
 	public static final Set<String> uselessWords = Set.of("that", "than", "this", "my", "your", "his", "her", "he", "hers", "these");
 
-	public static final String fixedConceptLeft = null;
-	public static final String fixedConceptRight = null;
+	public static String fixedConceptLeft = null;
+	public static String fixedConceptRight = null;
 
 	public static final char CONCEPT_WORD_SEPARATOR = ' ';
 
@@ -57,7 +57,7 @@ public class MOEA_Config {
 	public static final boolean SCREENSHOTS_ENABLED = false;
 	public static final boolean LAST_EPOCH_SCREENSHOT = true;
 
-	public static final int MAXIMUM_NUMBER_OF_CONCEPT_PAIRS = 10;
+	public static final int MAXIMUM_NUMBER_OF_CONCEPT_PAIRS = 8;
 	// mutation controls
 	public static final double REFPAIR_MUTATION_PROBABILITY = 1.0 / 8.0;
 	public static final int REFPAIR_JUMP_RANGE = 1;
@@ -68,4 +68,5 @@ public class MOEA_Config {
 	public static final int CACHE_SAVE_TIMEOUT = 1 * 60;
 	public static final String REFPAIR_CACHE_FILENAME = "refPairInnerDistanceCache.dat";
 	public static final String POS_CACHE_FILENAME = "posCache.dat";
+	public static final String MOEA_ICON_PATH = "data/hypervolume icon model.png";
 }
