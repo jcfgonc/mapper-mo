@@ -96,7 +96,7 @@ public class MapperMoLauncher {
 		inputSpace.removeEdgesByLabel(MOEA_Config.uselessRelations);
 		StaticSharedVariables.inputSpace = inputSpace;
 
-		MOEA_Config.fixedConceptLeft = askUserForFixedConcept();
+		// MOEA_Config.fixedConceptLeft = askUserForFixedConcept();
 
 		// read vital relations importance
 		Object2DoubleOpenHashMap<String> vitalRelations = readVitalRelations(MOEA_Config.vitalRelationsPath);
@@ -133,7 +133,7 @@ public class MapperMoLauncher {
 		// personalize your constructor here
 		CustomProblem problem = new CustomProblem();
 
-		InteractiveExecutor ie = new InteractiveExecutor(problem, properties, resultsWriter, MOEA_Config.WINDOW_TITLE);
+		InteractiveExecutor ie = new InteractiveExecutor(problem, properties, resultsWriter, MOEA_Config.WINDOW_TITLE, random);
 
 		// do 'k' runs of 'n' epochs
 		int totalRuns = MOEA_Config.MOEA_RUNS;
@@ -200,13 +200,15 @@ public class MapperMoLauncher {
 		return relationToImportance;
 	}
 
+	@SuppressWarnings("unused")
 	private static String askUserForFixedConcept() {
 		StringGraph inputSpace = StaticSharedVariables.inputSpace;
 
 		String concept;
 		do {
 			concept = (String) JOptionPane.showInputDialog(null, //
-					"Type in one of the mapping's concept:", "MapperMO", JOptionPane.DEFAULT_OPTION, null, //
+					"Type in one of the mapping's concepts\n(or nothing to select it randomly)\n\nClicking cancel exits the program.", "MapperMO",
+					JOptionPane.DEFAULT_OPTION, null, //
 					null, null);
 			if (concept == null) { // cancel clicked
 				System.exit(0);

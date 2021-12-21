@@ -15,11 +15,11 @@ public class OptimisationControlPanel extends JPanel {
 	private InteractiveExecutorGUI gui;
 	private JButton nextRunButton;
 	private JButton stopButton;
-	private AbstractButton dumpRandomSolutionButton;
-	private JButton saveCurrentNDSButton;
+	private AbstractButton bestSolutionButton;
 	private JPanel panelTop;
 	private JPanel panelMiddle;
 	private JButton pauseButton;
+	private JButton randomSolutionButton;
 
 	public OptimisationControlPanel(InteractiveExecutorGUI interactiveExecutorGUI) {
 		this.gui = interactiveExecutorGUI;
@@ -37,45 +37,22 @@ public class OptimisationControlPanel extends JPanel {
 		flowLayout_1.setVgap(2);
 		add(panelMiddle);
 
-		saveCurrentNDSButton = new JButton("Save Current NDSet");
-		saveCurrentNDSButton.addActionListener(new ActionListener() {
+		bestSolutionButton = new JButton("Show Best Solution");
+		panelTop.add(bestSolutionButton);
+		bestSolutionButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				gui.saveCurrentNDS();
+				gui.showBestSolution(); 
 			}
 		});
+		bestSolutionButton.setToolTipText("Dumps to a file a random solution chosen from the Non Dominated Set.");
 
-		dumpRandomSolutionButton = new JButton("Dump Random Solution");
-		panelTop.add(dumpRandomSolutionButton);
-		dumpRandomSolutionButton.addActionListener(new ActionListener() {
+		randomSolutionButton = new JButton("Show Random Solution");
+		randomSolutionButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// System.out.println((double) (horizontalPane.getDividerLocation()) / (horizontalPane.getWidth() - horizontalPane.getDividerSize()));
-				gui.dumpRandomSolution();
+				gui.showRandomSolution();
 			}
 		});
-		dumpRandomSolutionButton.setToolTipText("Dumps to a file a random solution chosen from the Non Dominated Set.");
-		panelTop.add(saveCurrentNDSButton);
-
-		stopButton = new JButton("Stop Optimization");
-		panelMiddle.add(stopButton);
-		stopButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				gui.stopOptimization();
-			}
-		});
-		stopButton.setToolTipText("Pauses the optimization procedure after the current epoch.");
-
-		pauseButton = new JButton("Pause");
-		panelMiddle.add(pauseButton);
-		pauseButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				gui.pause();
-				if (gui.isPaused()) {
-					pauseButton.setText("Unpause");
-				} else {
-					pauseButton.setText("Pause");
-				}
-			}
-		});
+		panelTop.add(randomSolutionButton);
 
 		nextRunButton = new JButton("Next Run");
 		panelMiddle.add(nextRunButton);
@@ -85,6 +62,28 @@ public class OptimisationControlPanel extends JPanel {
 			}
 		});
 		nextRunButton.setToolTipText("Stops the current optimization run and starts the next.");
+
+		pauseButton = new JButton("Pause");
+		panelMiddle.add(pauseButton);
+
+		stopButton = new JButton("Stop Optimization");
+		panelMiddle.add(stopButton);
+		stopButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				gui.stopOptimization();
+			}
+		});
+		stopButton.setToolTipText("Pauses the optimization procedure after the current epoch.");
+		pauseButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				gui.togglePause();
+				if (gui.isPaused()) {
+					pauseButton.setText("Unpause");
+				} else {
+					pauseButton.setText("Pause");
+				}
+			}
+		});
 	}
 
 }

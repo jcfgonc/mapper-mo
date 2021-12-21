@@ -337,15 +337,34 @@ public class InteractiveExecutorGUI extends JFrame {
 		return run;
 	}
 
-	public void dumpRandomSolution() {
-		interactiveExecutor.dumpRandomSolution();
+	public void showRandomSolution() {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				interactiveExecutor.showRandomSolution();
+			}
+
+		});
 	}
 
-	public void pause() {
-		interactiveExecutor.pause();
+	public void showBestSolution() {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				interactiveExecutor.showBestSolution();
+			}
+
+		});
+	}
+
+	public void togglePause() {
+		interactiveExecutor.togglePause();
 	}
 
 	public boolean isPaused() {
 		return interactiveExecutor.isPaused();
 	}
+
 }

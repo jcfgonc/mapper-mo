@@ -165,13 +165,10 @@ public class CustomProblem implements Problem, ProblemDescription {
 	private String[] objectivesDescription = { //
 			"d:numPairs", //
 			"f:vitalRelationsMean", //
-//			"f:relationStdDev", //
 			"d:numRelations", //
 			"d:degreeOfReferencePair", //
 			"d:refPairInnerDistance", //
-//			"f:meanWordsPerConcept", //
 			"f:samePOSpairRatio", //
-//			"f:closenessCentrality", //
 			"f:subTreeBalance", //
 			"d:assymetricRelationCount", //
 	};

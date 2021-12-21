@@ -1,23 +1,32 @@
 package jcfgonc.moea.generic;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import org.apache.commons.math3.random.RandomAdaptor;
 import org.moeaframework.core.Algorithm;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.spi.AlgorithmFactory;
 
+import graph.DirectedMultiGraph;
+import graph.StringGraph;
 import jcfgonc.mapper.MOEA_Config;
 import jcfgonc.mapper.gui.InteractiveExecutorGUI;
+import jcfgonc.mapper.structures.MappingStructure;
+import jcfgonc.moea.specific.CustomChromosome;
 import jcfgonc.moea.specific.ResultsWriter;
+import structures.OrderedPair;
 import structures.Ticker;
 import utils.VariousUtils;
+import visual.SimpleGraphVisualizer;
 
 public class InteractiveExecutor {
 	private Properties algorithmProperties;
@@ -40,12 +49,15 @@ public class InteractiveExecutor {
 	private String dateTimeStamp;
 	private int epoch;
 	private ReentrantLock pauseLock;
+	private SimpleGraphVisualizer graphVisualizer;
+	private RandomAdaptor random;
 
-	public InteractiveExecutor(Problem problem, Properties algorithmProperties, ResultsWriter resultsWriter, String windowTitle) {
+	public InteractiveExecutor(Problem problem, Properties algorithmProperties, ResultsWriter resultsWriter, String windowTitle, RandomAdaptor random) {
 		this.problem = problem;
 		this.algorithmProperties = algorithmProperties;
 		this.resultsWriter = resultsWriter;
 		this.windowTitle = windowTitle;
+		this.random = random;
 //		this.blenderVisualizer = new BlenderVisualizer(populationSize);
 		this.gui = new InteractiveExecutorGUI(this);
 		this.gui.initializeTheRest();
@@ -55,6 +67,7 @@ public class InteractiveExecutor {
 		this.resultsFilename = String.format("moea_results_%s.tsv", dateTimeStamp);
 		this.resultsWriter.writeFileHeader(problem, resultsFilename);
 		this.pauseLock = new ReentrantLock();
+		this.graphVisualizer = null; // not shown initially
 	}
 
 	public ArrayList<Solution> execute(int moea_run) throws InterruptedException {
@@ -192,6 +205,9 @@ public class InteractiveExecutor {
 	 */
 	public void stopOptimization() {
 		// stop MOEA's loop
+		if (isPaused()) {
+			togglePause();
+		}
 		this.canceled = true; // and stops the caller
 	}
 
@@ -210,20 +226,79 @@ public class InteractiveExecutor {
 		resultsWriter.appendResultsToFile(results.getElements(), problem, filename);
 	}
 
-	public void dumpRandomSolution() {
-		// TODO Auto-generated method stub
+	public void showRandomSolution() {
+		if (results == null || results.isEmpty())
+			return;
 
+		int i = random.nextInt(results.size());
+		Solution solution = results.get(i);
+
+		showSolution(solution);
+	}
+
+	private void showSolution(Solution solution) {
+		// MapperMO specific
+		CustomChromosome cc = (CustomChromosome) solution.getVariable(0); // unless the solution domain X has more than one dimension
+		MappingStructure<String, String> mappingStructure = cc.getGene();
+		DirectedMultiGraph<OrderedPair<String>, String> pairGraph = mappingStructure.getPairGraph();
+		// OrderedPair<String> referencePair = mappingStructure.getReferencePair();
+
+		// create window if non existent
+		if (graphVisualizer == null) {
+			graphVisualizer = new SimpleGraphVisualizer();
+			graphVisualizer.setExtendedState(graphVisualizer.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+		}
+		graphVisualizer.setVisible(true);
+		graphVisualizer.toFront();
+		// set data
+		StringGraph g = new StringGraph(pairGraph);
+		graphVisualizer.setData(g, null, null, epoch, results.size());
+	}
+
+	private void sortSolutionList(ArrayList<Solution> resultsList, int objective, double epsilon) {
+		resultsList.sort(new Comparator<Solution>() {
+
+			@Override
+			public int compare(Solution o1, Solution o2) {
+				return VariousUtils.doubleCompareTo(o1.getObjective(objective), o2.getObjective(objective), epsilon);
+			}
+		});
 	}
 
 	public boolean isPaused() {
 		return pauseLock.isLocked();
 	}
 
-	public void pause() {
+	public void togglePause() {
 		if (isPaused()) {
 			pauseLock.unlock();
 		} else {
 			pauseLock.lock();
 		}
+	}
+
+	public void showBestSolution() {
+		if (results == null || results.isEmpty())
+			return;
+
+		ArrayList<Solution> resultsList = new ArrayList<>();
+		resultsList.addAll(results.getElements());
+
+		// effective order is the reverse of the invocation
+		// make sure smaller is better!
+		sortSolutionList(resultsList, 0, 1e-12); // d:numPairs
+		sortSolutionList(resultsList, 7, 1e-12); // d:assymetricRelationCount
+		sortSolutionList(resultsList, 1, 1e-12); // f:vitalRelationsMean
+		sortSolutionList(resultsList, 5, 1e-12); // f:samePOSpairRatio
+
+//		for (Solution solution : resultsList) {
+//			VariousUtils.printArray(solution.getObjectives());
+//		}
+//		System.out.println("-----");
+
+		// get first in the above order
+		Solution solution = results.get(0);
+
+		showSolution(solution);
 	}
 }

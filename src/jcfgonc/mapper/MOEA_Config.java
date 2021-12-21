@@ -16,7 +16,7 @@ public class MOEA_Config {
 	/**
 	 * number of (constant) solutions in the population
 	 */
-	public static int POPULATION_SIZE = 4096;
+	public static int POPULATION_SIZE = 512;
 	/**
 	 * maximum number of epochs/generations to iterate
 	 */
