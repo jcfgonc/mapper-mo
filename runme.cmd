@@ -1,2 +1,3 @@
-java -jar blendermo_frames_required.jar -Xmx16g -Xms2g
+java -jar blendermo_frames_required.jar
+echo -Xmx16g -Xms2g
 pause

@@ -1,5 +1,7 @@
 package jcfgonc.moea.generic;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Properties;
@@ -17,6 +19,7 @@ import org.moeaframework.core.Solution;
 import org.moeaframework.core.spi.AlgorithmFactory;
 
 import graph.DirectedMultiGraph;
+import graph.GraphReadWrite;
 import graph.StringGraph;
 import jcfgonc.mapper.MOEA_Config;
 import jcfgonc.mapper.gui.InteractiveExecutorGUI;
@@ -47,10 +50,17 @@ public class InteractiveExecutor {
 	private String windowTitle;
 	private String resultsFilename;
 	private String dateTimeStamp;
+	/**
+	 * current epoch
+	 */
 	private int epoch;
 	private ReentrantLock pauseLock;
 	private SimpleGraphVisualizer graphVisualizer;
 	private RandomAdaptor random;
+	/**
+	 * used to store file IDs for saving graphs
+	 */
+	private int nextFileID;
 
 	public InteractiveExecutor(Problem problem, Properties algorithmProperties, ResultsWriter resultsWriter, String windowTitle, RandomAdaptor random) {
 		this.problem = problem;
@@ -68,6 +78,8 @@ public class InteractiveExecutor {
 		this.resultsWriter.writeFileHeader(problem, resultsFilename);
 		this.pauseLock = new ReentrantLock();
 		this.graphVisualizer = null; // not shown initially
+
+		this.nextFileID = VariousUtils.getNextAvailableFileId(MOEA_Config.saveFolder, "graph_", "csv");
 	}
 
 	public ArrayList<Solution> execute(int moea_run) throws InterruptedException {
@@ -233,10 +245,10 @@ public class InteractiveExecutor {
 		int i = random.nextInt(results.size());
 		Solution solution = results.get(i);
 
-		showSolution(solution);
+		showAndSaveSolution(solution);
 	}
 
-	private void showSolution(Solution solution) {
+	private void showAndSaveSolution(Solution solution) {
 		// MapperMO specific
 		CustomChromosome cc = (CustomChromosome) solution.getVariable(0); // unless the solution domain X has more than one dimension
 		MappingStructure<String, String> mappingStructure = cc.getGene();
@@ -250,9 +262,19 @@ public class InteractiveExecutor {
 		}
 		graphVisualizer.setVisible(true);
 		graphVisualizer.toFront();
-		// set data
+		// setup graph GUI data
 		StringGraph g = new StringGraph(pairGraph);
 		graphVisualizer.setData(g, null, null, epoch, results.size());
+		graphVisualizer.setTitle(String.format("Graph (%d)", nextFileID));
+		// save graph
+		try {
+			String filename = "graph_" + Integer.toString(nextFileID) + ".csv";
+			GraphReadWrite.writeCSV(MOEA_Config.saveFolder + File.separatorChar + filename, g);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		// next graph will have next ID
+		nextFileID++;
 	}
 
 	private void sortSolutionList(ArrayList<Solution> resultsList, int objective, double epsilon) {
@@ -285,20 +307,15 @@ public class InteractiveExecutor {
 		resultsList.addAll(results.getElements());
 
 		// effective order is the reverse of the invocation
-		// make sure smaller is better!
+		// make sure smaller is better and it is according to CustomProblem!
 		sortSolutionList(resultsList, 0, 1e-12); // d:numPairs
-		sortSolutionList(resultsList, 7, 1e-12); // d:assymetricRelationCount
+		sortSolutionList(resultsList, 6, 1e-12); // d:assymetricRelationCount
 		sortSolutionList(resultsList, 1, 1e-12); // f:vitalRelationsMean
-		sortSolutionList(resultsList, 5, 1e-12); // f:samePOSpairRatio
-
-//		for (Solution solution : resultsList) {
-//			VariousUtils.printArray(solution.getObjectives());
-//		}
-//		System.out.println("-----");
+		sortSolutionList(resultsList, 4, 1e-12); // f:samePOSpairRatio
 
 		// get first in the above order
 		Solution solution = results.get(0);
 
-		showSolution(solution);
+		showAndSaveSolution(solution);
 	}
 }

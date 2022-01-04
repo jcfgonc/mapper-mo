@@ -124,7 +124,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 		solution.setObjective(obj_i++, -vitalRelationsMean);
 //		solution.setObjective(obj_i++, relationStdDev);
 		solution.setObjective(obj_i++, -numRelations);
-		solution.setObjective(obj_i++, -degreeOfReferencePair);
+//		solution.setObjective(obj_i++, -degreeOfReferencePair);
 		solution.setObjective(obj_i++, refPairInnerDistance);
 //		solution.setObjective(obj_i++, meanWordsPerConcept);
 		solution.setObjective(obj_i++, -posRatio);
@@ -134,7 +134,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 
 		obj_i = 0;
 		// violated constraints are set to 1, otherwise set to 0
-		if (degreeOfReferencePair < 3) {
+		if (degreeOfReferencePair == 1) {
 			solution.setConstraint(obj_i++, 1); // violated
 		} else {
 			solution.setConstraint(obj_i++, 0); // not violated
@@ -166,7 +166,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 			"d:numPairs", //
 			"f:vitalRelationsMean", //
 			"d:numRelations", //
-			"d:degreeOfReferencePair", //
+//			"d:degreeOfReferencePair", //
 			"d:refPairInnerDistance", //
 			"f:samePOSpairRatio", //
 			"f:subTreeBalance", //

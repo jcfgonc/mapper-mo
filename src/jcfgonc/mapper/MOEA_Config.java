@@ -9,18 +9,18 @@ public class MOEA_Config {
 	 */
 	public static final String ALGORITHM = "eNSGA2";
 	public static final double eNSGA2_epsilon = 0.01; // default is 0.01
-	public static final int eNSGA2_windowSize = 4096; // epoch to trigger eNSGA2 population injection
-	public static final int eNSGA2_maxWindowSize = 4096; // epoch to trigger eNSGA2 hard restart
+	public static final int eNSGA2_windowSize = 512; // epoch to trigger eNSGA2 population injection
+	public static final int eNSGA2_maxWindowSize = 1024; // epoch to trigger eNSGA2 hard restart
 	public static final int NSGA3_divisionsOuter = 4; // decrease with increasing dimensions/objectives
 	public static final int NSGA3_divisionsInner = 1; // increase with increasing dimensions/objectives
 	/**
 	 * number of (constant) solutions in the population
 	 */
-	public static int POPULATION_SIZE = 512;
+	public static int POPULATION_SIZE = 1024;
 	/**
 	 * maximum number of epochs/generations to iterate
 	 */
-	public static int MAX_EPOCHS = 131072;
+	public static int MAX_EPOCHS = 4096;
 	/**
 	 * maximum number of MOEA runs (each run iterates max_epochs)
 	 */
@@ -69,4 +69,5 @@ public class MOEA_Config {
 	public static final String REFPAIR_CACHE_FILENAME = "refPairInnerDistanceCache.dat";
 	public static final String POS_CACHE_FILENAME = "posCache.dat";
 	public static final String MOEA_ICON_PATH = "data/hypervolume icon model.png";
+	public static final String saveFolder = "save";
 }

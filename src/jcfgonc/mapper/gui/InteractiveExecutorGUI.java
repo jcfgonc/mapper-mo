@@ -28,13 +28,14 @@ import org.moeaframework.core.Solution;
 import jcfgonc.mapper.MOEA_Config;
 import jcfgonc.moea.generic.InteractiveExecutor;
 import visual.GUI_Utils;
+import java.awt.FlowLayout;
 
 public class InteractiveExecutorGUI extends JFrame {
 
 	private static final long serialVersionUID = 5577378439253898247L;
 	private JPanel contentPane;
 	private NonDominatedSetPanel nonDominatedSetPanel;
-	private JPanel technicalPanel;
+	private JPanel rightTechnicalPanel;
 	private final InteractiveExecutor interactiveExecutor;
 	private final int numberOfObjectives;
 	private final int numberOfConstraints;
@@ -42,7 +43,7 @@ public class InteractiveExecutorGUI extends JFrame {
 	private StatusPanel statusPanel;
 	private OptimisationControlPanel optimisationControlPanel;
 	private BarChartPanel timeEpochPanel;
-	private JPanel upperPanel;
+	private JPanel leftPanel;
 	private JPanel upperLeftPanel;
 	private BarChartPanel ndsSizePanel;
 	private SettingsPanel settingsPanel;
@@ -104,19 +105,22 @@ public class InteractiveExecutorGUI extends JFrame {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		contentPane = new JPanel();
 		setContentPane(contentPane);
-		contentPane.setLayout(new GridLayout(2, 0, 0, 0));
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
 
-		upperPanel = new JPanel();
-		contentPane.add(upperPanel);
-		upperPanel.setLayout(new BoxLayout(upperPanel, BoxLayout.X_AXIS));
-
-		upperLeftPanel = new JPanel();
-		upperPanel.add(upperLeftPanel);
-		upperLeftPanel.setLayout(new GridLayout(1, 0, 0, 0));
+		leftPanel = new JPanel();
+		contentPane.add(leftPanel);
+		leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
 
 		timeSeriesPanel = new JPanel();
-		upperLeftPanel.add(timeSeriesPanel);
+		leftPanel.add(timeSeriesPanel);
 		timeSeriesPanel.setLayout(new GridLayout(1, 0, 0, 0));
+
+		nonDominatedSetPanel = new NonDominatedSetPanel(problem, Color.BLACK);
+		leftPanel.add(nonDominatedSetPanel);
+
+		rightTechnicalPanel = new JPanel();
+		contentPane.add(rightTechnicalPanel);
+		rightTechnicalPanel.setLayout(new BoxLayout(rightTechnicalPanel, BoxLayout.Y_AXIS));
 
 		timeEpochPanel = new BarChartPanel("Time vs Epoch", "Epoch", "Time (s)", new Color(200, 0, 100));
 		timeSeriesPanel.add(timeEpochPanel);
@@ -124,25 +128,18 @@ public class InteractiveExecutorGUI extends JFrame {
 		ndsSizePanel = new BarChartPanel("Non Dominated Set Size vs Epoch", "Epoch", "Size of the Non Dominated Set", new Color(0, 200, 100));
 		timeSeriesPanel.add(ndsSizePanel);
 
-		technicalPanel = new JPanel();
-		upperPanel.add(technicalPanel);
-		technicalPanel.setLayout(new BoxLayout(technicalPanel, BoxLayout.Y_AXIS));
-
 		statusPanel = new StatusPanel();
-		technicalPanel.add(statusPanel);
+		rightTechnicalPanel.add(statusPanel);
 
 		settingsPanel = new SettingsPanel();
-		technicalPanel.add(settingsPanel);
+		rightTechnicalPanel.add(settingsPanel);
 
 		optimisationControlPanel = new OptimisationControlPanel(this);
-		technicalPanel.add(optimisationControlPanel);
+		rightTechnicalPanel.add(optimisationControlPanel);
 
 		fillPanel = new JPanel();
-		technicalPanel.add(fillPanel);
+		rightTechnicalPanel.add(fillPanel);
 		fillPanel.setLayout(new BorderLayout(0, 0));
-
-		nonDominatedSetPanel = new NonDominatedSetPanel(problem, Color.BLACK);
-		contentPane.add(nonDominatedSetPanel);
 
 		addComponentListener(new ComponentAdapter() { // window resize event
 			@Override

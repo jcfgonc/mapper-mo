@@ -11,6 +11,7 @@ import javax.swing.border.TitledBorder;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import structures.Ticker;
+import utils.VariousUtils;
 
 public class StatusPanel extends JPanel {
 	private static final long serialVersionUID = -3946006228924064009L;
@@ -23,6 +24,7 @@ public class StatusPanel extends JPanel {
 	private JLabel numRunsStatus;
 	private JLabel currentRunStatus;
 	private JLabel ndsSizeStatus;
+	private JLabel usedMemoryStatus;
 	private JLabel lastEpochDuration;
 	private JLabel currentRunTimeStatus;
 	private JLabel totalRunTimeStatus;
@@ -140,6 +142,13 @@ public class StatusPanel extends JPanel {
 		ndsSizeStatus.setHorizontalAlignment(SwingConstants.LEFT);
 		add(ndsSizeStatus);
 
+		JLabel usedMemoryLabel = new JLabel("Used Memory (MB): ");
+		usedMemoryLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		add(usedMemoryLabel);
+
+		usedMemoryStatus = new JLabel("");
+		usedMemoryStatus.setHorizontalAlignment(SwingConstants.LEFT);
+		add(usedMemoryStatus);
 	}
 
 	public void setEpoch(int val) {
@@ -235,6 +244,7 @@ public class StatusPanel extends JPanel {
 							setCurrentRunTime(currentRunTimeCounter.getElapsedTime());
 							setTotalRunTimeStatus(totalRunTimeCounter.getElapsedTime());
 						}
+						usedMemoryStatus.setText(String.format("%.2f", VariousUtils.getUsedMemoryMB()));
 					}
 				});
 
