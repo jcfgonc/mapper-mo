@@ -1,10 +1,13 @@
 /.settings/
 /bin/
 /target/
-/data/
 /*.tsv
 /screenshots_
 /screenshots
 /libs/
 /tgf/
 /*.dat
+/save
+/results for blender
+/data/conceptnet5v45.csv
+/data/apagar.txt

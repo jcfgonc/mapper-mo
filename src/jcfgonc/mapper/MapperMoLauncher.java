@@ -102,11 +102,11 @@ public class MapperMoLauncher {
 		Object2DoubleOpenHashMap<String> vitalRelations = readVitalRelations(MOEA_Config.vitalRelationsPath);
 
 		// read pre-calculated semantic scores of word/relation pairs
-		Object2DoubleOpenHashMap<UnorderedPair<String>> wps = WordEmbeddingUtils.readWordPairScores(MOEA_Config.wordPairScores_filename);
+//		Object2DoubleOpenHashMap<UnorderedPair<String>> wps = WordEmbeddingUtils.readWordPairScores(MOEA_Config.wordPairScores_filename);
 
 		StaticSharedVariables.stopWords = new HashSet<String>(VariousUtils.readFileRows(MOEA_Config.stopWordsPath));
 		StaticSharedVariables.vitalRelations = vitalRelations;
-		StaticSharedVariables.wordPairScores = wps;
+//		StaticSharedVariables.wordPairScores = wps;
 		StaticSharedVariables.random = random;
 
 		// ------ MOEA SETUP

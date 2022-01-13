@@ -28,7 +28,6 @@ import org.moeaframework.core.Solution;
 import jcfgonc.mapper.MOEA_Config;
 import jcfgonc.moea.generic.InteractiveExecutor;
 import visual.GUI_Utils;
-import java.awt.FlowLayout;
 
 public class InteractiveExecutorGUI extends JFrame {
 
@@ -44,7 +43,6 @@ public class InteractiveExecutorGUI extends JFrame {
 	private OptimisationControlPanel optimisationControlPanel;
 	private BarChartPanel timeEpochPanel;
 	private JPanel leftPanel;
-	private JPanel upperLeftPanel;
 	private BarChartPanel ndsSizePanel;
 	private SettingsPanel settingsPanel;
 	private JPanel fillPanel;
