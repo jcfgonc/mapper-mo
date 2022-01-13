@@ -6,6 +6,8 @@ import java.util.Set;
 import org.ini4j.Profile.Section;
 import org.ini4j.Wini;
 
+import utils.VariousUtils;
+
 public class MOEA_Config {
 
 	private static Section INI_SECTION;
@@ -53,15 +55,15 @@ public class MOEA_Config {
 	/**
 	 * relations which direction is irrelevant (used map opposing left/right edges from the concept pairs)
 	 */
-	public static final Set<String> undirectedRelations = Set.of("synonym", "antonym", "relatedto", "similarto");
+	public static final Set<String> undirectedRelations = Set.of(VariousUtils.fastSplitWhiteSpace(INI_SECTION.get("undirectedRelations", String.class)));
 	/**
 	 * these relations are removed from the KB
 	 */
-	public static final Set<String> uselessRelations = Set.of("similarto", "derivedfrom", "hascontext", "relatedto");
+	public static final Set<String> uselessRelations = Set.of(VariousUtils.fastSplitWhiteSpace(INI_SECTION.get("uselessRelations", String.class)));
 	/**
 	 * concepts with at least one of these words have no POS
 	 */
-	public static final Set<String> uselessWords = Set.of("that", "than", "this", "my", "your", "his", "her", "he", "hers", "these");
+	public static final Set<String> uselessWords = Set.of(VariousUtils.fastSplitWhiteSpace(INI_SECTION.get("uselessWords", String.class)));
 
 	public static String fixedConceptLeft = null;
 	public static String fixedConceptRight = null;
@@ -72,7 +74,7 @@ public class MOEA_Config {
 
 	public static final String stopWordsPath = INI_SECTION.get("stopWordsPath", String.class);
 	public static final String screenshotsFolder = INI_SECTION.get("screenshotsFolder", String.class);
-	
+
 	public static final boolean GRAPHS_ENABLED = true;
 	public static final boolean SCREENSHOTS_ENABLED = false;
 	public static final boolean LAST_EPOCH_SCREENSHOT = true;
