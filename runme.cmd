@@ -1,3 +1,2 @@
-java -jar blendermo_frames_required.jar
-echo -Xmx16g -Xms2g
+java -jar mappermo.jar
 pause

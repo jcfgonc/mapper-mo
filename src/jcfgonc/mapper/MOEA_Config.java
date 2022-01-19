@@ -48,9 +48,9 @@ public class MOEA_Config {
 	public static double MAX_RUN_TIME = INI_SECTION.get("MAX_RUN_TIME", Double.class);
 
 	public static final String inputSpacePath = INI_SECTION.get("inputSpacePath", String.class);
-//	public static final String wordembedding_filename = INI_SECTION.get("wordembedding_filename", String.class);
-	public static final String synonyms_filename = INI_SECTION.get("synonyms_filename", String.class);
-//	public static final String wordPairScores_filename = INI_SECTION.get("wordPairScores_filename", String.class);
+//	public static final String wordembedding_filename = INI_SECTION.get("wordembedding_filename", String.class); // used in the blenderMO
+//	public static final String synonyms_filename = INI_SECTION.get("synonyms_filename", String.class); // used in the blenderMO
+//	public static final String wordPairScores_filename = INI_SECTION.get("wordPairScores_filename", String.class); // used in the blenderMO
 	public static final String vitalRelationsPath = INI_SECTION.get("vitalRelationsPath", String.class);
 	/**
 	 * relations which direction is irrelevant (used map opposing left/right edges from the concept pairs)
@@ -77,7 +77,7 @@ public class MOEA_Config {
 
 	public static final boolean GRAPHS_ENABLED = true;
 	public static final boolean SCREENSHOTS_ENABLED = false;
-	public static final boolean LAST_EPOCH_SCREENSHOT = true;
+	public static final boolean LAST_EPOCH_SCREENSHOT = false;
 
 	public static final int MAXIMUM_NUMBER_OF_CONCEPT_PAIRS = INI_SECTION.get("MAXIMUM_NUMBER_OF_CONCEPT_PAIRS", Integer.class);
 	// mutation controls
