@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Properties;
 
@@ -38,9 +39,7 @@ import jcfgonc.moea.specific.ResultsWriter;
 import net.sf.extjwnl.JWNLException;
 import structures.OrderedPair;
 import structures.Ticker;
-import structures.UnorderedPair;
 import utils.VariousUtils;
-import wordembedding.WordEmbeddingUtils;
 
 public class MapperMoLauncher {
 
@@ -72,6 +71,10 @@ public class MapperMoLauncher {
 	public static void main(String[] args) throws NoSuchFileException, IOException, ClassNotFoundException, InstantiationException, IllegalAccessException,
 			UnsupportedLookAndFeelException, InterruptedException, JWNLException {
 
+		System.out.println("Concept Mapper - Multiple Objective version");
+		System.out.println("(C) Joao Goncalves / University of Coimbra");
+		System.out.println("Contact: jcfgonc@gmail.com");
+
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
 		RandomAdaptor random = new RandomAdaptor(new SynchronizedRandomGenerator(new Well44497b()));
@@ -96,10 +99,11 @@ public class MapperMoLauncher {
 		inputSpace.removeEdgesByLabel(MOEA_Config.uselessRelations);
 		StaticSharedVariables.inputSpace = inputSpace;
 
-		// MOEA_Config.fixedConceptLeft = askUserForFixedConcept();
+		MOEA_Config.fixedConceptLeft = askUserForFixedConcept();
 
 		// read vital relations importance
 		Object2DoubleOpenHashMap<String> vitalRelations = readVitalRelations(MOEA_Config.vitalRelationsPath);
+		HashMap<String, String> relationTranslation = readRelationTranslation(MOEA_Config.relationTranslationPath);
 
 		// read pre-calculated semantic scores of word/relation pairs
 //		Object2DoubleOpenHashMap<UnorderedPair<String>> wps = WordEmbeddingUtils.readWordPairScores(MOEA_Config.wordPairScores_filename);
@@ -108,6 +112,7 @@ public class MapperMoLauncher {
 		StaticSharedVariables.vitalRelations = vitalRelations;
 //		StaticSharedVariables.wordPairScores = wps;
 		StaticSharedVariables.random = random;
+		StaticSharedVariables.relationTranslation = relationTranslation;
 
 		// ------ MOEA SETUP
 
@@ -186,10 +191,12 @@ public class MapperMoLauncher {
 		Object2DoubleOpenHashMap<String> relationToImportance = new Object2DoubleOpenHashMap<String>();
 		BufferedReader br = new BufferedReader(new FileReader(path, StandardCharsets.UTF_8), 1 << 24);
 		String line;
+		boolean firstLine = true;
 		while ((line = br.readLine()) != null) {
-			line = line.trim();
-			if (line.contains(":")) // header, eg, s:relation
+			if (firstLine) {
+				firstLine = false;
 				continue;
+			}
 			String[] cells = VariousUtils.fastSplitWhiteSpace(line);
 			String relation = cells[0];
 			double importance = Double.parseDouble(cells[1]);
@@ -198,6 +205,31 @@ public class MapperMoLauncher {
 		br.close();
 		System.out.printf("using the definition of %d vital relations from %s\n", relationToImportance.size(), path);
 		return relationToImportance;
+	}
+
+	public static HashMap<String, String> readRelationTranslation(String path) {
+		HashMap<String, String> translationMap = new HashMap<>();
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(path, StandardCharsets.UTF_8), 1 << 24);
+			String line;
+			boolean firstLine = true;
+			while ((line = br.readLine()) != null) {
+				if (firstLine) {
+					firstLine = false;
+					continue;
+				}
+				line = line.trim();
+				String[] cells = VariousUtils.fastSplit(line, '\t');
+				String relation = cells[0];
+				String translation = cells[1];
+				translationMap.put(relation, translation);
+			}
+			br.close();
+		} catch (IOException e) {
+			// if this file reading blows up for any reason, return an empty map
+			e.printStackTrace();
+		}
+		return translationMap;
 	}
 
 	@SuppressWarnings("unused")

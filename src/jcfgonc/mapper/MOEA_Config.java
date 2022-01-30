@@ -52,6 +52,7 @@ public class MOEA_Config {
 //	public static final String synonyms_filename = INI_SECTION.get("synonyms_filename", String.class); // used in the blenderMO
 //	public static final String wordPairScores_filename = INI_SECTION.get("wordPairScores_filename", String.class); // used in the blenderMO
 	public static final String vitalRelationsPath = INI_SECTION.get("vitalRelationsPath", String.class);
+	public static final String relationTranslationPath = INI_SECTION.get("relationTranslationPath", String.class);
 	/**
 	 * relations which direction is irrelevant (used map opposing left/right edges from the concept pairs)
 	 */

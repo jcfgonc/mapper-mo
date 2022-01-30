@@ -435,4 +435,26 @@ public class MappingAlgorithms {
 			}
 		}
 	}
+
+	/**
+	 * Converts the relations to their corresponding translations
+	 * 
+	 * @param g
+	 * @param relationTranslation
+	 * @return
+	 */
+	public static StringGraph translateEdges(StringGraph g, HashMap<String, String> relationTranslation) {
+		StringGraph newG = new StringGraph();
+		for (StringEdge edge : g.edgeSet()) {
+			String edgeSource = edge.getSource();
+			String edgeTarget = edge.getTarget();
+			String edgeLabel = edge.getLabel();
+			String translation = relationTranslation.get(edgeLabel);
+			if (translation == null) { // no translation -> mantain original
+				translation = edgeLabel;
+			}
+			newG.addEdge(edgeSource, edgeTarget, translation);
+		}
+		return newG;
+	}
 }

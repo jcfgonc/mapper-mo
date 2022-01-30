@@ -1,5 +1,6 @@
 package jcfgonc.mapper;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 import org.apache.commons.math3.random.RandomAdaptor;
@@ -22,6 +23,7 @@ public class StaticSharedVariables {
 	public static Dictionary dictionary; // wordnet dictionary
 	public static HashSet<String> stopWords;
 	public static StringGraph inputSpaceForPOS;
+	public static HashMap<String, String> relationTranslation;
 
 	static {
 		try {

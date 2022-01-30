@@ -88,11 +88,11 @@ public class CustomProblem implements Problem, ProblemDescription {
 			refPairInnerDistance = (int) ObjectiveEvaluationUtils.minimumRadialDistanceFunc(3, 1, dist);
 		}
 
-//		double meanWordsPerConcept = 10;
-//		if (!emptyGraph) {
-//			double[] wpcs = ObjectiveEvaluationUtils.calculateWordsPerConceptStatistics(pairGraph);
-//			meanWordsPerConcept = wpcs[0];
-//		}
+		double meanWordsPerConcept = 10;
+		if (!emptyGraph) {
+			double[] wpcs = ObjectiveEvaluationUtils.calculateWordsPerConceptStatistics(pairGraph);
+			meanWordsPerConcept = wpcs[0];
+		}
 
 		double posRatio = 0;
 		if (!emptyGraph) {
@@ -126,7 +126,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 		solution.setObjective(obj_i++, -numRelations);
 //		solution.setObjective(obj_i++, -degreeOfReferencePair);
 		solution.setObjective(obj_i++, refPairInnerDistance);
-//		solution.setObjective(obj_i++, meanWordsPerConcept);
+		solution.setObjective(obj_i++, meanWordsPerConcept);
 		solution.setObjective(obj_i++, -posRatio);
 //		solution.setObjective(obj_i++, -closenessCentrality);
 		solution.setObjective(obj_i++, subTreeBal);
@@ -168,6 +168,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 			"d:numRelations", //
 //			"d:degreeOfReferencePair", //
 			"d:refPairInnerDistance", //
+			"f:meanWordsPerConcept", //
 			"f:samePOSpairRatio", //
 			"f:subTreeBalance", //
 			"d:assymetricRelationCount", //

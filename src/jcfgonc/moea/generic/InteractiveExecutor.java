@@ -22,6 +22,8 @@ import graph.DirectedMultiGraph;
 import graph.GraphReadWrite;
 import graph.StringGraph;
 import jcfgonc.mapper.MOEA_Config;
+import jcfgonc.mapper.MappingAlgorithms;
+import jcfgonc.mapper.StaticSharedVariables;
 import jcfgonc.mapper.gui.InteractiveExecutorGUI;
 import jcfgonc.mapper.structures.MappingStructure;
 import jcfgonc.moea.specific.CustomChromosome;
@@ -248,6 +250,26 @@ public class InteractiveExecutor {
 		showAndSaveSolution(solution);
 	}
 
+	public void showBestSolution() {
+		if (results == null || results.isEmpty())
+			return;
+
+		ArrayList<Solution> resultsList = new ArrayList<>();
+		resultsList.addAll(results.getElements());
+
+		// effective order is the reverse of the invocation
+		// make sure smaller is better and it is according to CustomProblem!
+		sortSolutionList(resultsList, 0, 1e-12); // d:numPairs
+		sortSolutionList(resultsList, 7, 1e-12); // d:assymetricRelationCount
+		sortSolutionList(resultsList, 1, 1e-12); // f:vitalRelationsMean
+		sortSolutionList(resultsList, 5, 1e-12); // f:samePOSpairRatio
+
+		// get first in the above order
+		Solution solution = results.get(0);
+
+		showAndSaveSolution(solution);
+	}
+
 	private void showAndSaveSolution(Solution solution) {
 		// MapperMO specific
 		CustomChromosome cc = (CustomChromosome) solution.getVariable(0); // unless the solution domain X has more than one dimension
@@ -264,6 +286,7 @@ public class InteractiveExecutor {
 		graphVisualizer.toFront();
 		// setup graph GUI data
 		StringGraph g = new StringGraph(pairGraph);
+		g = MappingAlgorithms.translateEdges(g, StaticSharedVariables.relationTranslation);
 		graphVisualizer.setData(g, null, null, epoch, results.size());
 		graphVisualizer.setTitle(String.format("Graph (%d)", nextFileID));
 		// save graph
@@ -299,23 +322,4 @@ public class InteractiveExecutor {
 		}
 	}
 
-	public void showBestSolution() {
-		if (results == null || results.isEmpty())
-			return;
-
-		ArrayList<Solution> resultsList = new ArrayList<>();
-		resultsList.addAll(results.getElements());
-
-		// effective order is the reverse of the invocation
-		// make sure smaller is better and it is according to CustomProblem!
-		sortSolutionList(resultsList, 0, 1e-12); // d:numPairs
-		sortSolutionList(resultsList, 6, 1e-12); // d:assymetricRelationCount
-		sortSolutionList(resultsList, 1, 1e-12); // f:vitalRelationsMean
-		sortSolutionList(resultsList, 4, 1e-12); // f:samePOSpairRatio
-
-		// get first in the above order
-		Solution solution = results.get(0);
-
-		showAndSaveSolution(solution);
-	}
 }
