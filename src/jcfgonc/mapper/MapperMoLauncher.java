@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Properties;
 
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -39,7 +40,9 @@ import jcfgonc.moea.specific.ResultsWriter;
 import net.sf.extjwnl.JWNLException;
 import structures.OrderedPair;
 import structures.Ticker;
+import utils.OSTools;
 import utils.VariousUtils;
+import visual.OptionFrame;
 
 public class MapperMoLauncher {
 
@@ -70,6 +73,8 @@ public class MapperMoLauncher {
 
 	public static void main(String[] args) throws NoSuchFileException, IOException, ClassNotFoundException, InstantiationException, IllegalAccessException,
 			UnsupportedLookAndFeelException, InterruptedException, JWNLException {
+
+		OSTools.setLowPriorityProcess();
 
 		System.out.println("Concept Mapper - Multiple Objective version");
 		System.out.println("(C) Joao Goncalves / University of Coimbra");
@@ -232,16 +237,16 @@ public class MapperMoLauncher {
 		return translationMap;
 	}
 
-	@SuppressWarnings("unused")
 	private static String askUserForFixedConcept() {
 		StringGraph inputSpace = StaticSharedVariables.inputSpace;
+		String imagePath = MOEA_Config.MOEA_ICON_PATH;
+		ImageIcon ImageIcon = new ImageIcon(imagePath);
 
 		String concept;
 		do {
-			concept = (String) JOptionPane.showInputDialog(null, //
-					"Type in one of the mapping's concepts\n(or nothing to select it randomly)\n\nClicking cancel exits the program.", "MapperMO",
-					JOptionPane.DEFAULT_OPTION, null, //
-					null, null);
+			concept = OptionFrame.showInputDialogStringRequest("MapperMO", ImageIcon.getImage(),
+					"Type in one of the mapping's concepts\n(or nothing to select it randomly)\n\nClicking cancel exits the program.", "MapperMO");
+
 			if (concept == null) { // cancel clicked
 				System.exit(0);
 			}
