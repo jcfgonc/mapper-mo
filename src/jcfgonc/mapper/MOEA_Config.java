@@ -76,9 +76,9 @@ public class MOEA_Config {
 	public static final String stopWordsPath = INI_SECTION.get("stopWordsPath", String.class);
 	public static final String screenshotsFolder = INI_SECTION.get("screenshotsFolder", String.class);
 
-	public static final boolean GRAPHS_ENABLED = true;
-	public static final boolean SCREENSHOTS_ENABLED = false;
-	public static final boolean LAST_EPOCH_SCREENSHOT = false;
+	public static final boolean GRAPHS_ENABLED = INI_SECTION.get("GRAPHS_ENABLED", Boolean.class);
+	public static final boolean SCREENSHOTS_ENABLED = INI_SECTION.get("SCREENSHOTS_ENABLED", Boolean.class);
+	public static final boolean LAST_EPOCH_SCREENSHOT = INI_SECTION.get("LAST_EPOCH_SCREENSHOT", Boolean.class);
 
 	public static final int MAXIMUM_NUMBER_OF_CONCEPT_PAIRS = INI_SECTION.get("MAXIMUM_NUMBER_OF_CONCEPT_PAIRS", Integer.class);
 	// mutation controls
@@ -94,4 +94,6 @@ public class MOEA_Config {
 	public static final String POS_CACHE_FILENAME = INI_SECTION.get("POS_CACHE_FILENAME", String.class);
 	public static final String MOEA_ICON_PATH = INI_SECTION.get("MOEA_ICON_PATH", String.class);
 	public static final String saveFolder = INI_SECTION.get("saveFolder", String.class);
+	
+	public static final int NUMBER_THREADS = VariousUtils.parseNumberThreads(INI_SECTION.get("NUMBER_THREADS", String.class));
 }

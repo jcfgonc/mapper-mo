@@ -38,6 +38,7 @@ import jcfgonc.moea.specific.CustomProblem;
 import jcfgonc.moea.specific.CustomResultsWriter;
 import jcfgonc.moea.specific.ResultsWriter;
 import net.sf.extjwnl.JWNLException;
+import stream.SharedParallelConsumer;
 import structures.OrderedPair;
 import structures.Ticker;
 import utils.OSTools;
@@ -75,6 +76,7 @@ public class MapperMoLauncher {
 			UnsupportedLookAndFeelException, InterruptedException, JWNLException {
 
 		OSTools.setLowPriorityProcess();
+		SharedParallelConsumer.initialize(MOEA_Config.NUMBER_THREADS);
 
 		System.out.println("Concept Mapper - Multiple Objective version");
 		System.out.println("(C) Joao Goncalves / University of Coimbra");
