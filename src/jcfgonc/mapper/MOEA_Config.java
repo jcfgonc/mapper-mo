@@ -96,4 +96,5 @@ public class MOEA_Config {
 	public static final String saveFolder = INI_SECTION.get("saveFolder", String.class);
 	
 	public static final int NUMBER_THREADS = VariousUtils.parseNumberThreads(INI_SECTION.get("NUMBER_THREADS", String.class));
+	public static final int MAX_ACCEPTABLE_CONCEPT_WORD_COUNT = INI_SECTION.get("MAX_ACCEPTABLE_CONCEPT_WORD_COUNT", Integer.class);
 }

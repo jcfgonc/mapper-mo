@@ -123,7 +123,7 @@ public class InteractiveExecutor {
 			pauseLock.lock();
 			pauseLock.unlock();
 
-			// count algorithm time
+			// count current step/epoch time
 			ticker.getTimeDeltaLastCall();
 			algorithm.step();
 			double epochDuration = ticker.getTimeDeltaLastCall();
@@ -134,6 +134,7 @@ public class InteractiveExecutor {
 
 			// update GUI stuff
 			updateStatus(moea_run, epoch, epochDuration);
+			System.out.printf("epoch\t%d\ttime\t%f\n", epoch, epochDuration);
 
 			// update blender visualizer
 //			blenderVisualizer.update(lastResult);

@@ -3,7 +3,6 @@ package jcfgonc.mapper;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -67,13 +66,13 @@ public class ObjectiveEvaluationUtils {
 		return stats;
 	}
 
-	public static <T> double[] calculateWordsPerConceptStatistics(DirectedMultiGraph<OrderedPair<T>, T> graph) {
+	public static <T> double[] calculateWordsPerConceptStatistics(DirectedMultiGraph<OrderedPair<T>, T> graph, final int maxAcceptableWordCount) {
 		// array where each element is the number of words in a vertex
 		int[] conceptWords = countWordsPerConcept(graph);
 		double[] asDouble = new double[conceptWords.length];
 		for (int i = 0; i < conceptWords.length; i++) {
 			int numWords = conceptWords[i];
-			if (numWords <= 3) { // 2/3 words per concept is acceptable, make them equal to one
+			if (numWords <= maxAcceptableWordCount) { // 2/3 words per concept is acceptable, make them equal to one
 				numWords = 1;
 			}
 			asDouble[i] = numWords;

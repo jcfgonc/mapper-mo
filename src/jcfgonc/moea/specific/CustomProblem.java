@@ -90,7 +90,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 
 		double meanWordsPerConcept = 10;
 		if (!emptyGraph) {
-			double[] wpcs = ObjectiveEvaluationUtils.calculateWordsPerConceptStatistics(pairGraph);
+			double[] wpcs = ObjectiveEvaluationUtils.calculateWordsPerConceptStatistics(pairGraph, MOEA_Config.MAX_ACCEPTABLE_CONCEPT_WORD_COUNT);
 			meanWordsPerConcept = wpcs[0];
 		}
 
@@ -139,7 +139,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 		} else {
 			solution.setConstraint(obj_i++, 0); // not violated
 		}
-		if (posRatio < 0.75) {
+		if (posRatio < 0.95) {
 			solution.setConstraint(obj_i++, 1); // violated
 		} else {
 			solution.setConstraint(obj_i++, 0); // not violated
