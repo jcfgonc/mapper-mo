@@ -134,7 +134,7 @@ public class InteractiveExecutor {
 
 			// update GUI stuff
 			updateStatus(moea_run, epoch, epochDuration);
-			System.out.printf("epoch\t%d\ttime\t%f\n", epoch, epochDuration);
+//			System.out.printf("epoch\t%d\ttime\t%f\n", epoch, epochDuration);
 
 			// update blender visualizer
 //			blenderVisualizer.update(lastResult);
@@ -150,6 +150,7 @@ public class InteractiveExecutor {
 		} while (true);
 
 		algorithm.terminate();
+		System.out.printf("run took\t%f\tseconds\n", ticker.getElapsedTime());
 		gui.takeLastEpochScreenshot();
 		ArrayList<Solution> arr = new ArrayList<Solution>(results.getElements());
 		resultsWriter.appendResultsToFile(arr, problem, resultsFilename);
