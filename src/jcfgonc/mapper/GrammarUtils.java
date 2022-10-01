@@ -318,6 +318,12 @@ public class GrammarUtils {
 		}
 	}
 
+	/**
+	 * Calculates the ratio of same POS concept pairs in the overall mapping.
+	 * @param pairGraph
+	 * @param inputSpace
+	 * @return
+	 */
 	public static double calculateSamePOS_pairsPercentage(DirectedMultiGraph<OrderedPair<String>, String> pairGraph, StringGraph inputSpace) {
 		if (pairGraph.getNumberOfVertices() == 0)
 			return 0;

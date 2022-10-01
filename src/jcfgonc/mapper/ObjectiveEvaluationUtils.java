@@ -59,6 +59,7 @@ public class ObjectiveEvaluationUtils {
 			mean = ds.getMean(); // 0...1
 			stddev = ds.getStandardDeviation();
 		}
+		// returns 3 measures:
 		double[] stats = new double[3];
 		stats[0] = mean;
 		stats[1] = stddev;
@@ -133,6 +134,14 @@ public class ObjectiveEvaluationUtils {
 		return val;
 	}
 
+	/**
+	 * Calculates the variance of the number of vertices hanging in a subtree for all the subtrees of the given reference pair. IE, for a three neighbor
+	 * reference pair with hanging nodes [7 1 3] this will return 3.055
+	 * 
+	 * @param pairGraph
+	 * @param referencePair
+	 * @return
+	 */
 	public static double calculateSubTreesBalance(DirectedMultiGraph<OrderedPair<String>, String> pairGraph, OrderedPair<String> referencePair) {
 		// calculates strictly nearby balance
 		Object2IntOpenHashMap<OrderedPair<String>> childrenTree = MappingAlgorithms.countNumberOfChildrenPerSubTree(pairGraph, referencePair);
@@ -141,8 +150,7 @@ public class ObjectiveEvaluationUtils {
 		for (OrderedPair<String> vertex : neighborVertices) {
 			subTreeCount.add(childrenTree.getInt(vertex) + 1);
 		}
-		double[] elements = subTreeCount.elements();
-		DescriptiveStatistics ds = new DescriptiveStatistics(elements);
+		DescriptiveStatistics ds = new DescriptiveStatistics(subTreeCount.elements());
 		double stddev = ds.getStandardDeviation();
 //		if (subTreeCount.size() > 1) {
 //			System.lineSeparator();
@@ -158,6 +166,8 @@ public class ObjectiveEvaluationUtils {
 		// List<String> relationList = terminal.getValue();
 		for (OrderedPair<String> terminal : terminalSet) { // iterate only in terminal vertices
 			List<String> relationList = priorRelations.get(terminal);
+			if (relationList.size() < 2) // shortcut
+				continue;
 			if (containsOpposingRelations(relationList)) {
 				numConflictingRelations++;
 			}
@@ -165,16 +175,14 @@ public class ObjectiveEvaluationUtils {
 		return numConflictingRelations;
 	}
 
-	private static boolean containsOpposingRelations(List<String> relationList) {
-		// check for ISA
-		if (relationList.size() < 2) {
-			return false;
-		}
-		return (relationList.contains("+isa") && relationList.contains("-isa")) //
-				|| (relationList.contains("+partof") && relationList.contains("-partof")) //
-				|| (relationList.contains("+capableof") && relationList.contains("-capableof")) //
-				|| (relationList.contains("+usedfor") && relationList.contains("-usedfor")) //
-		;
-	}
+	final static String[] RELATIONS = new String[] { "isa", "partof", "capableof", "usedfor" };
 
+	private static boolean containsOpposingRelations(List<String> relationList) {
+		for (String relation : RELATIONS) {
+			if (relationList.contains("+" + relation) && //
+					relationList.contains("-" + relation))
+				return true;
+		}
+		return false;
+	}
 }

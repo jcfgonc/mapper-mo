@@ -61,14 +61,15 @@ public class CustomProblem implements Problem, ProblemDescription {
 		}
 
 		// relation statistics
-//		double relationStdDev;
 		int numRelations;
-//		relationStdDev = 100;
 		numRelations = 0;
 		if (!emptyGraph) {
 			double[] rs = ObjectiveEvaluationUtils.calculateRelationStatistics(pairGraph);
-//			relationStdDev = rs[1]; // 0...1 : 0 = equal amount of relation labels
-			numRelations = (int) rs[2];
+			// returns the following:
+//			stats[0] = mean;
+//			stats[1] = stddev;
+//			stats[2] = numRelations;
+			numRelations = (int) rs[2]; // number of unique relations
 		}
 
 		int degreeOfReferencePair = 0;
@@ -112,6 +113,12 @@ public class CustomProblem implements Problem, ProblemDescription {
 
 		double assymetricRelationCount = 10;
 		if (!emptyGraph) {
+
+			if(pairGraph.getNumberOfVertices()>6) {
+				System.lineSeparator();
+			}
+			// calculates the number of paths from the origin to the terminals containing opposing directional edges
+			// ie +isa,-isa
 			MapOfList<OrderedPair<String>, String> priorRelations = new MapOfList<>();
 			HashSet<OrderedPair<String>> terminalSet = new HashSet<>();
 			MappingAlgorithms.calculatePathsFromOrigin(pairGraph, referencePair, priorRelations, terminalSet);

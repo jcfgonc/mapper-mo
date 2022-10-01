@@ -325,7 +325,7 @@ public class MappingAlgorithms {
 
 	/**
 	 * Calculates the number of children per sub tree for the given graph, starting at the root vertex. Used to calculate the balanced sub-tree(s) at the root
-	 * vertex.
+	 * vertex. IE, for each vertex calculates the number of hanging vertices from it to the terminal vertices, beginning at the root vertice.
 	 * 
 	 * @param graph
 	 * @param root
