@@ -175,7 +175,21 @@ public class ObjectiveEvaluationUtils {
 		return numConflictingRelations;
 	}
 
-	final static String[] RELATIONS = new String[] { "isa", "partof", "capableof", "usedfor" };
+	final static String[] RELATIONS = new String[] { 
+			"isa", //
+			"partof", //
+			"capableof", //
+			"usedfor", //
+
+			"madeof", //
+			"motivatedbygoal", //
+			"desires", //
+			"causes", //
+			"requires", //
+			"symbolof", //
+			"createdby", //
+			"symbolof", //
+};
 
 	private static boolean containsOpposingRelations(List<String> relationList) {
 		for (String relation : RELATIONS) {
