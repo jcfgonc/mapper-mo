@@ -105,7 +105,8 @@ public class CustomProblem implements Problem, ProblemDescription {
 //			closenessCentrality = MappingAlgorithms.closenessCentrality(referencePair, pairGraph);
 //		}
 
-		double subTreeBal = MOEA_Config.MAXIMUM_NUMBER_OF_CONCEPT_PAIRS;
+		// initialize to maximum number of vertices
+		double subTreeBal = pairGraph.getNumberOfVertices();
 		if (!emptyGraph) {
 			subTreeBal = ObjectiveEvaluationUtils.calculateSubTreesBalance(pairGraph, referencePair);
 //			System.out.println(subTreeBal);
@@ -161,7 +162,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 		} else {
 			solution.setConstraint(obj_i++, 0); // not violated
 		}
-		if (vitalRelationsMean < 0.75) {
+		if (vitalRelationsMean < 0.85) {
 			solution.setConstraint(obj_i++, 1); // violated
 		} else {
 			solution.setConstraint(obj_i++, 0); // not violated
