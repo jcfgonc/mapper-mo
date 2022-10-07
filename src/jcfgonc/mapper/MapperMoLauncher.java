@@ -148,9 +148,8 @@ public class MapperMoLauncher {
 		InteractiveExecutor ie = new InteractiveExecutor(problem, properties, resultsWriter, MOEA_Config.WINDOW_TITLE, random);
 
 		// do 'k' runs of 'n' epochs
-		int totalRuns = MOEA_Config.MOEA_RUNS;
 		// ArrayList<NondominatedPopulation> allResults = new ArrayList<NondominatedPopulation>(totalRuns);
-		for (int moea_run = 0; moea_run < totalRuns; moea_run++) {
+		for (int moea_run = 0; moea_run < MOEA_Config.MOEA_RUNS; moea_run++) {
 			if (ie.isCanceled())
 				break;
 			// properties.setProperty("maximumPopulationSize", Integer.toString(MOEA_Config.POPULATION_SIZE * 2)); // default is 10 000
