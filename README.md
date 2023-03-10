@@ -14,9 +14,9 @@ directory.
 
 The primary contributors to this project are:
 
-* João Gonçalves
-* Pedro Martins
-* Amílcar Cardoso
+* João Gonçalves  - jcfgonc@gmail.com
+* Pedro Martins   - pjmm@dei.uc.pt
+* Amílcar Cardoso - amilcar@dei.uc.pt
 
 Please email jcfgonc@gmail.com with questions, comments, and bug reports.
 
