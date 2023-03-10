@@ -12,7 +12,7 @@ directory.
 
 # People
 
-The primary contributors to AbcDatalog are:
+The primary contributors to this project are:
 
 * João Gonçalves
 * Pedro Martins
