@@ -59,22 +59,22 @@ public class MapperGeneticOperations {
 		if (leftFixed && rightFixed) {
 			// do not mutate
 		} else {
-			if (random.nextDouble() < MOEA_Config.REFPAIR_MUTATION_PROBABILITY) {
+			if (random.nextDouble() < MOEA_Config.REFPAIR_MUTATION_PROBABILITY) { // 0.125
 
 				int numberTries = 0;
 
 				// unalign/rearrange a new refpair from the existing
 				// do a random walk on either left or right concepts (or both)
 				do {
-					if (numberTries > MOEA_Config.NUMBER_MUTATION_TRIES) {
+					if (numberTries > MOEA_Config.NUMBER_MUTATION_TRIES) { // 16
 						System.err.println("mutation reached maximum number of tries (" + numberTries + ") without making a change");
 						break;
 					}
 					if (random.nextBoolean() && !leftFixed) { // shift left element
 						int hops = 1;
 						if (MOEA_Config.REFPAIR_JUMP_RANGE > 1) {
-							double r = Math.pow(random.nextDouble(), MOEA_Config.JUMP_PROBABILITY_POWER);
-							hops = (int) Math.ceil(r * MOEA_Config.REFPAIR_JUMP_RANGE);
+							double r = Math.pow(random.nextDouble(), MOEA_Config.JUMP_PROBABILITY_POWER); // 5.2
+							hops = (int) Math.ceil(r * MOEA_Config.REFPAIR_JUMP_RANGE); // 1
 							if (hops < 1)
 								hops = 1;
 						}
@@ -82,8 +82,8 @@ public class MapperGeneticOperations {
 					} else { // shift right element
 						int hops = 1;
 						if (MOEA_Config.REFPAIR_JUMP_RANGE > 1) {
-							double r = Math.pow(random.nextDouble(), MOEA_Config.JUMP_PROBABILITY_POWER);
-							hops = (int) Math.ceil(r * MOEA_Config.REFPAIR_JUMP_RANGE);
+							double r = Math.pow(random.nextDouble(), MOEA_Config.JUMP_PROBABILITY_POWER); // 5.2
+							hops = (int) Math.ceil(r * MOEA_Config.REFPAIR_JUMP_RANGE); // 1
 							if (hops < 1)
 								hops = 1;
 						}

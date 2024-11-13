@@ -134,7 +134,7 @@ public class InteractiveExecutor {
 
 			// update GUI stuff
 			updateStatus(moea_run, epoch, epochDuration);
-//			System.out.printf("epoch\t%d\ttime\t%f\n", epoch, epochDuration);
+			System.out.printf("epoch\t%d\ttime\t%f\tnds size\t%d\n", epoch, epochDuration,results.size());
 
 			// update blender visualizer
 //			blenderVisualizer.update(lastResult);
