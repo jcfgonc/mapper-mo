@@ -1,0 +1,24 @@
+relation	text template	certainty
+antonym	Just as %a% is an antonym of %b%, %c% is an antonym of %d%	9
+atlocation	Just as %a% is at %b%, %c% is at %d%	9
+capableof	Just as %a% is capable of %b%, %c% is capable of %d%	9
+causes	Just as %a% causes %b%, %c% causes %d%	9
+causesdesire	Just as %a% causes the desire to %b%, %c% causes the desire to %d%	7
+createdby	Just as %a% creates %b%, %c% creates %d%	7
+definedas	Just as %a% is defined as %b%, %c% is defined as %d%	7
+desires	Just as %a% desires %b%, %c% desires %d%	9
+entails	Just as %a% involves %b%, %c% involves %d%	7
+hasfirstsubevent	Just as %a% implies %b%, %c% implies %d%	3
+hasprerequisite	Just as %a% has the prerequisite %b%, %c% has the prerequisite %d%	5
+hasproperty	Just as %a% has the property %b%, %c% has the property %d%	6
+hassubevent	Just as %a% is followed by %b%, %c% is followed by %d%	6
+isa	Just as %a% is %b%, %c% is %a%	8
+knownfor	Just as %a% is known for %b%, %c% is known for %d%	8
+madeof	Just as %a% is made of %b%, %c% is made of %d%	9
+motivatedbygoal	Just as %a% is motivated by %b%, %c% is motivated by %d%	6
+notdesires	Just as %a% rejects %b%, %c% rejects %d%	6
+partof	Just as %a% is part of %b%, %c% is part of %d%	8
+receivesaction	Just as %a% %b%, %c% %d%	6
+symbolof	Just as %a% symbolizes %b%, %c% symbolizes %d%	7
+synonym	Just as %a% is synonym of %b%, %c% is synonym of %d%	8
+usedfor	Just as %a% is used for %b%, %c% is used for %d%	8

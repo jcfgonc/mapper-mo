@@ -1,0 +1,5 @@
+Adding or changing the indefinite or definite articles if required, correcting the grammatical gender and other grammatical rules of agreement as needed, make an analogy between %a% and %b%. Use the following statements as a background for generating the analogy.
+Do not explain your changes and do not format your answer with bold, italic, underlined or any markdown. Answer only with the improved text that you think is best.
+These are the statements:
+
+%text%

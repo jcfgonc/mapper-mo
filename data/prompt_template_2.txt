@@ -1,0 +1,3 @@
+maintaining the statements as much as possible, even if incoherent, correct the following text that describes an analogy between %a% and %b%:
+
+%text%
