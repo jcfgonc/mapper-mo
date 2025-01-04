@@ -34,11 +34,17 @@ public class AnalogyToText {
 	private static final Gson GSON = new Gson();
 
 	public static void main(String[] args) throws NoSuchFileException, IOException {
+		// analogy format I get from my excel file
+		String txt = "fridge|orchestra	fridge|orchestra,atlocation,south london|concert hall;fridge|orchestra,usedfor,refrigeration|make music;yogurt|instrument,atlocation,fridge|orchestra;fridge|orchestra,isa,refrigerator|group of musician;fridge|orchestra,partof,kitchen|theatre;fridge|orchestra,capableof,cool food|play symphony;oven|band,antonym,fridge|orchestra;";
+		String[] tokens = txt.split("\t");
 
-		StringGraph analogy = GraphReadWrite.readCSVFromString(
-				"poop|bread,antonym,bow|cracker;poop|bread,isa,defecation|cover;eat|crumb,antonym,poop|bread;poop|bread,madeof,waste|grain;toilet|bake oven,usedfor,poop|bread;poop|bread,createdby,live creature|baker;eat breakfast|make bread,causes,poop|bread;");
-		String startingVertex = "poop|bread";
+		String startingVertex = tokens[0];
+		StringGraph analogy = GraphReadWrite.readCSVFromString(tokens[1]);
+		// remove crappy relations
+		analogy.removeEdgesByLabel("synonym");
+		analogy.removeEdgesByLabel("antonym");
 
+		// get central concepts of the analogy
 		String[] concepts = startingVertex.split("\\|");
 		String concept_a = concepts[0];
 		String concept_b = concepts[1];
@@ -48,23 +54,11 @@ public class AnalogyToText {
 		String analogy_facts = textualizeAnalogy(edgeSeq, rt_templates);
 		String prompt_template = readFileToString("data/prompt_template_1.txt");
 		String prompt = prompt_template.replace("%a%", concept_a).replace("%b%", concept_b).replace("%text%", analogy_facts);
-		String reply = sendRequest(prompt);
 
-		String chatbotText = getChatBotResponse(reply);
-		System.out.println(chatbotText);
+		String reply = sendRequest(prompt);
+		System.out.println(reply);
 
 		System.lineSeparator();
-	}
-
-	private static String getChatBotResponse(String reply) {
-		ChatBotReply chatbotReply = GSON.fromJson(reply, ChatBotReply.class);
-		ArrayList<Candidate> candidates = chatbotReply.candidates;
-		Candidate candidate = candidates.get(0);
-		Content content = candidate.content;
-		ArrayList<Part> parts = content.parts;
-		Part part = parts.get(0);
-		String chatbotText = part.text;
-		return chatbotText;
 	}
 
 	private static String textualizeAnalogy(ArrayList<StringEdge> edgeSeq, HashMap<String, String> rt_templates) {
@@ -174,7 +168,17 @@ public class AnalogyToText {
 			inputStream.close();
 			connection.disconnect();
 			t.showTimeDeltaLastCall();
-			return raw_reply;
+
+			// process chatbot reply in json format
+			ChatBotReply chatbotReply = GSON.fromJson(raw_reply, ChatBotReply.class);
+			ArrayList<Candidate> candidates = chatbotReply.candidates;
+			Candidate candidate = candidates.get(0);
+			Content content = candidate.content;
+			ArrayList<Part> parts = content.parts;
+			Part part = parts.get(0);
+			String chatbotText = part.text;
+
+			return chatbotText;
 		} catch (Exception e) {
 			System.out.println(e);
 			System.out.println("Failed successfully");
