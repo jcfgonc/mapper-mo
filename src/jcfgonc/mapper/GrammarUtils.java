@@ -237,27 +237,27 @@ public class GrammarUtils {
 
 				// catches two word rules with at least one noun
 				if (pos0.contains(POS.NOUN) || pos1.contains(POS.NOUN))
-					return true;
+					return true; // MORE THAN OK
 
 				// rules with no nouns
 				if (pos0.contains(POS.ADJECTIVE)) {
 					if (pos1.contains(POS.ADJECTIVE)) {
-						return true;
+						return true; // OK
 					}
 					if (pos1.contains(POS.VERB)) {
-						return true;
+						return true; // PARTIALLY OK
 					}
 				}
 				if (pos0.contains(POS.ADVERB)) {
 					if (pos1.contains(POS.VERB)) {
-						return true;
+						return true; // PARTIALLY OK
 					}
 				}
-				if (pos0.contains(POS.VERB)) {
-					if (pos1.contains(POS.ADVERB)) {
-						return true;
-					}
-				}
+//				if (pos0.contains(POS.VERB)) {
+//					if (pos1.contains(POS.ADVERB)) {
+//						return true;
+//					}
+//				}
 			}
 			// not matched with the two word rules
 

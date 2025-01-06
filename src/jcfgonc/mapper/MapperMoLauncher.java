@@ -3,11 +3,8 @@ package jcfgonc.mapper;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.module.ModuleDescriptor.Opens;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Properties;
@@ -32,9 +29,7 @@ import org.moeaframework.util.TypedProperties;
 import graph.DirectedMultiGraph;
 import graph.GraphAlgorithms;
 import graph.GraphReadWrite;
-import graph.StringEdge;
 import graph.StringGraph;
-import graph.GraphAlgorithms.ExpandingEdge;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import jcfgonc.mapper.structures.MappingStructure;
 import jcfgonc.moea.generic.InteractiveExecutor;
@@ -44,6 +39,7 @@ import jcfgonc.moea.specific.CustomProblem;
 import jcfgonc.moea.specific.CustomResultsWriter;
 import jcfgonc.moea.specific.ResultsWriter;
 import net.sf.extjwnl.JWNLException;
+import net.sf.extjwnl.data.POS;
 import stream.SharedParallelConsumer;
 import structures.OrderedPair;
 import structures.Ticker;
@@ -82,6 +78,28 @@ public class MapperMoLauncher {
 			UnsupportedLookAndFeelException, InterruptedException, JWNLException {
 
 		OSTools.setLowPriorityProcess();
+
+		StaticSharedVariables.stopWords = new HashSet<String>(VariousUtils.readFileRows(MOEA_Config.stopWordsPath));
+		RandomAdaptor random = new RandomAdaptor(new SynchronizedRandomGenerator(new Well44497b()));
+		StaticSharedVariables.random = random;
+
+		// read input space
+		StringGraph inputSpace = readInputSpace(MOEA_Config.inputSpacePath);
+
+		Set<POS> p = GrammarUtils.checkPOS_InInputSpace("buy something", inputSpace);
+
+		for (String vertex : inputSpace.getVertexSet()) {
+			Set<POS> poses = GrammarUtils.checkPOS_InInputSpace(vertex, inputSpace);
+			if (poses.isEmpty()) {
+				System.out.printf("%d\t%s\t%s\n", inputSpace.degreeOf(vertex), vertex, inputSpace.edgesOf(vertex));
+			}
+		}
+
+//		inputSpace.removeVertices(toRemove);
+		// GraphReadWrite.writeCSV(MOEA_Config.inputSpacePath, inputSpace);
+
+		System.exit(0);
+
 		SharedParallelConsumer.initialize(MOEA_Config.NUMBER_THREADS);
 
 		System.out.println("Concept Mapper - Multiple Objective version");
@@ -90,10 +108,6 @@ public class MapperMoLauncher {
 
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-		RandomAdaptor random = new RandomAdaptor(new SynchronizedRandomGenerator(new Well44497b()));
-
-		// read input space
-		StringGraph inputSpace = readInputSpace(MOEA_Config.inputSpacePath);
 		// remove crap
 		inputSpace.removeVerticesStartingWith("they ");
 		inputSpace.removeVerticesStartingWith("some ");
@@ -121,10 +135,8 @@ public class MapperMoLauncher {
 		// read pre-calculated semantic scores of word/relation pairs
 //		Object2DoubleOpenHashMap<UnorderedPair<String>> wps = WordEmbeddingUtils.readWordPairScores(MOEA_Config.wordPairScores_filename);
 
-		StaticSharedVariables.stopWords = new HashSet<String>(VariousUtils.readFileRows(MOEA_Config.stopWordsPath));
 		StaticSharedVariables.vitalRelations = vitalRelations;
 //		StaticSharedVariables.wordPairScores = wps;
-		StaticSharedVariables.random = random;
 		StaticSharedVariables.relationTranslation = relationTranslation;
 
 		// ------ MOEA SETUP
