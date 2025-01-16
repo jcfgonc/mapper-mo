@@ -10,7 +10,6 @@ anyone
 anything
 anywhere
 both
-certain
 each
 either
 enough
@@ -22,10 +21,9 @@ everywhere
 few
 fewer
 fewest
-last (also adjective)
 least
-less (also adverb and preposition)
-little (also adjective)
+less
+little
 many
 many a
 more

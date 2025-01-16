@@ -61,10 +61,6 @@ public class MOEA_Config {
 	 * these relations are removed from the KB
 	 */
 	public static final Set<String> uselessRelations = Set.of(VariousUtils.fastSplitWhiteSpace(INI_SECTION.get("uselessRelations", String.class)));
-	/**
-	 * concepts with at least one of these words have no POS
-	 */
-	public static final Set<String> uselessWords = Set.of(VariousUtils.fastSplitWhiteSpace(INI_SECTION.get("uselessWords", String.class)));
 
 	public static String fixedConceptLeft = null;
 	public static String fixedConceptRight = null;
@@ -73,7 +69,6 @@ public class MOEA_Config {
 	 */
 	public static final char CONCEPT_WORD_SEPARATOR = INI_SECTION.get("CONCEPT_WORD_SEPARATOR", String.class).charAt(1);
 
-	public static final String stopWordsPath = INI_SECTION.get("stopWordsPath", String.class);
 	public static final String screenshotsFolder = INI_SECTION.get("screenshotsFolder", String.class);
 
 	public static final boolean GRAPHS_ENABLED = INI_SECTION.get("GRAPHS_ENABLED", Boolean.class);
@@ -90,8 +85,6 @@ public class MOEA_Config {
 	public static final int REFERENCE_PAIRINNER_DISTANCE_CALCULATION_LIMIT = INI_SECTION.get("REFERENCE_PAIRINNER_DISTANCE_CALCULATION_LIMIT", Integer.class);
 	public static final int CACHE_SAVE_TIMEOUT = INI_SECTION.get("CACHE_SAVE_TIMEOUT", Integer.class);
 
-	public static final String REFPAIR_CACHE_FILENAME = INI_SECTION.get("REFPAIR_CACHE_FILENAME", String.class);
-	public static final String POS_CACHE_FILENAME = INI_SECTION.get("POS_CACHE_FILENAME", String.class);
 	public static final String MOEA_ICON_PATH = INI_SECTION.get("MOEA_ICON_PATH", String.class);
 	public static final String saveFolder = INI_SECTION.get("saveFolder", String.class);
 	

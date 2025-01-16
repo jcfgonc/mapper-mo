@@ -39,7 +39,6 @@ import jcfgonc.moea.specific.CustomProblem;
 import jcfgonc.moea.specific.CustomResultsWriter;
 import jcfgonc.moea.specific.ResultsWriter;
 import net.sf.extjwnl.JWNLException;
-import net.sf.extjwnl.data.POS;
 import stream.SharedParallelConsumer;
 import structures.OrderedPair;
 import structures.Ticker;
@@ -76,20 +75,20 @@ public class MapperMoLauncher {
 
 	public static void main(String[] args) throws NoSuchFileException, IOException, ClassNotFoundException, InstantiationException, IllegalAccessException,
 			UnsupportedLookAndFeelException, InterruptedException, JWNLException {
-
-		OSTools.setLowPriorityProcess();
-
-		StaticSharedVariables.stopWords = new HashSet<String>(VariousUtils.readFileRows(MOEA_Config.stopWordsPath));
 		RandomAdaptor random = new RandomAdaptor(new SynchronizedRandomGenerator(new Well44497b()));
 		StaticSharedVariables.random = random;
+
+		OSTools.setLowPriorityProcess();
 
 		// read input space
 		StringGraph inputSpace = readInputSpace(MOEA_Config.inputSpacePath);
 
-		Set<POS> p = GrammarUtils.checkPOS_InInputSpace("buy something", inputSpace);
+		Set<MyPOS> posses = GrammarUtils.getConceptPOS_includingInputSpace("light sport aircraft", inputSpace);
+		System.out.println(posses);
 
+		System.exit(0);
 		for (String vertex : inputSpace.getVertexSet()) {
-			Set<POS> poses = GrammarUtils.checkPOS_InInputSpace(vertex, inputSpace);
+			Set<MyPOS> poses = GrammarUtils.getConceptPOS_includingInputSpace(vertex, inputSpace);
 			if (poses.isEmpty()) {
 				System.out.printf("%d\t%s\t%s\n", inputSpace.degreeOf(vertex), vertex, inputSpace.edgesOf(vertex));
 			}

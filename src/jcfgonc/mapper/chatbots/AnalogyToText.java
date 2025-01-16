@@ -35,6 +35,7 @@ public class AnalogyToText {
 
 	public static void main(String[] args) throws NoSuchFileException, IOException {
 		// analogy format I get from my excel file
+		// root pair TAB graph in CSV
 		String txt = "fridge|orchestra	fridge|orchestra,atlocation,south london|concert hall;fridge|orchestra,usedfor,refrigeration|make music;yogurt|instrument,atlocation,fridge|orchestra;fridge|orchestra,isa,refrigerator|group of musician;fridge|orchestra,partof,kitchen|theatre;fridge|orchestra,capableof,cool food|play symphony;oven|band,antonym,fridge|orchestra;";
 		String[] tokens = txt.split("\t");
 
@@ -77,7 +78,6 @@ public class AnalogyToText {
 			text += template.replace("%a%", a).replace("%b%", b).replace("%c%", c).replace("%d%", d) + ". ";
 			System.lineSeparator();
 		}
-		// TODO Auto-generated method stub
 		return text;
 	}
 
