@@ -3,40 +3,30 @@ package jcfgonc.mapper.chatbots;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.google.gson.Gson;
-
 import graph.GraphReadWrite;
 import graph.StringEdge;
 import graph.StringGraph;
-import jcfgonc.mapper.chatbots.json.Candidate;
-import jcfgonc.mapper.chatbots.json.ChatBotReply;
-import jcfgonc.mapper.chatbots.json.Content;
-import jcfgonc.mapper.chatbots.json.Part;
-import structures.Ticker;
+import utils.VariousUtils;
 
 public class AnalogyToText {
-
-	private static final Gson GSON = new Gson();
 
 	public static void main(String[] args) throws NoSuchFileException, IOException {
 		// analogy format I get from my excel file
 		// root pair TAB graph in CSV
 		String txt = "fridge|orchestra	fridge|orchestra,atlocation,south london|concert hall;fridge|orchestra,usedfor,refrigeration|make music;yogurt|instrument,atlocation,fridge|orchestra;fridge|orchestra,isa,refrigerator|group of musician;fridge|orchestra,partof,kitchen|theatre;fridge|orchestra,capableof,cool food|play symphony;oven|band,antonym,fridge|orchestra;";
+		completeAnalogy(txt);
+
+		System.lineSeparator();
+	}
+
+	private static void completeAnalogy(String txt) throws NoSuchFileException, IOException {
 		String[] tokens = txt.split("\t");
 
 		String startingVertex = tokens[0];
@@ -53,13 +43,11 @@ public class AnalogyToText {
 		HashMap<String, String> rt_templates = readRelationToTextTemplates("data/relation_to_text_templates.tsv", "\t", true);
 		ArrayList<StringEdge> edgeSeq = createEdgeSequenceBFS(analogy, startingVertex);
 		String analogy_facts = textualizeAnalogy(edgeSeq, rt_templates);
-		String prompt_template = readFileToString("data/prompt_template_1.txt");
+		String prompt_template = VariousUtils.readFile("data/prompt_template_1.txt");
 		String prompt = prompt_template.replace("%a%", concept_a).replace("%b%", concept_b).replace("%text%", analogy_facts);
 
-		String reply = sendRequest(prompt);
+		String reply = GoogleLLM_Caller.doREST_HTTP_Request(prompt);
 		System.out.println(reply);
-
-		System.lineSeparator();
 	}
 
 	private static String textualizeAnalogy(ArrayList<StringEdge> edgeSeq, HashMap<String, String> rt_templates) {
@@ -131,67 +119,5 @@ public class AnalogyToText {
 			visitedEdges.add(edge);
 		}
 		return edgeSequence;
-	}
-
-	public static String sendRequest(String text) {
-		try {
-			String api_call = readFileToString("data/google_gemini_api_query.txt");
-			String apikey = readFileToString("data/apikey.txt");
-
-			Ticker t = new Ticker();
-
-			///// models as of 19/11/2024
-			// gemini-1.5-pro
-			// gemini-1.5-flash
-			// gemini-1.5-flash-8b
-			String model = "gemini-1.5-flash";
-			String apiurl = "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent?key=" + apikey;
-
-			URL url = new URI(apiurl).toURL();
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod("POST");
-			connection.setDoOutput(true);
-			connection.setRequestProperty("Content-Type", "application/json");
-			connection.setRequestProperty("Accept", "application/json");
-//			connection.setRequestProperty("Authorization", "Basic " + Base64.getEncoder().encodeToString((userName + ":" + password).getBytes()));
-			String requestContents = api_call.replace("%text%", text);
-			byte[] out = requestContents.getBytes(StandardCharsets.UTF_8);
-			OutputStream stream = connection.getOutputStream();
-			stream.write(out);
-			stream.flush();
-
-			System.out.println(connection.getResponseCode() + " " + connection.getResponseMessage()); // THis is optional
-
-			InputStream inputStream = connection.getInputStream();
-			String raw_reply = toString(inputStream);
-			System.out.println(raw_reply);
-			inputStream.close();
-			connection.disconnect();
-			t.showTimeDeltaLastCall();
-
-			// process chatbot reply in json format
-			ChatBotReply chatbotReply = GSON.fromJson(raw_reply, ChatBotReply.class);
-			ArrayList<Candidate> candidates = chatbotReply.candidates;
-			Candidate candidate = candidates.get(0);
-			Content content = candidate.content;
-			ArrayList<Part> parts = content.parts;
-			Part part = parts.get(0);
-			String chatbotText = part.text;
-
-			return chatbotText;
-		} catch (Exception e) {
-			System.out.println(e);
-			System.out.println("Failed successfully");
-		}
-		return null;
-	}
-
-	public static String toString(InputStream input) throws IOException {
-		return new String(input.readAllBytes(), StandardCharsets.UTF_8);
-	}
-
-	public static String readFileToString(String filename) throws IOException {
-		String text = new String(Files.readAllBytes(Paths.get(filename)), StandardCharsets.UTF_8);
-		return text;
 	}
 }

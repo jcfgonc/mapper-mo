@@ -1,4 +1,4 @@
-package jcfgonc.mapper;
+package jcfgonc.mapper.chatbots;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,27 +15,17 @@ import jcfgonc.mapper.chatbots.json.Candidate;
 import jcfgonc.mapper.chatbots.json.ChatBotReply;
 import jcfgonc.mapper.chatbots.json.Content;
 import jcfgonc.mapper.chatbots.json.Part;
-import structures.Ticker;
 import utils.VariousUtils;
 
-public class GoogleLLM_knowledgeExtractor {
+public class GoogleLLM_Caller {
 	private static final Gson GSON = new Gson();
 
-	public static void main(String[] args) {
-		String concept = "vehicle";
-		String prompt_template = "one fact per line, what are the most well known parts of a %concept% and their function? give their function with a single action verb";
-		String prompt = prompt_template.replace("%concept%", concept);
-
-		String reply = sendRequest(prompt);
-		System.out.println(reply);
-	}
-
-	public static String sendRequest(String text) {
+	public static String doREST_HTTP_Request(String text) {
 		try {
 			String api_call = VariousUtils.readFile("data/google_gemini_api_query.txt");
 			String apikey = VariousUtils.readFile("data/apikey.txt");
 
-			//Ticker t = new Ticker();
+			// Ticker t = new Ticker();
 
 			///// models as of 19/11/2024
 			// gemini-1.5-pro
@@ -61,10 +51,10 @@ public class GoogleLLM_knowledgeExtractor {
 
 			InputStream inputStream = connection.getInputStream();
 			String raw_reply = toString(inputStream);
-			//System.out.println(raw_reply);
+			// System.out.println(raw_reply);
 			inputStream.close();
 			connection.disconnect();
-			//t.showTimeDeltaLastCall();
+			// t.showTimeDeltaLastCall();
 
 			// process chatbot reply in json format
 			ChatBotReply chatbotReply = GSON.fromJson(raw_reply, ChatBotReply.class);
