@@ -12,8 +12,8 @@
   "generationConfig": {
     "temperature": 0,
     "topK": 3,
-    "topP": 0.95,
-    "maxOutputTokens": 1024,
+    "topP": 0.98,
+    "maxOutputTokens": 128,
     "responseMimeType": "text/plain"
   }
 }

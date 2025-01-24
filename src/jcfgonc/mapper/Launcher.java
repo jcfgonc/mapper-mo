@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -26,6 +24,7 @@ import org.moeaframework.core.spi.OperatorFactory;
 import org.moeaframework.core.spi.OperatorProvider;
 import org.moeaframework.util.TypedProperties;
 
+import chatbots.googleai.GoogleLLM_knowledgeExtractor;
 import graph.DirectedMultiGraph;
 import graph.GraphAlgorithms;
 import graph.GraphReadWrite;
@@ -46,7 +45,7 @@ import utils.OSTools;
 import utils.VariousUtils;
 import visual.OptionFrame;
 
-public class MapperMoLauncher {
+public class Launcher {
 
 	private static void registerCustomMutation() {
 		OperatorFactory.getInstance().addProvider(new OperatorProvider() {
@@ -82,23 +81,15 @@ public class MapperMoLauncher {
 
 		// read input space
 		StringGraph inputSpace = readInputSpace(MOEA_Config.inputSpacePath);
-
-		Set<MyPOS> posses = GrammarUtils.getConceptPOS_includingInputSpace("light sport aircraft", inputSpace);
-		System.out.println(posses);
-
+		
+		GoogleLLM_knowledgeExtractor.checkISA(inputSpace);
+		
+		
+		
+		
+		
 		System.exit(0);
-		for (String vertex : inputSpace.getVertexSet()) {
-			Set<MyPOS> poses = GrammarUtils.getConceptPOS_includingInputSpace(vertex, inputSpace);
-			if (poses.isEmpty()) {
-				System.out.printf("%d\t%s\t%s\n", inputSpace.degreeOf(vertex), vertex, inputSpace.edgesOf(vertex));
-			}
-		}
-
-//		inputSpace.removeVertices(toRemove);
-		// GraphReadWrite.writeCSV(MOEA_Config.inputSpacePath, inputSpace);
-
-		System.exit(0);
-
+		
 		SharedParallelConsumer.initialize(MOEA_Config.NUMBER_THREADS);
 
 		System.out.println("Concept Mapper - Multiple Objective version");
