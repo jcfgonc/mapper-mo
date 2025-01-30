@@ -3,6 +3,7 @@ package jcfgonc.mapper;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import org.moeaframework.core.spi.OperatorProvider;
 import org.moeaframework.util.TypedProperties;
 
 import chatbots.googleai.GoogleLLM_knowledgeExtractor;
+import chatbots.googleai.OpenAiLLM_Caller;
 import graph.DirectedMultiGraph;
 import graph.GraphAlgorithms;
 import graph.GraphReadWrite;
@@ -73,17 +75,20 @@ public class Launcher {
 	}
 
 	public static void main(String[] args) throws NoSuchFileException, IOException, ClassNotFoundException, InstantiationException, IllegalAccessException,
-			UnsupportedLookAndFeelException, InterruptedException, JWNLException {
+			UnsupportedLookAndFeelException, InterruptedException, JWNLException, URISyntaxException {
 		RandomAdaptor random = new RandomAdaptor(new SynchronizedRandomGenerator(new Well44497b()));
 		StaticSharedVariables.random = random;
 
 		OSTools.setLowPriorityProcess();
 
 		// read input space
-		StringGraph inputSpace = readInputSpace(MOEA_Config.inputSpacePath);
+//		StringGraph inputSpace = readInputSpace(MOEA_Config.inputSpacePath);
+		StringGraph inputSpace = readInputSpace("verified.csv");
+//		GraphReadWrite.writeCSV("original.csv", inputSpace);
 		
-		GoogleLLM_knowledgeExtractor.checkISA(inputSpace);
-		
+		OpenAiLLM_Caller.checkISA(inputSpace);
+		GraphReadWrite.writeCSV("verified.csv", inputSpace);
+	
 		
 		
 		
