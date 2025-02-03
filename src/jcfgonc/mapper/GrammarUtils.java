@@ -421,7 +421,7 @@ public class GrammarUtils {
 	}
 
 	/**
-	 * Calculates the ratio of same POS concept pairs in the overall mapping.
+	 * Calculates the ratio of same POS concept pairs in the overall mapping. Called from the genetic algorithm's fitness evaluation.
 	 * 
 	 * @param pairGraph
 	 * @param inputSpace
