@@ -25,6 +25,7 @@ import org.moeaframework.core.spi.OperatorFactory;
 import org.moeaframework.core.spi.OperatorProvider;
 import org.moeaframework.util.TypedProperties;
 
+import chatbots.googleai.GoogleLLM_knowledgeExtractor;
 import chatbots.openai.OpenAiLLM_Caller;
 import graph.DirectedMultiGraph;
 import graph.GraphAlgorithms;
@@ -85,7 +86,10 @@ public class Launcher {
 		StringGraph inputSpace = readInputSpace("verified.csv");
 //		GraphReadWrite.writeCSV("original.csv", inputSpace);
 		
-		OpenAiLLM_Caller.checkISA_concurrent(inputSpace);
+		GoogleLLM_knowledgeExtractor.correctConcepts(inputSpace);
+		
+		//GrammarUtilsCoreNLP.testConceptPOSes(inputSpace);
+		//OpenAiLLM_Caller.checkISA_concurrent(inputSpace);
 		GraphReadWrite.writeCSV("verified.csv", inputSpace);
 	
 		

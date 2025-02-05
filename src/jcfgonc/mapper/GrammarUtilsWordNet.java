@@ -20,7 +20,7 @@ import structures.OrderedPair;
 import structures.SynchronizedSeriarizableMapOfSet;
 import utils.VariousUtils;
 
-public class GrammarUtils {
+public class GrammarUtilsWordNet {
 	private static Dictionary dictionary;
 
 	static {
@@ -212,13 +212,13 @@ public class GrammarUtils {
 	 */
 	public static HashSet<MyPOS> lookUpPOS_inLocalFiles(String word) {
 		HashSet<MyPOS> possible_poses = new HashSet<MyPOS>();
-		if (GrammarUtils.determiners.contains(word)) {
+		if (GrammarUtilsWordNet.determiners.contains(word)) {
 			possible_poses.add(MyPOS.DETERMINER);
 		}
-		if (GrammarUtils.prepositions.contains(word)) {
+		if (GrammarUtilsWordNet.prepositions.contains(word)) {
 			possible_poses.add(MyPOS.PREPOSITION);
 		}
-		if (GrammarUtils.pronouns.contains(word)) {
+		if (GrammarUtilsWordNet.pronouns.contains(word)) {
 			possible_poses.add(MyPOS.PRONOUN);
 		}
 		return possible_poses;

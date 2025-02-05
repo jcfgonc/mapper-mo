@@ -18,5 +18,8 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="corenlp/stanford-corenlp-models-current.jar"/>
+	<classpathentry kind="lib" path="corenlp/stanford-english-extra-corenlp-models-current.jar"/>
+	<classpathentry kind="lib" path="corenlp/stanford-english-kbp-corenlp-models-current.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -6,7 +6,7 @@ import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 
 import graph.DirectedMultiGraph;
-import jcfgonc.mapper.GrammarUtils;
+import jcfgonc.mapper.GrammarUtilsWordNet;
 import jcfgonc.mapper.MOEA_Config;
 import jcfgonc.mapper.MappingAlgorithms;
 import jcfgonc.mapper.ObjectiveEvaluationUtils;
@@ -97,7 +97,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 
 		double posRatio = 0;
 		if (!emptyGraph) {
-			posRatio = GrammarUtils.calculateSamePOS_pairsPercentage(pairGraph, StaticSharedVariables.inputSpaceForPOS);
+			posRatio = GrammarUtilsWordNet.calculateSamePOS_pairsPercentage(pairGraph, StaticSharedVariables.inputSpaceForPOS);
 		}
 
 //		double closenessCentrality = 0;
