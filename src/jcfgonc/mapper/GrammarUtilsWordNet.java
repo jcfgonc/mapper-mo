@@ -14,7 +14,7 @@ import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.POS;
 import net.sf.extjwnl.dictionary.Dictionary;
 import structures.ListOfSet;
-import structures.ObjectCount;
+import structures.ObjectIntPair;
 import structures.ObjectCounter;
 import structures.OrderedPair;
 import structures.SynchronizedSeriarizableMapOfSet;
@@ -407,8 +407,8 @@ public class GrammarUtilsWordNet {
 		for (String concept : graph.getVertexSet()) {
 			degreeCounter.addObject(concept, graph.degreeOf(concept));
 		}
-		ArrayList<ObjectCount<String>> sortedCount = degreeCounter.getSortedCount();
-		for (ObjectCount<String> oc : sortedCount) {
+		ArrayList<ObjectIntPair<String>> sortedCount = degreeCounter.getSortedCount();
+		for (ObjectIntPair<String> oc : sortedCount) {
 			String concept = oc.getId();
 			int inDegree = graph.getInDegree(concept);
 			int outDegree = graph.getOutDegree(concept);

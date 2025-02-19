@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Properties;
 
 import javax.swing.ImageIcon;
@@ -83,21 +85,24 @@ public class Launcher {
 
 		// read input space
 //		StringGraph inputSpace = readInputSpace(MOEA_Config.inputSpacePath);
-		StringGraph inputSpace = readInputSpace("verified.csv");
-//		GraphReadWrite.writeCSV("original.csv", inputSpace);
+		StringGraph inputSpace = null;//readInputSpace("verified.csv");
+//		String[] toRename = "program language,meet,edit,nasa,ultralight aviation,film edit,publish,mythical be,public speak,naval aviation".split(",");
+//		String[] rename = "programming language,meeting,editor,nasa personnel,ultralight aircraft,film editor,publisher,mythical being,public speaker,naval aviator"
+//				.split(",");
+//		for (int i = 0; i < toRename.length; i++) {
+//			String concept = toRename[i];
+//			String target = rename[i];
+//			inputSpace.renameVertex(concept, target);
+//		}
 		
-		GoogleLLM_knowledgeExtractor.correctConcepts(inputSpace);
-		
-		//GrammarUtilsCoreNLP.testConceptPOSes(inputSpace);
-		//OpenAiLLM_Caller.checkISA_concurrent(inputSpace);
-		GraphReadWrite.writeCSV("verified.csv", inputSpace);
-	
-		
-		
-		
-		
+		//VariousUtils.countEdgeTargetsOf(inputSpace, "isa").toSystemOut(10);
+		OpenAiLLM_Caller.getPartsAndPurpose("church");
+		// GrammarUtilsCoreNLP.testConcepts(inputSpace);
+
+//		GraphReadWrite.writeCSV("verified.csv", inputSpace);
+
 		System.exit(0);
-		
+
 		SharedParallelConsumer.initialize(MOEA_Config.NUMBER_THREADS);
 
 		System.out.println("Concept Mapper - Multiple Objective version");
