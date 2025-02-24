@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Properties;
 
 import javax.swing.ImageIcon;
@@ -27,7 +25,6 @@ import org.moeaframework.core.spi.OperatorFactory;
 import org.moeaframework.core.spi.OperatorProvider;
 import org.moeaframework.util.TypedProperties;
 
-import chatbots.googleai.GoogleLLM_knowledgeExtractor;
 import chatbots.openai.OpenAiLLM_Caller;
 import graph.DirectedMultiGraph;
 import graph.GraphAlgorithms;
@@ -41,6 +38,7 @@ import jcfgonc.moea.specific.CustomMutation;
 import jcfgonc.moea.specific.CustomProblem;
 import jcfgonc.moea.specific.CustomResultsWriter;
 import jcfgonc.moea.specific.ResultsWriter;
+import linguistics.GrammarUtilsCoreNLP;
 import net.sf.extjwnl.JWNLException;
 import stream.SharedParallelConsumer;
 import structures.OrderedPair;
@@ -85,7 +83,7 @@ public class Launcher {
 
 		// read input space
 //		StringGraph inputSpace = readInputSpace(MOEA_Config.inputSpacePath);
-		StringGraph inputSpace = null;//readInputSpace("verified.csv");
+		StringGraph inputSpace = null;// readInputSpace("verified.csv");
 //		String[] toRename = "program language,meet,edit,nasa,ultralight aviation,film edit,publish,mythical be,public speak,naval aviation".split(",");
 //		String[] rename = "programming language,meeting,editor,nasa personnel,ultralight aircraft,film editor,publisher,mythical being,public speaker,naval aviator"
 //				.split(",");
@@ -94,9 +92,15 @@ public class Launcher {
 //			String target = rename[i];
 //			inputSpace.renameVertex(concept, target);
 //		}
-		
-		//VariousUtils.countEdgeTargetsOf(inputSpace, "isa").toSystemOut(10);
-		OpenAiLLM_Caller.getPartsAndPurpose("church");
+
+		// VariousUtils.countEdgeTargetsOf(inputSpace, "isa").toSystemOut(10);
+		// System.out.println(OpenAiLLM_Caller.getMadeOf("civil engineer"));
+		String txt = "bomb,animal,author,atom,computer,island,book,death,vehicle,asteroid,mineral rock,crater,mountain,weapon,food,fictional character,celestial body";
+		String[] split = txt.split(",");
+		for (String concept : split) {
+			// System.out.println(GrammarUtilsCoreNLP.getSingularForm(concept));
+			System.out.println(concept + "\t" + OpenAiLLM_Caller.getCapableOf(concept));
+		}
 		// GrammarUtilsCoreNLP.testConcepts(inputSpace);
 
 //		GraphReadWrite.writeCSV("verified.csv", inputSpace);

@@ -6,13 +6,13 @@ import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 
 import graph.DirectedMultiGraph;
-import jcfgonc.mapper.GrammarUtilsWordNet;
 import jcfgonc.mapper.MOEA_Config;
 import jcfgonc.mapper.MappingAlgorithms;
 import jcfgonc.mapper.ObjectiveEvaluationUtils;
 import jcfgonc.mapper.StaticSharedVariables;
 import jcfgonc.mapper.structures.MappingStructure;
 import jcfgonc.moea.generic.ProblemDescription;
+import linguistics.GrammarUtilsWordNet;
 import structures.MapOfList;
 import structures.OrderedPair;
 
