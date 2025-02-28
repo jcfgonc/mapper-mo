@@ -19,7 +19,7 @@ hasproperty	0.8	F/T say is important (property)	9
 locationofaction	0.027	F/T say is important (space)	3
 locatednear	0.027	F/T say is important (space)	3
 entails	0.027	F/T say is important (property)	3
-knownfor	0.512	F/T say is important (role)	8
+knownfor	0.75	F/T say is important (role)	8
 synonym	0.125	F/T say is important (similarity)	5
 hassubevent	0.064	F/T say is important (cause-effect)	4
 receivesaction	0.064	F/T say is important (cause-effect)	4

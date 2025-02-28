@@ -95,12 +95,7 @@ public class Launcher {
 
 		// VariousUtils.countEdgeTargetsOf(inputSpace, "isa").toSystemOut(10);
 		// System.out.println(OpenAiLLM_Caller.getMadeOf("civil engineer"));
-		String txt = "bomb,animal,author,atom,computer,island,book,death,vehicle,asteroid,mineral rock,crater,mountain,weapon,food,fictional character,celestial body";
-		String[] split = txt.split(",");
-		for (String concept : split) {
-			// System.out.println(GrammarUtilsCoreNLP.getSingularForm(concept));
-			System.out.println(concept + "\t" + OpenAiLLM_Caller.getCapableOf(concept));
-		}
+		OpenAiLLM_Caller.runTest(inputSpace);
 		// GrammarUtilsCoreNLP.testConcepts(inputSpace);
 
 //		GraphReadWrite.writeCSV("verified.csv", inputSpace);
