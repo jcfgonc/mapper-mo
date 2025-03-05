@@ -38,7 +38,6 @@ import jcfgonc.moea.specific.CustomMutation;
 import jcfgonc.moea.specific.CustomProblem;
 import jcfgonc.moea.specific.CustomResultsWriter;
 import jcfgonc.moea.specific.ResultsWriter;
-import linguistics.GrammarUtilsCoreNLP;
 import net.sf.extjwnl.JWNLException;
 import stream.SharedParallelConsumer;
 import structures.OrderedPair;
@@ -83,7 +82,7 @@ public class Launcher {
 
 		// read input space
 //		StringGraph inputSpace = readInputSpace(MOEA_Config.inputSpacePath);
-		StringGraph inputSpace = null;// readInputSpace("verified.csv");
+		StringGraph inputSpace = readInputSpace("verified.csv");
 //		String[] toRename = "program language,meet,edit,nasa,ultralight aviation,film edit,publish,mythical be,public speak,naval aviation".split(",");
 //		String[] rename = "programming language,meeting,editor,nasa personnel,ultralight aircraft,film editor,publisher,mythical being,public speaker,naval aviator"
 //				.split(",");
@@ -95,6 +94,12 @@ public class Launcher {
 
 		// VariousUtils.countEdgeTargetsOf(inputSpace, "isa").toSystemOut(10);
 		// System.out.println(OpenAiLLM_Caller.getMadeOf("civil engineer"));
+
+//		ArrayList<StringEdge> facts = OpenAiLLM_Caller.addExamplesOfClass();
+//		HashSet<String> newEntities = new HashSet<String>(GraphAlgorithms.getEdgesSources(facts));
+//		System.out.println(facts);
+//		System.out.println(newEntities);
+
 		OpenAiLLM_Caller.runTest(inputSpace);
 		// GrammarUtilsCoreNLP.testConcepts(inputSpace);
 
