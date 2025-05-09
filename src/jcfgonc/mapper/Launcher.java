@@ -38,10 +38,10 @@ import jcfgonc.moea.specific.CustomMutation;
 import jcfgonc.moea.specific.CustomProblem;
 import jcfgonc.moea.specific.CustomResultsWriter;
 import jcfgonc.moea.specific.ResultsWriter;
+import linguistics.PythonNLP_RestServiceInterface;
 import net.sf.extjwnl.JWNLException;
 import stream.SharedParallelConsumer;
 import structures.OrderedPair;
-import structures.Ticker;
 import utils.OSTools;
 import utils.VariousUtils;
 import visual.OptionFrame;
@@ -75,6 +75,7 @@ public class Launcher {
 
 	public static void main(String[] args) throws NoSuchFileException, IOException, ClassNotFoundException, InstantiationException, IllegalAccessException,
 			UnsupportedLookAndFeelException, InterruptedException, JWNLException, URISyntaxException {
+
 		RandomAdaptor random = new RandomAdaptor(new SynchronizedRandomGenerator(new Well44497b()));
 		StaticSharedVariables.random = random;
 
@@ -82,28 +83,12 @@ public class Launcher {
 
 		// read input space
 //		StringGraph inputSpace = readInputSpace(MOEA_Config.inputSpacePath);
-		StringGraph inputSpace = readInputSpace("verified.csv");
-//		String[] toRename = "program language,meet,edit,nasa,ultralight aviation,film edit,publish,mythical be,public speak,naval aviation".split(",");
-//		String[] rename = "programming language,meeting,editor,nasa personnel,ultralight aircraft,film editor,publisher,mythical being,public speaker,naval aviator"
-//				.split(",");
-//		for (int i = 0; i < toRename.length; i++) {
-//			String concept = toRename[i];
-//			String target = rename[i];
-//			inputSpace.renameVertex(concept, target);
-//		}
+		StringGraph inputSpace = new StringGraph(); // GraphReadWrite.readInputSpaceCSV("newfacts.csv");
+//		OpenAiLLM_Caller.populateKB_withFacts(inputSpace);
+		OpenAiLLM_Caller.populateKB_withExamples(inputSpace);
+		
 
-		// VariousUtils.countEdgeTargetsOf(inputSpace, "isa").toSystemOut(10);
-		// System.out.println(OpenAiLLM_Caller.getMadeOf("civil engineer"));
-
-//		ArrayList<StringEdge> facts = OpenAiLLM_Caller.addExamplesOfClass();
-//		HashSet<String> newEntities = new HashSet<String>(GraphAlgorithms.getEdgesSources(facts));
-//		System.out.println(facts);
-//		System.out.println(newEntities);
-
-		OpenAiLLM_Caller.runTest(inputSpace);
-		// GrammarUtilsCoreNLP.testConcepts(inputSpace);
-
-//		GraphReadWrite.writeCSV("verified.csv", inputSpace);
+		GraphReadWrite.writeCSV("newfacts.csv", inputSpace);
 
 		System.exit(0);
 
@@ -205,17 +190,6 @@ public class Launcher {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	public static StringGraph readInputSpace(String inputSpacePath) throws IOException, NoSuchFileException {
-		System.out.println("loading input space from " + inputSpacePath);
-		StringGraph inputSpace = new StringGraph();
-		Ticker ticker = new Ticker();
-		GraphReadWrite.readCSV(inputSpacePath, inputSpace);
-		inputSpace.showStructureSizes();
-		System.out.println("loading took " + ticker.getTimeDeltaLastCall() + " s");
-		System.out.println("-------");
-		return inputSpace;
 	}
 
 	public static Object2DoubleOpenHashMap<String> readVitalRelations(String path) throws IOException {
