@@ -21,4 +21,4 @@ partof	%a% is part of %b% as %c% is part of %d%	8
 receivesaction	%a% %b% as %c% %d%	6
 symbolof	%a% symbolizes %b% as %c% symbolizes %d%	7
 synonym	%a% is synonym of %b% as %c% is synonym of %d%	8
-usedfor	%a% is used for %b% as %c% is used for %d%	8
+usedto	%a% is used to %b% as %c% is used to %d%	8

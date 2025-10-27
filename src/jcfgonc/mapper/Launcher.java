@@ -25,7 +25,6 @@ import org.moeaframework.core.spi.OperatorFactory;
 import org.moeaframework.core.spi.OperatorProvider;
 import org.moeaframework.util.TypedProperties;
 
-import chatbots.openai.OpenAiLLM_Caller;
 import graph.DirectedMultiGraph;
 import graph.GraphAlgorithms;
 import graph.GraphReadWrite;
@@ -38,7 +37,6 @@ import jcfgonc.moea.specific.CustomMutation;
 import jcfgonc.moea.specific.CustomProblem;
 import jcfgonc.moea.specific.CustomResultsWriter;
 import jcfgonc.moea.specific.ResultsWriter;
-import linguistics.PythonNLP_RestServiceInterface;
 import net.sf.extjwnl.JWNLException;
 import stream.SharedParallelConsumer;
 import structures.OrderedPair;
@@ -82,16 +80,12 @@ public class Launcher {
 		OSTools.setLowPriorityProcess();
 
 		// read input space
-//		StringGraph inputSpace = readInputSpace(MOEA_Config.inputSpacePath);
-		StringGraph inputSpace = new StringGraph(); // GraphReadWrite.readInputSpaceCSV("newfacts.csv");
-//		OpenAiLLM_Caller.populateKB_withFacts(inputSpace);
-		OpenAiLLM_Caller.populateKB_withExamples(inputSpace);
-		
+		StringGraph inputSpace = new StringGraph();
+//	GraphReadWrite.readCSV("newfacts.csv", inputSpace);
+		GraphReadWrite.readCSV(MOEA_Config.inputSpacePath, inputSpace);
 
-		GraphReadWrite.writeCSV("newfacts.csv", inputSpace);
-
-		System.exit(0);
-
+		// ------------
+		// ------------
 		SharedParallelConsumer.initialize(MOEA_Config.NUMBER_THREADS);
 
 		System.out.println("Concept Mapper - Multiple Objective version");
@@ -100,17 +94,7 @@ public class Launcher {
 
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-		// remove crap
-		inputSpace.removeVerticesStartingWith("they ");
-		inputSpace.removeVerticesStartingWith("some ");
-		inputSpace.removeVerticesStartingWith("sometime");
-		inputSpace.removeVerticesStartingWith("this ");
-		inputSpace.removeVerticesStartingWith("you ");
-		inputSpace.removeVerticesStartingWith("that ");
-		inputSpace.removeVerticesStartingWith("sit on it");
-		inputSpace.removeVerticesStartingWith("something you");
 		GraphAlgorithms.addMirroredCopyEdges(inputSpace, MOEA_Config.undirectedRelations);
-//		GraphReadWrite.writeCSV(MOEA_Config.inputSpacePath, inputSpace);
 
 		StaticSharedVariables.inputSpaceForPOS = new StringGraph(inputSpace);
 
@@ -158,11 +142,13 @@ public class Launcher {
 		InteractiveExecutor ie = new InteractiveExecutor(problem, properties, resultsWriter, MOEA_Config.WINDOW_TITLE, random);
 
 		// do 'k' runs of 'n' epochs
-		// ArrayList<NondominatedPopulation> allResults = new ArrayList<NondominatedPopulation>(totalRuns);
+		// ArrayList<NondominatedPopulation> allResults = new
+		// ArrayList<NondominatedPopulation>(totalRuns);
 		for (int moea_run = 0; moea_run < MOEA_Config.MOEA_RUNS; moea_run++) {
 			if (ie.isCanceled())
 				break;
-			// properties.setProperty("maximumPopulationSize", Integer.toString(MOEA_Config.POPULATION_SIZE * 2)); // default is 10 000
+			// properties.setProperty("maximumPopulationSize",
+			// Integer.toString(MOEA_Config.POPULATION_SIZE * 2)); // default is 10 000
 			properties.setProperty("populationSize", Integer.toString(MOEA_Config.POPULATION_SIZE));
 
 			// do one run of 'n' epochs
@@ -179,7 +165,8 @@ public class Launcher {
 	private static void saveIndividualSolutions(NondominatedPopulation currentResults, int run) {
 		for (int i = 0; i < currentResults.size(); i++) {
 			Solution solution = currentResults.get(i);
-			CustomChromosome cc = (CustomChromosome) solution.getVariable(0); // unless the solution domain X has more than one dimension
+			CustomChromosome cc = (CustomChromosome) solution.getVariable(0); // unless the solution domain X has more
+																				// than one dimension
 			MappingStructure<String, String> mappingStructure = cc.getGene();
 			DirectedMultiGraph<OrderedPair<String>, String> pairGraph = mappingStructure.getPairGraph();
 
@@ -223,7 +210,7 @@ public class Launcher {
 					firstLine = false;
 					continue;
 				}
-				line = line.trim();
+				line = line.strip();
 				String[] cells = VariousUtils.fastSplit(line, '\t');
 				String relation = cells[0];
 				String translation = cells[1];
@@ -250,7 +237,7 @@ public class Launcher {
 			if (concept == null) { // cancel clicked
 				System.exit(0);
 			}
-			concept = concept.trim();
+			concept = concept.strip();
 			if (concept.isEmpty()) { // nothing entered
 				return null;
 			}

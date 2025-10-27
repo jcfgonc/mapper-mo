@@ -1,4 +1,0 @@
-Adding or changing the indefinite or definite articles if required, correcting the grammatical gender and other grammatical rules of agreement as needed, describe a structurally consistent proportional analogy that draws parallels between %a% and %b%.
-Do not attempt to make the analogy logical or meaningful. Do not criticize dubious or erroneous claims. Use the following statements as a background for generating the analogy, ignoring if they are flawed and incoherent and assume that they are absolute.
-
-%text%

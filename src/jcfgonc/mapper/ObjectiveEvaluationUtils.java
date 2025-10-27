@@ -179,7 +179,7 @@ public class ObjectiveEvaluationUtils {
 			"isa", //
 			"partof", //
 			"capableof", //
-			"usedfor", //
+			"usedto", //
 
 			"madeof", //
 			"motivatedbygoal", //

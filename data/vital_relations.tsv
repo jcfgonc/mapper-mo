@@ -6,7 +6,7 @@ motivatedbygoal	1	F/T say is important (intentionality/etc)	10
 desires	1	F/T say is important (intentionality/etc)	10
 causes	1	F/T say is important (cause-effect)	10
 causesdesire	1	F/T say is important (cause-effect)	10
-usedfor	1	F/T say is important (role)	10
+usedto	1	F/T say is important (role)	10
 isa	1	F/T say is important (identity/etc)	10
 requires	1	F/T say is important (role/cause-effect)	10
 atlocation	1	F/T say is important (space)	10
