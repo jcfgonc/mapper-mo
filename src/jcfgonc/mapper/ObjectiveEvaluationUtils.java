@@ -7,20 +7,22 @@ import java.util.Set;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
+import chatbots.openai.OpenAiLLM_Caller;
 import graph.DirectedMultiGraph;
 import graph.GraphAlgorithms;
+import graph.StringGraph;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import linguistics.GrammarUtilsWordNet;
 import structures.MapOfList;
 import structures.OrderedPair;
 import utils.VariousUtils;
 
 public class ObjectiveEvaluationUtils {
 
-	public static DescriptiveStatistics calculateVitalRelationsStatistics(DirectedMultiGraph<OrderedPair<String>, String> graph,
-			Object2DoubleOpenHashMap<String> relationWeights) {
+	public static DescriptiveStatistics calculateVitalRelationsStatistics(DirectedMultiGraph<OrderedPair<String>, String> graph, Object2DoubleOpenHashMap<String> relationWeights) {
 		DescriptiveStatistics ds = new DescriptiveStatistics();
 		// histogram of relations
 		Object2IntOpenHashMap<String> relHist = GraphAlgorithms.countRelations(graph);
@@ -38,8 +40,7 @@ public class ObjectiveEvaluationUtils {
 	}
 
 	/**
-	 * Calculates statistics about the number of relations of each type in the blend. Returns an array with the measurements mean, stddev and number of
-	 * relations of each type.
+	 * Calculates statistics about the number of relations of each type in the blend. Returns an array with the measurements mean, stddev and number of relations of each type.
 	 * 
 	 * @param graph
 	 * @return
@@ -135,8 +136,8 @@ public class ObjectiveEvaluationUtils {
 	}
 
 	/**
-	 * Calculates the variance of the number of vertices hanging in a subtree for all the subtrees of the given reference pair. IE, for a three neighbor
-	 * reference pair with hanging nodes [7 1 3] this will return 3.055
+	 * Calculates the variance of the number of vertices hanging in a subtree for all the subtrees of the given reference pair. IE, for a three neighbor reference pair with hanging
+	 * nodes [7 1 3] this will return 3.055
 	 * 
 	 * @param pairGraph
 	 * @param referencePair
@@ -175,8 +176,7 @@ public class ObjectiveEvaluationUtils {
 		return numConflictingRelations;
 	}
 
-	final static String[] RELATIONS = new String[] { 
-			"isa", //
+	final static String[] RELATIONS = new String[] { "isa", //
 			"partof", //
 			"capableof", //
 			"usedto", //
@@ -189,7 +189,7 @@ public class ObjectiveEvaluationUtils {
 			"symbolof", //
 			"createdby", //
 			"symbolof", //
-};
+	};
 
 	private static boolean containsOpposingRelations(List<String> relationList) {
 		for (String relation : RELATIONS) {
@@ -199,4 +199,26 @@ public class ObjectiveEvaluationUtils {
 		}
 		return false;
 	}
+
+	public static double calculateSamePOS_pairsPercentage(DirectedMultiGraph<OrderedPair<String>, String> pairGraph, StringGraph inputSpaceForPOS) {
+		if (pairGraph.getNumberOfVertices() == 0)
+			return 0;
+		int samePOScount = 0;
+		for (OrderedPair<String> pair : pairGraph.vertexSet()) {
+			String leftElement = pair.getLeftElement();
+			String rightElement = pair.getRightElement();
+			String pos_left = OpenAiLLM_Caller.getPhraseType(leftElement);
+			String pos_right = OpenAiLLM_Caller.getPhraseType(rightElement);
+			boolean sameWordPOS = pos_left.equals(pos_right);
+			if (sameWordPOS) {
+				samePOScount++;
+			}
+		}
+		double ratio = (double) samePOScount / pairGraph.getNumberOfVertices();
+		return ratio;
+
+		// uses old wordnet implementation (may fail for complex concepts)
+		// return GrammarUtilsWordNet.calculateSamePOS_pairsPercentage(pairGraph, inputSpaceForPOS);
+	}
+
 }

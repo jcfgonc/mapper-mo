@@ -28,8 +28,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 
 	@Override
 	/**
-	 * Invoked by MOEA when initializing/filling the solution population. Custom code may required here. Typically only invoked in the initial phase of the
-	 * algorithm.
+	 * Invoked by MOEA when initializing/filling the solution population. Custom code may required here. Typically only invoked in the initial phase of the algorithm.
 	 */
 	public Solution newSolution() {
 		// !!! do not touch this unless the solution domain X has more than ONE dimension
@@ -97,7 +96,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 
 		double posRatio = 0;
 		if (!emptyGraph) {
-			posRatio = GrammarUtilsWordNet.calculateSamePOS_pairsPercentage(pairGraph, StaticSharedVariables.inputSpaceForPOS);
+			posRatio = ObjectiveEvaluationUtils.calculateSamePOS_pairsPercentage(pairGraph, StaticSharedVariables.inputSpaceForPOS);
 		}
 
 //		double closenessCentrality = 0;
@@ -115,7 +114,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 		double assymetricRelationCount = 10;
 		if (!emptyGraph) {
 
-			if(pairGraph.getNumberOfVertices()>6) {
+			if (pairGraph.getNumberOfVertices() > 6) {
 				System.lineSeparator();
 			}
 			// calculates the number of paths from the origin to the terminals containing opposing directional edges

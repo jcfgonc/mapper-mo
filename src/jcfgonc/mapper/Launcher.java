@@ -25,6 +25,7 @@ import org.moeaframework.core.spi.OperatorFactory;
 import org.moeaframework.core.spi.OperatorProvider;
 import org.moeaframework.util.TypedProperties;
 
+import chatbots.openai.OpenAiLLM_Caller;
 import graph.DirectedMultiGraph;
 import graph.GraphAlgorithms;
 import graph.GraphReadWrite;
@@ -73,36 +74,45 @@ public class Launcher {
 
 	public static void main(String[] args) throws NoSuchFileException, IOException, ClassNotFoundException, InstantiationException, IllegalAccessException,
 			UnsupportedLookAndFeelException, InterruptedException, JWNLException, URISyntaxException {
+		System.out.println("Concept Mapper - Multiple Objective version");
+		System.out.println("(C) Joao Goncalves / University of Coimbra");
+		System.out.println("Contact: jcfgonc@gmail.com");
 
+		String currentDir = System.getProperty("user.dir");
+		System.out.println("Working directory: " + currentDir);
 		RandomAdaptor random = new RandomAdaptor(new SynchronizedRandomGenerator(new Well44497b()));
 		StaticSharedVariables.random = random;
 
 		OSTools.setLowPriorityProcess();
 
 		// read input space
-		StringGraph inputSpace = new StringGraph();
-//	GraphReadWrite.readCSV("newfacts.csv", inputSpace);
-		GraphReadWrite.readCSV(MOEA_Config.inputSpacePath, inputSpace);
+		StringGraph kb = new StringGraph();
+		String kb_filename = "../UnoLibrary/new facts v3.tsv";
+		GraphReadWrite.readTSV(kb_filename, kb);
+		kb.showStructureSizes();
+//		GraphReadWrite.readCSV(MOEA_Config.inputSpacePath, kb);
 
 		// ------------
+		for (String concept : kb.getVertexSet()) {
+			System.out.println(concept + "\t" + OpenAiLLM_Caller.getPhraseType(concept));
+		}
+		OpenAiLLM_Caller.saveCaches();
+		System.exit(0);
 		// ------------
+		
 		SharedParallelConsumer.initialize(MOEA_Config.NUMBER_THREADS);
-
-		System.out.println("Concept Mapper - Multiple Objective version");
-		System.out.println("(C) Joao Goncalves / University of Coimbra");
-		System.out.println("Contact: jcfgonc@gmail.com");
 
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-		GraphAlgorithms.addMirroredCopyEdges(inputSpace, MOEA_Config.undirectedRelations);
+		GraphAlgorithms.addMirroredCopyEdges(kb, MOEA_Config.undirectedRelations);
 
-		StaticSharedVariables.inputSpaceForPOS = new StringGraph(inputSpace);
+		StaticSharedVariables.inputSpaceForPOS = new StringGraph(kb);
 
 		// remove useless relations
-		inputSpace.removeEdgesByLabel(MOEA_Config.uselessRelations);
-		StaticSharedVariables.inputSpace = inputSpace;
+		kb.removeEdgesByLabel(MOEA_Config.uselessRelations);
+		StaticSharedVariables.inputSpace = kb;
 
-		MOEA_Config.fixedConceptLeft = askUserForFixedConcept();
+		MOEA_Config.fixedConceptLeft = null;// askUserForFixedConcept();
 
 		// read vital relations importance
 		Object2DoubleOpenHashMap<String> vitalRelations = readVitalRelations(MOEA_Config.vitalRelationsPath);

@@ -1,39 +1,14 @@
 s:relation	f:importance	s:observations	f:original importance
-partof	1	F/T say is important (part-whole)	10
-capableof	1	F/T say is important (role)	10
-madeof	1	F/T say is important (identity/etc)	10
-motivatedbygoal	1	F/T say is important (intentionality/etc)	10
-desires	1	F/T say is important (intentionality/etc)	10
+atlocation	0.75	F/T say is important (space)	10
+capableof	1	F/T say is important (role/cause-effect)	10
 causes	1	F/T say is important (cause-effect)	10
-causesdesire	1	F/T say is important (cause-effect)	10
-usedto	1	F/T say is important (role)	10
+createdby	1	F/T say is important (role/cause-effect)	10
+desires	1	F/T say is important (intentionality/etc)	10
 isa	1	F/T say is important (identity/etc)	10
+knownfor	0.5	F/T say is important (role/cause-effect)	8
+madeof	1	F/T say is important (identity/etc)	10
+notdesires	1	F/T say is important (intentionality/etc)	7
+partof	1	F/T say is important (part-whole)	10
 requires	1	F/T say is important (role/cause-effect)	10
-atlocation	1	F/T say is important (space)	10
-symbolof	1	F/T say is important (representation/etc)	10
-notableidea	1	F/T say is important (representation/etc)	10
-antonym	1	F/T say is important (similarity)	10
-createdby	1	F/T say is important (role)	10
-notdesires	0.343	F/T say is important (intentionality/etc)	7
-hasproperty	0.8	F/T say is important (property)	9
-locationofaction	0.027	F/T say is important (space)	3
-locatednear	0.027	F/T say is important (space)	3
-entails	0.027	F/T say is important (property)	3
-knownfor	0.75	F/T say is important (role)	8
-synonym	0.125	F/T say is important (similarity)	5
-hassubevent	0.064	F/T say is important (cause-effect)	4
-receivesaction	0.064	F/T say is important (cause-effect)	4
-attribute	0.064	F/T say is important (property)	4
-maininterest	0.064	F/T say is important (role)	4
-notgeneralize	0.064	F/T say is important (identity/etc)	4
-spokenin	0.008	F/T say is important (property)	2
-influencedby	0.001	F/T say is important (representation/etc)	1
-similarsize	0.027	F/T say is important (similarity)	3
-definedas	0.027	F/T say is important (identity/etc)	3
-field	0.027	F/T say is important (role)	3
-hasfirstsubevent	0.008	F/T say is important (cause-effect)	2
-haslastsubevent	0.008	F/T say is important (cause-effect)	2
-similarto	0.001	F/T say is important (similarity)	1
-derivedfrom	0.000001	redundant in ConceptNet	0.1
-hascontext	0.000001	redundant in ConceptNet	0.1
-relatedto	0.000001	redundant in ConceptNet	0.1
+usedto	1	F/T say is important (role/cause-effect)	10
+limitedby	1	F/T say is important (role/cause-effect)	NA
