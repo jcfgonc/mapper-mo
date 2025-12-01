@@ -12,6 +12,7 @@ import structures.UnorderedPair;
 public class StaticSharedVariables {
 
 	public static StringGraph inputSpace;
+	public static StringGraph inputSpace_for_RefPairInnerDistance;
 	public static RandomAdaptor random;
 	public static Object2DoubleOpenHashMap<UnorderedPair<String>> wordPairScores;
 	public static Object2DoubleOpenHashMap<String> vitalRelations;
