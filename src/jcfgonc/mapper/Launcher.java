@@ -71,8 +71,7 @@ public class Launcher {
 		});
 	}
 
-	public static void main(String[] args) throws NoSuchFileException, IOException, ClassNotFoundException, InstantiationException, IllegalAccessException,
-			UnsupportedLookAndFeelException, InterruptedException, JWNLException, URISyntaxException {
+	public static void main(String[] args) throws NoSuchFileException, IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException, InterruptedException, JWNLException, URISyntaxException {
 
 		System.out.println("Concept Mapper - Multiple Objective version");
 		System.out.println("(C) Joao Goncalves / University of Coimbra");
@@ -107,85 +106,20 @@ public class Launcher {
 
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-		GraphAlgorithms.addMirroredCopyEdges(kb, MOEA_Config.undirectedRelations);
+		// GraphAlgorithms.addMirroredCopyEdges(kb, MOEA_Config.undirectedRelations); // Do not exist in the new KB
 
 		StaticSharedVariables.inputSpaceForPOS = new StringGraph(kb);
 
 		// remove useless relations
-		kb.removeEdgesByLabel(MOEA_Config.uselessRelations);
+//		kb.removeEdgesByLabel(MOEA_Config.uselessRelations); // Do not exist in the new KB
 		StaticSharedVariables.inputSpace = kb;
-		StringGraph inputSpace_for_RefPairInnerDistance = new StringGraph(kb);
-//		GraphAlgorithms.removeVerticesHighIsaDegree(inputSpace_for_RefPairInnerDistance, 500);
+		StringGraph inputSpace_for_RefPairInnerDistance = kb;// new StringGraph(kb);
 		// remove generic concepts that usually relate lots of stuff
-		inputSpace_for_RefPairInnerDistance.removeVertex("superclass");
-		inputSpace_for_RefPairInnerDistance.removeVertex("life form");
-		inputSpace_for_RefPairInnerDistance.removeVertex("lifeform");
-		inputSpace_for_RefPairInnerDistance.removeVertex("entity");
-		inputSpace_for_RefPairInnerDistance.removeVertex("person");
-		inputSpace_for_RefPairInnerDistance.removeVertex("tool");
-		inputSpace_for_RefPairInnerDistance.removeVertex("equipment");
-		inputSpace_for_RefPairInnerDistance.removeVertex("organism");
-		inputSpace_for_RefPairInnerDistance.removeVertex("individual");
-		inputSpace_for_RefPairInnerDistance.removeVertex("substance");
-		inputSpace_for_RefPairInnerDistance.removeVertex("machine");
-		inputSpace_for_RefPairInnerDistance.removeVertex("object");
-		inputSpace_for_RefPairInnerDistance.removeVertex("device");
-		inputSpace_for_RefPairInnerDistance.removeVertex("artifact");
-		inputSpace_for_RefPairInnerDistance.removeVertex("physical object");
-		inputSpace_for_RefPairInnerDistance.removeVertex("product");
-		inputSpace_for_RefPairInnerDistance.removeVertex("material");
-		inputSpace_for_RefPairInnerDistance.removeVertex("structure");
-		inputSpace_for_RefPairInnerDistance.removeVertex("concept");
-		inputSpace_for_RefPairInnerDistance.removeVertex("man-made object");
-		inputSpace_for_RefPairInnerDistance.removeVertex("physical entity");
-		inputSpace_for_RefPairInnerDistance.removeVertex("item");
-		inputSpace_for_RefPairInnerDistance.removeVertex("consumer good");
-		inputSpace_for_RefPairInnerDistance.removeVertex("fictional entity");
-		inputSpace_for_RefPairInnerDistance.removeVertex("biological entity");
-		inputSpace_for_RefPairInnerDistance.removeVertex("fictional character");
-		inputSpace_for_RefPairInnerDistance.removeVertex("life form");
-		inputSpace_for_RefPairInnerDistance.removeVertex("chemical substance");
-		inputSpace_for_RefPairInnerDistance.removeVertex("natural object");
-		inputSpace_for_RefPairInnerDistance.removeVertex("group");
-		inputSpace_for_RefPairInnerDistance.removeVertex("being");
-		inputSpace_for_RefPairInnerDistance.removeVertex("container");
-		inputSpace_for_RefPairInnerDistance.removeVertex("implement");
-		inputSpace_for_RefPairInnerDistance.removeVertex("medium");
-		inputSpace_for_RefPairInnerDistance.removeVertex("entertainment");
-		inputSpace_for_RefPairInnerDistance.removeVertex("service");
-		inputSpace_for_RefPairInnerDistance.removeVertex("comic book character");
-		inputSpace_for_RefPairInnerDistance.removeVertex("utensil");
-		inputSpace_for_RefPairInnerDistance.removeVertex("occupation");
-		inputSpace_for_RefPairInnerDistance.removeVertex("agent");
-		inputSpace_for_RefPairInnerDistance.removeVertex("area");
-		inputSpace_for_RefPairInnerDistance.removeVertex("merchandise");
-		inputSpace_for_RefPairInnerDistance.removeVertex("component");
-		inputSpace_for_RefPairInnerDistance.removeVertex("commodity");
-		inputSpace_for_RefPairInnerDistance.removeVertex("abstract entity");
-		inputSpace_for_RefPairInnerDistance.removeVertex("matter");
-		inputSpace_for_RefPairInnerDistance.removeVertex("living organism");
-		inputSpace_for_RefPairInnerDistance.removeVertex("superhero");
-		inputSpace_for_RefPairInnerDistance.removeVertex("literary character");
-		inputSpace_for_RefPairInnerDistance.removeVertex("invention");
-		inputSpace_for_RefPairInnerDistance.removeVertex("supernatural being");
-		inputSpace_for_RefPairInnerDistance.removeVertex("artistic creation");
-		inputSpace_for_RefPairInnerDistance.removeVertex("biblical figure");
-		inputSpace_for_RefPairInnerDistance.removeVertex("apparel");
-		inputSpace_for_RefPairInnerDistance.removeVertex("asset");
-		inputSpace_for_RefPairInnerDistance.removeVertex("autotroph");
-		inputSpace_for_RefPairInnerDistance.removeVertex("disney character");
-		inputSpace_for_RefPairInnerDistance.removeVertex("liquid");
-		inputSpace_for_RefPairInnerDistance.removeVertex("work");
-		inputSpace_for_RefPairInnerDistance.removeVertex("apparatus");
-		inputSpace_for_RefPairInnerDistance.removeVertex("ingredient");
-		inputSpace_for_RefPairInnerDistance.removeVertex("living being");
-		inputSpace_for_RefPairInnerDistance.removeVertex("good");
-		inputSpace_for_RefPairInnerDistance.removeVertex("appliance");
-		inputSpace_for_RefPairInnerDistance.removeVertex("accessory");
-		inputSpace_for_RefPairInnerDistance.removeVertex("apparatus");
+//		GraphAlgorithms.removeVerticesHighIsaDegree(inputSpace_for_RefPairInnerDistance, 50);
+
 		StaticSharedVariables.inputSpace_for_RefPairInnerDistance = inputSpace_for_RefPairInnerDistance;
 
-		MOEA_Config.fixedConceptLeft = askUserForFixedConcept();
+		// MOEA_Config.fixedConceptLeft = askUserForFixedConcept();
 
 		// read vital relations importance
 		Object2DoubleOpenHashMap<String> vitalRelations = readVitalRelations(MOEA_Config.vitalRelationsPath);
@@ -315,8 +249,7 @@ public class Launcher {
 
 		String concept;
 		do {
-			concept = OptionFrame.showInputDialogStringRequest("MapperMO", ImageIcon.getImage(),
-					"Type in one of the mapping's concepts\n(or nothing to select it randomly)\n\nClicking cancel exits the program.", "MapperMO");
+			concept = OptionFrame.showInputDialogStringRequest("MapperMO", ImageIcon.getImage(), "Type in one of the mapping's concepts\n(or nothing to select it randomly)\n\nClicking cancel exits the program.", "MapperMO");
 
 			if (concept == null) { // cancel clicked
 				System.exit(0);

@@ -2,6 +2,7 @@ package jcfgonc.mapper;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,7 +27,7 @@ import utils.VariousUtils;
 public class MappingAlgorithms {
 
 	/**
-	 * map edge label (+=outgoing, -=incoming) to the set of connected neighbors
+	 * map edge label (+=outgoing, -=incoming, relative to the reference) to the set of connected neighbors
 	 * 
 	 * @param reference
 	 * @param inputSpace
@@ -52,10 +53,7 @@ public class MappingAlgorithms {
 		return dirLabelMap;
 	}
 
-	public static HashMap<String, OrderedPair<String>> expandConceptPair(StringGraph inputSpace, DirectedMultiGraph<OrderedPair<String>, String> pairGraph,
-			RandomGenerator random, OrderedPair<String> refPair, HashSet<String> usedConcepts) {
-		// do the expansion
-		HashMap<String, OrderedPair<String>> pairs;
+	public static MapOfList<String, OrderedPair<String>> expandConceptPair(StringGraph inputSpace, DirectedMultiGraph<OrderedPair<String>, String> pairGraph, RandomGenerator random, OrderedPair<String> refPair, HashSet<String> usedConcepts) {
 		// get left/right edges
 		String left = refPair.getLeftElement();
 		String right = refPair.getRightElement();
@@ -74,23 +72,23 @@ public class MappingAlgorithms {
 //		removeUselessRelations(rightmap);
 
 		// intersect maps' keys randomly
-		pairs = matchLeftRightMapsAndSelectRandom(leftmap, rightmap, random, usedConcepts);
+		MapOfList<String, OrderedPair<String>> pairs = matchLeftRightMapsAndSelectRandom(leftmap, rightmap, random, usedConcepts);
 		// update the pair/mapping graph
 		for (String dirLabel : pairs.keySet()) {
 			if (pairGraph.getNumberOfVertices() >= MOEA_Config.MAXIMUM_NUMBER_OF_CONCEPT_PAIRS)
 				break;
-			OrderedPair<String> nextPair = pairs.get(dirLabel);
+			List<OrderedPair<String>> listPairs = pairs.get(dirLabel);
 
-			// take care of tagged +- label
-			String label = dirLabel;
-			if (dirLabel.startsWith("+") || dirLabel.startsWith("-")) {
-				label = dirLabel.substring(1);
-			}
+			// dirLabel always start with + OR -
+			String label = dirLabel.substring(1);
 
-			if (dirLabel.charAt(0) == '-') {
-				pairGraph.addEdge(nextPair, refPair, label);
-			} else { // must be '+'
-				pairGraph.addEdge(refPair, nextPair, label);
+			for (OrderedPair<String> nextPair : listPairs) {
+
+				if (dirLabel.charAt(0) == '-') {
+					pairGraph.addEdge(nextPair, refPair, label);
+				} else { // must be '+'
+					pairGraph.addEdge(refPair, nextPair, label);
+				}
 			}
 		}
 		return pairs;
@@ -125,60 +123,41 @@ public class MappingAlgorithms {
 	 * @param usedConcepts
 	 * @return
 	 */
-	private static HashMap<String, OrderedPair<String>> matchLeftRightMapsAndSelectRandom(MapOfSet<String, String> leftmap, MapOfSet<String, String> rightmap,
-			RandomGenerator random, HashSet<String> usedConcepts) {
-		HashMap<String, OrderedPair<String>> relationToPair = new HashMap<>();
+	private static MapOfList<String, OrderedPair<String>> matchLeftRightMapsAndSelectRandom(MapOfSet<String, String> leftmap, MapOfSet<String, String> rightmap, RandomGenerator random, HashSet<String> usedConcepts) {
+		MapOfList<String, OrderedPair<String>> relationToPairs = new MapOfList<String, OrderedPair<String>>();
 		Set<String> leftDirLabels = leftmap.keySet();
 		Set<String> rightDirLabels = rightmap.keySet();
-		for (String label : leftDirLabels) {
-			// TODO ter cuidado aqui se avancar com relacoes nao direccionais
-			if (rightDirLabels.contains(label)) {
-				Set<String> leftInputSet = leftmap.get(label);
-				Set<String> rightInputSet = rightmap.get(label);
+		HashSet<String> commonDirLabels = VariousUtils.intersection(leftDirLabels, rightDirLabels);
+		for (String dirLabel : commonDirLabels) {
 
-				ArrayList<String> leftNeighbors = setToListExcluding(leftInputSet, usedConcepts);
-				ArrayList<String> rightNeighbors = setToListExcluding(rightInputSet, leftInputSet, usedConcepts); // what's on the left can't be on the right
+			Set<String> leftInputSet = leftmap.get(dirLabel);
+			Set<String> rightInputSet = rightmap.get(dirLabel);
 
-				if (leftNeighbors.isEmpty() || rightNeighbors.isEmpty())
-					continue;
+			// create both sets as list excluding closed concepts
+			ArrayList<String> leftNeighbors = VariousUtils.toListExcluding(leftInputSet, usedConcepts);
+			ArrayList<String> rightNeighbors = VariousUtils.toListExcluding(rightInputSet, leftInputSet, usedConcepts); // what's on the left can't be on the right
 
-				// any of the left concepts can be paired with any of the right concepts
-				String leftNeighbor = VariousUtils.getRandomElementFromCollection(leftNeighbors, random);
-				String rightNeighbor = VariousUtils.getRandomElementFromCollection(rightNeighbors, random);
+			if (leftNeighbors.isEmpty() || rightNeighbors.isEmpty())
+				continue;
 
+			Collections.shuffle(leftNeighbors);
+			Collections.shuffle(rightNeighbors); // one shuffle is probably enough but two is better
+
+			int smallerSize = Math.min(leftNeighbors.size(), rightNeighbors.size());
+
+			for (int i = 0; i < smallerSize; i++) {
+				String leftNeighbor = leftNeighbors.get(i);
+				String rightNeighbor = rightNeighbors.get(i);
+				OrderedPair<String> pair = new OrderedPair<String>(leftNeighbor, rightNeighbor);
 				usedConcepts.add(leftNeighbor);
 				usedConcepts.add(rightNeighbor);
-
-				OrderedPair<String> pair = new OrderedPair<String>(leftNeighbor, rightNeighbor);
-				relationToPair.put(label, pair);
+				relationToPairs.add(dirLabel, pair);
 			}
 		}
-		return relationToPair;
+		return relationToPairs;
 	}
 
-	private static <T> ArrayList<T> setToListExcluding(Set<T> inputSet, Set<T> exclusionSet) {
-		ArrayList<T> asList = new ArrayList<>();
-		for (T element : inputSet) {
-			if (exclusionSet.contains(element))
-				continue;
-			asList.add(element);
-		}
-		return asList;
-	}
-
-	private static <T> ArrayList<T> setToListExcluding(Set<T> inputSet, Set<T> exclusionSet0, Set<T> exclusionSet1) {
-		ArrayList<T> asList = new ArrayList<>();
-		for (T element : inputSet) {
-			if (exclusionSet0.contains(element) || exclusionSet1.contains(element))
-				continue;
-			asList.add(element);
-		}
-		return asList;
-	}
-
-	public static Object2IntOpenHashMap<OrderedPair<String>> createIsomorphism(StringGraph inputSpace,
-			DirectedMultiGraph<OrderedPair<String>, String> pairGraph, RandomGenerator random, OrderedPair<String> refPair) {
-
+	public static Object2IntOpenHashMap<OrderedPair<String>> createIsomorphism(StringGraph inputSpace, DirectedMultiGraph<OrderedPair<String>, String> pairGraph, RandomGenerator random, OrderedPair<String> refPair) {
 		Object2IntOpenHashMap<OrderedPair<String>> pairDeepness = null;
 		pairDeepness = new Object2IntOpenHashMap<>();
 		pairDeepness.defaultReturnValue(-1);
@@ -200,16 +179,22 @@ public class MappingAlgorithms {
 			int nextDeepness = deepness + 1;
 
 			// expand a vertex not in the closed set
-			if (closedSet.contains(currentPair.getLeftElement()) || closedSet.contains(currentPair.getRightElement()))
+			if (closedSet.contains(currentPair.getLeftElement()))
+				continue;
+			if (closedSet.contains(currentPair.getRightElement()))
 				continue;
 			// get the vertex neighbors not in the closed set
-			HashMap<String, OrderedPair<String>> expansion = expandConceptPair(inputSpace, pairGraph, random, currentPair, usedConcepts);
-			for (OrderedPair<String> nextPair : expansion.values()) {
-				if (closedSet.contains(currentPair.getLeftElement()) || closedSet.contains(currentPair.getRightElement()))
-					continue;
-				// put the neighbors in the open set
-				openSet.addLast(nextPair);
-				pairDeepness.put(nextPair, nextDeepness);
+			MapOfList<String, OrderedPair<String>> expansion = expandConceptPair(inputSpace, pairGraph, random, currentPair, usedConcepts);
+			for (List<OrderedPair<String>> pairs : expansion.values()) {
+				for (OrderedPair<String> nextPair : pairs) {
+					if (closedSet.contains(nextPair.getLeftElement()))
+						continue;
+					if (closedSet.contains(nextPair.getRightElement()))
+						continue;
+					// put the neighbors in the open set
+					openSet.addLast(nextPair);
+					pairDeepness.put(nextPair, nextDeepness);
+				}
 			}
 			// vertex from the open set explored, remove it from further exploration
 			closedSet.add(currentPair.getLeftElement());
@@ -298,8 +283,7 @@ public class MappingAlgorithms {
 	}
 
 	/**
-	 * calculates the distance (in hops on the given graph) between the two concepts of the given pair. Uses distanceBetweenVertices() from GraphAlgorithms but
-	 * with prior caching.
+	 * calculates the distance (in hops on the given graph) between the two concepts of the given pair. Uses distanceBetweenVertices() from GraphAlgorithms but with prior caching.
 	 * 
 	 * @param pair
 	 * @return
@@ -324,15 +308,14 @@ public class MappingAlgorithms {
 	}
 
 	/**
-	 * Calculates the number of children per sub tree for the given graph, starting at the root vertex. Used to calculate the balanced sub-tree(s) at the root
-	 * vertex. IE, for each vertex calculates the number of hanging vertices from it to the terminal vertices, beginning at the root vertice.
+	 * Calculates the number of children per sub tree for the given graph, starting at the root vertex. Used to calculate the balanced sub-tree(s) at the root vertex. IE, for each vertex calculates the number of hanging vertices from it to the terminal
+	 * vertices, beginning at the root vertice.
 	 * 
 	 * @param graph
 	 * @param root
 	 * @return
 	 */
-	public static Object2IntOpenHashMap<OrderedPair<String>> countNumberOfChildrenPerSubTree(DirectedMultiGraph<OrderedPair<String>, String> graph,
-			OrderedPair<String> root) {
+	public static Object2IntOpenHashMap<OrderedPair<String>> countNumberOfChildrenPerSubTree(DirectedMultiGraph<OrderedPair<String>, String> graph, OrderedPair<String> root) {
 		HashMap<OrderedPair<String>, OrderedPair<String>> cameFrom = new HashMap<>();
 		HashSet<OrderedPair<String>> closedSet = new HashSet<>();
 		ArrayDeque<OrderedPair<String>> stack = new ArrayDeque<>();
