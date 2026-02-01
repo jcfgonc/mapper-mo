@@ -48,7 +48,7 @@ public class MapperGeneticOperations {
 	}
 
 	@SuppressWarnings("unused")
-	public static MappingStructure<String, String> mutateGenes(MappingStructure<String, String> genes, StringGraph inputSpace, RandomGenerator random) {
+	public static void mutateGenes(MappingStructure<String, String> genes, StringGraph inputSpace, RandomGenerator random) {
 		OrderedPair<String> refPair = genes.getReferencePair();
 		String leftElement = refPair.getLeftElement();
 		String rightElement = refPair.getRightElement();
@@ -99,14 +99,26 @@ public class MapperGeneticOperations {
 			}
 		}
 
-//		if (refPair.getLeftElement().equals(leftElement) && // debug
+		// DEBUG
+//		if (refPair.getLeftElement().equals(leftElement) && //
 //				refPair.getRightElement().equals(rightElement)) {
 //			System.err.printf("reference pair %s did not change\n", refPair);
 //		}
 
 		// create random left-right isomorphism
-		MappingAlgorithms.updateMappingGraph(inputSpace, genes, random);
-		return genes;
+		MappingAlgorithms.updateMappingGraph(inputSpace, genes, random); // the genes are modified inside the function
+
+		// check if the refpair is still the pair with the highest degree
+		OrderedPair<String> highestDegreeVertex = GraphAlgorithms.getHighestDegreeVertex(genes.getPairGraph());
+		if (highestDegreeVertex == null) { // likely because the pairgraph is empty
+//			System.lineSeparator();
+		} else {
+			if (highestDegreeVertex.equals(refPair)) { // refpair still the highest degree pair
+				// System.lineSeparator();
+			} else { // refpair no longer the highest degree pair
+				genes.setReferencePair(highestDegreeVertex);
+			}
+		}
 	}
 
 }

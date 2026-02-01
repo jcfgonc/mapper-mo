@@ -76,7 +76,7 @@ public class InteractiveExecutor {
 		this.gui.setVisible(true);
 
 		this.dateTimeStamp = VariousUtils.generateCurrentDateAndTimeStamp();
-		this.resultsFilename = String.format("moea_results_%s.tsv", dateTimeStamp);
+		this.resultsFilename = String.format("results/moea_results_%s.tsv", dateTimeStamp);
 		this.resultsWriter.writeFileHeader(problem, resultsFilename);
 		this.pauseLock = new ReentrantLock();
 		this.graphVisualizer = null; // not shown initially
@@ -84,6 +84,13 @@ public class InteractiveExecutor {
 		this.nextFileID = VariousUtils.getNextAvailableFileId(MOEA_Config.saveFolder, "graph_", "csv");
 	}
 
+	/**
+	 * Executes one MOEA epoch run, showing execution details. Called by the Launcher main loop()
+	 * 
+	 * @param moea_run
+	 * @return
+	 * @throws InterruptedException
+	 */
 	public ArrayList<Solution> execute(int moea_run) throws InterruptedException {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -134,7 +141,7 @@ public class InteractiveExecutor {
 
 			// update GUI stuff
 			updateStatus(moea_run, epoch, epochDuration);
-		//	System.out.printf("epoch\t%d\ttime\t%f\tnds size\t%d\n", epoch, epochDuration,results.size());
+			// System.out.printf("epoch\t%d\ttime\t%f\tnds size\t%d\n", epoch, epochDuration,results.size());
 
 			// update blender visualizer
 //			blenderVisualizer.update(lastResult);
@@ -151,7 +158,9 @@ public class InteractiveExecutor {
 
 		algorithm.terminate();
 		System.out.printf("run took\t%f\tseconds\n", ticker.getElapsedTime());
+		// save GUI screenshot
 		gui.takeLastEpochScreenshot();
+		// save results
 		ArrayList<Solution> arr = new ArrayList<Solution>(results.getElements());
 		resultsWriter.appendResultsToFile(arr, problem, resultsFilename);
 		return arr;

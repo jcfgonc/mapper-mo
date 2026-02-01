@@ -86,10 +86,10 @@ public class Launcher {
 
 		// read input space
 		StringGraph kb = new StringGraph();
-		String kb_filename = "../UnoLibrary/new facts v3.tsv";
-		GraphReadWrite.readTSV(kb_filename, kb);
+//		String kb_filename = "../UnoLibrary/new facts v3.tsv";
+//		GraphReadWrite.readTSV(kb_filename, kb);
+		GraphReadWrite.readTSV(MOEA_Config.inputSpacePath, kb);
 		kb.showStructureSizes();
-//		GraphReadWrite.readCSV(MOEA_Config.inputSpacePath, kb);
 
 		// ------------
 		System.out.println("-------------------");
@@ -136,19 +136,7 @@ public class Launcher {
 
 		// setup the mutation and the MOEA
 		registerCustomMutation();
-		Properties properties = new Properties();
-		properties.setProperty("operator", "CustomMutation");
-		properties.setProperty("CustomMutation.Rate", "1.0");
-
-		// eNSGA-II
-		properties.setProperty("epsilon", Double.toString(MOEA_Config.eNSGA2_epsilon));
-		properties.setProperty("windowSize", Integer.toString(MOEA_Config.eNSGA2_windowSize));
-		properties.setProperty("maxWindowSize", Integer.toString(MOEA_Config.eNSGA2_maxWindowSize));
-//		properties.setProperty("injectionRate", Double.toString(1.0 / 0.25)); // population to archive ratio, default is 0.25
-
-		// NSGA-III
-//		properties.setProperty("divisionsOuter", Integer.toString(MOEA_Config.NSGA3_divisionsOuter));
-//		properties.setProperty("divisionsInner", Integer.toString(MOEA_Config.NSGA3_divisionsInner));
+		Properties properties = setAlgorithmProperties();
 
 		// personalize your results writer here
 		ResultsWriter resultsWriter = new CustomResultsWriter();
@@ -164,18 +152,51 @@ public class Launcher {
 		for (int moea_run = 0; moea_run < MOEA_Config.MOEA_RUNS; moea_run++) {
 			if (ie.isCanceled())
 				break;
-			// properties.setProperty("maximumPopulationSize",
-			// Integer.toString(MOEA_Config.POPULATION_SIZE * 2)); // default is 10 000
+			properties.setProperty("maximumPopulationSize", Integer.toString(MOEA_Config.POPULATION_SIZE)); // default is 10 000
 			properties.setProperty("populationSize", Integer.toString(MOEA_Config.POPULATION_SIZE));
 
 			// do one run of 'n' epochs
-			ie.execute(moea_run);
+			try {
+				ie.execute(moea_run);
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(-1);
+			}
 
 		}
 		ie.closeGUI();
 
 		// terminate daemon threads
 		System.exit(0);
+	}
+
+	private static Properties setAlgorithmProperties() {
+		Properties properties = new Properties();
+		properties.setProperty("operator", "CustomMutation");
+		properties.setProperty("CustomMutation.Rate", "1.0");
+
+		// eNSGA-II
+		double eNSGA2_epsilon = MOEA_Config.eNSGA2_epsilon;
+		if (eNSGA2_epsilon > 0)
+			properties.setProperty("epsilon", Double.toString(eNSGA2_epsilon));
+		int ensga2Windowsize = MOEA_Config.eNSGA2_windowSize;
+		if (ensga2Windowsize > 0)
+			properties.setProperty("windowSize", Integer.toString(ensga2Windowsize));
+		int ensga2Maxwindowsize = MOEA_Config.eNSGA2_maxWindowSize;
+		if (ensga2Maxwindowsize > 0)
+			properties.setProperty("maxWindowSize", Integer.toString(ensga2Maxwindowsize));
+		double injectionRate = 1.0 / 0.25;
+		if (injectionRate > 0)
+			properties.setProperty("injectionRate", Double.toString(injectionRate)); // population to archive ratio, default is 0.25
+
+		// NSGA-III
+		int nsga3Divisionsouter = MOEA_Config.NSGA3_divisionsOuter;
+		if (nsga3Divisionsouter > 0)
+			properties.setProperty("divisionsOuter", Integer.toString(nsga3Divisionsouter));
+		int nsga3Divisionsinner = MOEA_Config.NSGA3_divisionsInner;
+		if (nsga3Divisionsinner > 0)
+			properties.setProperty("divisionsInner", Integer.toString(nsga3Divisionsinner));
+		return properties;
 	}
 
 	@SuppressWarnings("unused")

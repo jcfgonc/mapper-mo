@@ -440,4 +440,11 @@ public class MappingAlgorithms {
 		}
 		return newG;
 	}
+
+	public static DirectedMultiGraph<OrderedPair<String>, String> createGraphAroundRefPair(DirectedMultiGraph<OrderedPair<String>, String> pairGraph, OrderedPair<String> referencePair) {
+		DirectedMultiGraph<OrderedPair<String>, String> nearby = new DirectedMultiGraph<>();
+		HashSet<GraphEdge<OrderedPair<String>, String>> edgesOf = pairGraph.edgesOf(referencePair);
+		nearby.addEdges(edgesOf);
+		return nearby;
+	}
 }

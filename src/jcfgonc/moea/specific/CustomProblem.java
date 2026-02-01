@@ -1,7 +1,5 @@
 package jcfgonc.moea.specific;
 
-import java.util.HashSet;
-
 import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 
@@ -12,7 +10,6 @@ import jcfgonc.mapper.ObjectiveEvaluationUtils;
 import jcfgonc.mapper.StaticSharedVariables;
 import jcfgonc.mapper.structures.MappingStructure;
 import jcfgonc.moea.generic.ProblemDescription;
-import structures.MapOfList;
 import structures.OrderedPair;
 import utils.VariousUtils;
 
@@ -50,20 +47,25 @@ public class CustomProblem implements Problem, ProblemDescription {
 
 //		System.out.println(referencePair + "\t" + pairGraph.getNumberOfVertices());
 
-		int numPairs = pairGraph.getNumberOfVertices();
+		if (!referencePair.getLeftElement().startsWith("to ") && !referencePair.getRightElement().startsWith("to "))
+			System.lineSeparator();
+
+		DirectedMultiGraph<OrderedPair<String>, String> nearbyGraph = MappingAlgorithms.createGraphAroundRefPair(pairGraph, referencePair);
+
+		int numPairs = nearbyGraph.getNumberOfVertices();
 		boolean emptyGraph = numPairs <= 1;
 
 		// maximize the presence of vital/important relations
 		double vitalRelationsMean = 0;
 		if (!emptyGraph) {
-			vitalRelationsMean = ObjectiveEvaluationUtils.calculateVitalRelationsStatistics(pairGraph, StaticSharedVariables.vitalRelations).getMean();
+			vitalRelationsMean = ObjectiveEvaluationUtils.calculateVitalRelationsStatistics(nearbyGraph, StaticSharedVariables.vitalRelations).getMean();
 		}
 
 		// relation statistics
 		int numRelations;
 		numRelations = 0;
 		if (!emptyGraph) {
-			double[] rs = ObjectiveEvaluationUtils.calculateRelationStatistics(pairGraph);
+			double[] rs = ObjectiveEvaluationUtils.calculateRelationStatistics(nearbyGraph);
 			// returns the following:
 //			stats[0] = mean;
 //			stats[1] = stddev;
@@ -73,7 +75,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 
 		int degreeOfReferencePair = 0;
 		if (!emptyGraph) {
-			degreeOfReferencePair = pairGraph.degreeOf(referencePair);
+			degreeOfReferencePair = nearbyGraph.degreeOf(referencePair);
 		}
 
 //		double refPairOptimalDegree = 100; // to minimize
@@ -81,12 +83,11 @@ public class CustomProblem implements Problem, ProblemDescription {
 //			refPairOptimalDegree = ObjectiveEvaluationUtils.idealDegree(pairGraph, referencePair);
 //		}
 
-//		int refPairInnerDistance = 10;
-//		if (!emptyGraph) {
-//			int dist = MappingAlgorithms.calculateReferencePairInnerDistance(StaticSharedVariables.inputSpace_for_RefPairInnerDistance, referencePair,
-//					MOEA_Config.REFERENCE_PAIRINNER_DISTANCE_CALCULATION_LIMIT);
-//			refPairInnerDistance = dist; //(int) ObjectiveEvaluationUtils.minimumRadialDistanceFunc(3, 1, dist);
-//		}
+		int refPairInnerDistance = 10;
+		if (!emptyGraph) {
+			int dist = MappingAlgorithms.calculateReferencePairInnerDistance(StaticSharedVariables.inputSpace_for_RefPairInnerDistance, referencePair, MOEA_Config.REFERENCE_PAIRINNER_DISTANCE_CALCULATION_LIMIT);
+			refPairInnerDistance = dist; // (int) ObjectiveEvaluationUtils.minimumRadialDistanceFunc(3, 1, dist);
+		}
 
 //		double meanWordsPerConcept = 10;
 //		if (!emptyGraph) {
@@ -96,7 +97,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 
 		double posRatio = 0;
 		if (!emptyGraph) {
-			posRatio = ObjectiveEvaluationUtils.calculateSamePOS_pairsPercentage(pairGraph, StaticSharedVariables.inputSpaceForPOS);
+			posRatio = ObjectiveEvaluationUtils.calculateSamePOS_pairsPercentage(nearbyGraph, StaticSharedVariables.inputSpaceForPOS);
 		}
 
 //		double closenessCentrality = 0;
@@ -104,40 +105,40 @@ public class CustomProblem implements Problem, ProblemDescription {
 //			closenessCentrality = MappingAlgorithms.closenessCentrality(referencePair, pairGraph);
 //		}
 
-		// initialize to maximum number of vertices
-		double subTreeBal = pairGraph.getNumberOfVertices();
-		if (!emptyGraph) {
-			subTreeBal = ObjectiveEvaluationUtils.calculateSubTreesBalance(pairGraph, referencePair);
-//			System.out.println(subTreeBal);
-		}
-
-		double assymetricRelationCount = 10;
-		if (!emptyGraph) {
-
-			if (pairGraph.getNumberOfVertices() > 6) {
-				System.lineSeparator();
-			}
-			// calculates the number of paths from the origin to the terminals containing opposing directional edges
-			// ie +isa,-isa
-			MapOfList<OrderedPair<String>, String> priorRelations = new MapOfList<>();
-			HashSet<OrderedPair<String>> terminalSet = new HashSet<>();
-			MappingAlgorithms.calculatePathsFromOrigin(pairGraph, referencePair, priorRelations, terminalSet);
-			assymetricRelationCount = ObjectiveEvaluationUtils.calculateRelationAsymmetryPenalty(priorRelations, terminalSet);
-		}
+//		// initialize to maximum number of vertices
+//		double subTreeBal = pairGraph.getNumberOfVertices();
+//		if (!emptyGraph) {
+//			subTreeBal = ObjectiveEvaluationUtils.calculateSubTreesBalance(pairGraph, referencePair);
+////			System.out.println(subTreeBal);
+//		}
+//
+//		double assymetricRelationCount = 10;
+//		if (!emptyGraph) {
+//
+//			if (pairGraph.getNumberOfVertices() > 6) {
+//				System.lineSeparator();
+//			}
+//			// calculates the number of paths from the origin to the terminals containing opposing directional edges
+//			// ie +isa,-isa
+//			MapOfList<OrderedPair<String>, String> priorRelations = new MapOfList<>();
+//			HashSet<OrderedPair<String>> terminalSet = new HashSet<>();
+//			MappingAlgorithms.calculatePathsFromOrigin(pairGraph, referencePair, priorRelations, terminalSet);
+//			assymetricRelationCount = ObjectiveEvaluationUtils.calculateRelationAsymmetryPenalty(priorRelations, terminalSet);
+//		}
 
 		// set solution's objectives here
 		int obj_i = 0;
-		solution.setObjective(obj_i++, -numPairs);
+		solution.setObjective(obj_i++, numPairs);
 		solution.setObjective(obj_i++, -vitalRelationsMean);
 //		solution.setObjective(obj_i++, relationStdDev);
 		solution.setObjective(obj_i++, -numRelations);
 //		solution.setObjective(obj_i++, -degreeOfReferencePair);
-//		solution.setObjective(obj_i++, -refPairInnerDistance);
+		solution.setObjective(obj_i++, -refPairInnerDistance);
 //		solution.setObjective(obj_i++, meanWordsPerConcept);
 		solution.setObjective(obj_i++, -posRatio);
 //		solution.setObjective(obj_i++, -closenessCentrality);
-		solution.setObjective(obj_i++, subTreeBal);
-		solution.setObjective(obj_i++, assymetricRelationCount);
+//		solution.setObjective(obj_i++, subTreeBal);
+//		solution.setObjective(obj_i++, assymetricRelationCount);
 
 		obj_i = 0;
 		// violated constraints are set to 1, otherwise set to 0
@@ -187,11 +188,11 @@ public class CustomProblem implements Problem, ProblemDescription {
 			"f:vitalRelationsMean", //
 			"d:numRelations", //
 //			"d:degreeOfReferencePair", //
-//			"d:refPairInnerDistance", //
+			"d:refPairInnerDistance", //
 //			"f:meanWordsPerConcept", //
 			"f:samePOSpairRatio", //
-			"f:subTreeBalance", //
-			"d:assymetricRelationCount", //
+//			"f:subTreeBalance", //
+//			"d:assymetricRelationCount", //
 	};
 
 	private String[] constraintsDescription = { //
