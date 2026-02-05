@@ -26,7 +26,6 @@ import org.moeaframework.core.spi.OperatorProvider;
 import org.moeaframework.util.TypedProperties;
 
 import graph.DirectedMultiGraph;
-import graph.GraphAlgorithms;
 import graph.GraphReadWrite;
 import graph.StringGraph;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
@@ -121,16 +120,13 @@ public class Launcher {
 
 		// MOEA_Config.fixedConceptLeft = askUserForFixedConcept();
 
-		// read vital relations importance
-		Object2DoubleOpenHashMap<String> vitalRelations = readVitalRelations(MOEA_Config.vitalRelationsPath);
-		HashMap<String, String> relationTranslation = readRelationTranslation(MOEA_Config.relationTranslationPath);
-
 		// read pre-calculated semantic scores of word/relation pairs
 //		Object2DoubleOpenHashMap<UnorderedPair<String>> wps = WordEmbeddingUtils.readWordPairScores(MOEA_Config.wordPairScores_filename);
 
-		StaticSharedVariables.vitalRelations = vitalRelations;
+		// read vital relations importance
+		StaticSharedVariables.vitalRelations = readVitalRelations(MOEA_Config.vitalRelationsPath);
+		StaticSharedVariables.relationTranslation = readRelationTranslation(MOEA_Config.relationTranslationPath);
 //		StaticSharedVariables.wordPairScores = wps;
-		StaticSharedVariables.relationTranslation = relationTranslation;
 
 		// ------ MOEA SETUP
 

@@ -1,14 +1,14 @@
 s:relation	f:importance	s:observations	f:original importance
-atlocation	0.75	F/T say is important (space)	10
 capableof	1	F/T say is important (role/cause-effect)	10
 causes	1	F/T say is important (cause-effect)	10
-createdby	0.75	F/T say is important (role/cause-effect)	10
 desires	1	F/T say is important (intentionality/etc)	10
-isa	0.9	F/T say is important (identity/etc)	10
-knownfor	0.5	F/T say is important (role/cause-effect)	8
 madeof	1	F/T say is important (identity/etc)	10
 notdesires	1	F/T say is important (intentionality/etc)	7
 partof	1	F/T say is important (part-whole)	10
-requires	0.9	F/T say is important (role/cause-effect)	10
 usedto	1	F/T say is important (role/cause-effect)	10
+isa	0.9	F/T say is important (identity/etc)	10
+requires	0.9	F/T say is important (role/cause-effect)	10
 limitedby	0.9	F/T say is important (role/cause-effect)	NA
+atlocation	0.5	F/T say is important (space)	10
+createdby	1	F/T say is important (role/cause-effect)	10
+knownfor	1	F/T say is important (role/cause-effect)	8
