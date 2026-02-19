@@ -128,6 +128,14 @@ public class Launcher {
 		StaticSharedVariables.relationTranslation = readRelationTranslation(MOEA_Config.relationTranslationPath);
 //		StaticSharedVariables.wordPairScores = wps;
 
+	
+		 // para ver distancias entre conceitos
+//		String[] tokens = VariousUtils.fastSplit("atomic nucleus|computer program", '|');
+//		OrderedPair<String> pair = new OrderedPair<String>(tokens[0], tokens[1]);
+//		int dist = MappingAlgorithms.calculateReferencePairInnerDistance(StaticSharedVariables.inputSpace_for_RefPairInnerDistance, pair, MOEA_Config.REFERENCE_PAIRINNER_DISTANCE_CALCULATION_LIMIT);
+//		System.out.printf("%s\t%d\n", pair.toString(), dist);
+//		System.exit(0);
+
 		// ------ MOEA SETUP
 
 		// setup the mutation and the MOEA

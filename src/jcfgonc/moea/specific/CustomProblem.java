@@ -83,11 +83,11 @@ public class CustomProblem implements Problem, ProblemDescription {
 //			refPairOptimalDegree = ObjectiveEvaluationUtils.idealDegree(pairGraph, referencePair);
 //		}
 
-		int refPairInnerDistance = 10;
-		if (!emptyGraph) {
-			int dist = MappingAlgorithms.calculateReferencePairInnerDistance(StaticSharedVariables.inputSpace_for_RefPairInnerDistance, referencePair, MOEA_Config.REFERENCE_PAIRINNER_DISTANCE_CALCULATION_LIMIT);
-			refPairInnerDistance = dist; // (int) ObjectiveEvaluationUtils.minimumRadialDistanceFunc(3, 1, dist);
-		}
+//		int refPairInnerDistance = 10;
+//		if (!emptyGraph) {
+//			int dist = MappingAlgorithms.calculateReferencePairInnerDistance(StaticSharedVariables.inputSpace_for_RefPairInnerDistance, referencePair, MOEA_Config.REFERENCE_PAIRINNER_DISTANCE_CALCULATION_LIMIT);
+//			refPairInnerDistance = dist; // (int) ObjectiveEvaluationUtils.minimumRadialDistanceFunc(3, 1, dist);
+//		}
 
 //		double meanWordsPerConcept = 10;
 //		if (!emptyGraph) {
@@ -95,10 +95,10 @@ public class CustomProblem implements Problem, ProblemDescription {
 //			meanWordsPerConcept = wpcs[0];
 //		}
 
-		double posRatio = 0;
-		if (!emptyGraph) {
-			posRatio = ObjectiveEvaluationUtils.calculateSamePOS_pairsPercentage(nearbyGraph, StaticSharedVariables.inputSpaceForPOS);
-		}
+//		double posRatio = 0;
+//		if (!emptyGraph) {
+//			posRatio = ObjectiveEvaluationUtils.calculateSamePOS_pairsPercentage(nearbyGraph, StaticSharedVariables.inputSpaceForPOS);
+//		}
 
 //		double closenessCentrality = 0;
 //		if (!emptyGraph) {
@@ -133,9 +133,9 @@ public class CustomProblem implements Problem, ProblemDescription {
 //		solution.setObjective(obj_i++, relationStdDev);
 		solution.setObjective(obj_i++, -numRelations);
 //		solution.setObjective(obj_i++, -degreeOfReferencePair);
-		solution.setObjective(obj_i++, -refPairInnerDistance);
+//		solution.setObjective(obj_i++, -refPairInnerDistance);
 //		solution.setObjective(obj_i++, meanWordsPerConcept);
-		solution.setObjective(obj_i++, -posRatio);
+//		solution.setObjective(obj_i++, -posRatio);
 //		solution.setObjective(obj_i++, -closenessCentrality);
 //		solution.setObjective(obj_i++, subTreeBal);
 //		solution.setObjective(obj_i++, assymetricRelationCount);
@@ -148,11 +148,11 @@ public class CustomProblem implements Problem, ProblemDescription {
 			solution.setConstraint(obj_i++, 0); // not violated
 		}
 
-		if (posRatio < 0.95) {
-			solution.setConstraint(obj_i++, 1); // violated
-		} else {
-			solution.setConstraint(obj_i++, 0); // not violated
-		}
+//		if (posRatio < 0.95) {
+//			solution.setConstraint(obj_i++, 1); // violated
+//		} else {
+//			solution.setConstraint(obj_i++, 0); // not violated
+//		}
 
 //		if (subTreeBal > 3.5) {
 //			solution.setConstraint(obj_i++, 1); // violated
@@ -175,7 +175,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 		// require ref pairs concepts to have more than one word
 		int n0 = VariousUtils.countWords_fast(referencePair.getLeftElement());
 		int n1 = VariousUtils.countWords_fast(referencePair.getRightElement());
-		if (Math.min(n0, n1) < 2) {
+		if (Math.min(n0, n1) < 0) {
 			solution.setConstraint(obj_i++, 1); // violated
 		} else {
 			solution.setConstraint(obj_i++, 0); // not violated
@@ -188,16 +188,16 @@ public class CustomProblem implements Problem, ProblemDescription {
 			"f:vitalRelationsMean", //
 			"d:numRelations", //
 //			"d:degreeOfReferencePair", //
-			"d:refPairInnerDistance", //
+//			"d:refPairInnerDistance", //
 //			"f:meanWordsPerConcept", //
-			"f:samePOSpairRatio", //
+//			"f:samePOSpairRatio", //
 //			"f:subTreeBalance", //
 //			"d:assymetricRelationCount", //
 	};
 
 	private String[] constraintsDescription = { //
 			"required degreeOfReferencePair", //
-			"required posRatio", //
+//			"required posRatio", //
 			// "required subTreeBal", //
 			"required numRelations", //
 			"required vitalRelationsMean", //

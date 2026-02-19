@@ -179,8 +179,17 @@ public class MapperStringGraphClipboardReader {
 		}
 		if (graph != null && !graph.isEmpty()) {
 			StringGraph croppedGraph = selectRelevantRelations(graph, refpair, relevantRelations, 4);
-			AnalogyToText.textifyAnalogy(refpair, croppedGraph);
 			vg.refreshGraph(croppedGraph);
+			final String localRefPair = new String(refpair);
+			new Thread() {
+				public void run() {
+					try {
+						AnalogyToText.textifyAnalogy(localRefPair, croppedGraph);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				};
+			}.start();
 		}
 	}
 
