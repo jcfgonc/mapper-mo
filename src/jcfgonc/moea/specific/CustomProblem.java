@@ -4,7 +4,6 @@ import org.moeaframework.core.Problem;
 import org.moeaframework.core.Solution;
 
 import graph.DirectedMultiGraph;
-import jcfgonc.mapper.MOEA_Config;
 import jcfgonc.mapper.MappingAlgorithms;
 import jcfgonc.mapper.ObjectiveEvaluationUtils;
 import jcfgonc.mapper.StaticSharedVariables;
@@ -12,6 +11,7 @@ import jcfgonc.mapper.structures.MappingStructure;
 import jcfgonc.moea.generic.ProblemDescription;
 import structures.OrderedPair;
 import utils.VariousUtils;
+import wordembedding.WordEmbeddingUtils;
 
 public class CustomProblem implements Problem, ProblemDescription {
 
@@ -50,22 +50,23 @@ public class CustomProblem implements Problem, ProblemDescription {
 		if (!referencePair.getLeftElement().startsWith("to ") && !referencePair.getRightElement().startsWith("to "))
 			System.lineSeparator();
 
-		DirectedMultiGraph<OrderedPair<String>, String> nearbyGraph = MappingAlgorithms.createGraphAroundRefPair(pairGraph, referencePair);
+		// create graph of pairs immediately around the reference pair (smaller graph, easier for humans to interpret)
+		DirectedMultiGraph<OrderedPair<String>, String> nearbyPairGraph = MappingAlgorithms.createGraphAroundRefPair(pairGraph, referencePair);
 
-		int numPairs = nearbyGraph.getNumberOfVertices();
+		int numPairs = nearbyPairGraph.getNumberOfVertices();
 		boolean emptyGraph = numPairs <= 1;
 
 		// maximize the presence of vital/important relations
 		double vitalRelationsMean = 0;
 		if (!emptyGraph) {
-			vitalRelationsMean = ObjectiveEvaluationUtils.calculateVitalRelationsStatistics(nearbyGraph, StaticSharedVariables.vitalRelations).getMean();
+			vitalRelationsMean = ObjectiveEvaluationUtils.calculateVitalRelationsStatistics(nearbyPairGraph, StaticSharedVariables.vitalRelations).getMean();
 		}
 
 		// relation statistics
 		int numRelations;
 		numRelations = 0;
 		if (!emptyGraph) {
-			double[] rs = ObjectiveEvaluationUtils.calculateRelationStatistics(nearbyGraph);
+			double[] rs = ObjectiveEvaluationUtils.calculateRelationStatistics(nearbyPairGraph);
 			// returns the following:
 //			stats[0] = mean;
 //			stats[1] = stddev;
@@ -75,7 +76,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 
 		int degreeOfReferencePair = 0;
 		if (!emptyGraph) {
-			degreeOfReferencePair = nearbyGraph.degreeOf(referencePair);
+			degreeOfReferencePair = nearbyPairGraph.degreeOf(referencePair);
 		}
 
 //		double refPairOptimalDegree = 100; // to minimize
@@ -126,6 +127,9 @@ public class CustomProblem implements Problem, ProblemDescription {
 //			assymetricRelationCount = ObjectiveEvaluationUtils.calculateRelationAsymmetryPenalty(priorRelations, terminalSet);
 //		}
 
+//		double graphSimilarity = WordEmbeddingUtils.getCosineSimilarity(nearbyPairGraph);
+		double graphSimilarity = WordEmbeddingUtils.getCosineSimilarity(referencePair.getLeftElement(), referencePair.getRightElement());
+
 		// set solution's objectives here
 		int obj_i = 0;
 		solution.setObjective(obj_i++, numPairs);
@@ -139,6 +143,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 //		solution.setObjective(obj_i++, -closenessCentrality);
 //		solution.setObjective(obj_i++, subTreeBal);
 //		solution.setObjective(obj_i++, assymetricRelationCount);
+		solution.setObjective(obj_i++, -graphSimilarity);
 
 		obj_i = 0;
 		// violated constraints are set to 1, otherwise set to 0
@@ -193,7 +198,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 //			"f:samePOSpairRatio", //
 //			"f:subTreeBalance", //
 //			"d:assymetricRelationCount", //
-	};
+			"f:cosineSimilarity" };
 
 	private String[] constraintsDescription = { //
 			"required degreeOfReferencePair", //
@@ -253,7 +258,7 @@ public class CustomProblem implements Problem, ProblemDescription {
 	 * The number of variables defined by this problem.
 	 */
 	public int getNumberOfVariables() {
-		return 1; // blend space/graph
+		return 1; // it's a single graph
 	}
 
 	@Override
